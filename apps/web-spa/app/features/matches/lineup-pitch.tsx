@@ -48,7 +48,9 @@ function PlayerBubble({ name, team }: { name: string; team: 'blue' | 'red' }) {
       <span
         className={cn(
           'flex size-12 items-center justify-center rounded-full border-2 text-xs font-semibold text-white shadow-md',
-          team === 'blue' ? 'border-blue-300 bg-blue-700' : 'border-red-300 bg-red-700',
+          team === 'blue'
+            ? 'border-team-blue-dark bg-team-blue'
+            : 'border-primary-dark bg-primary',
         )}
       >
         {initials}

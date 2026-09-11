@@ -47,7 +47,7 @@ const PLAYERS: Array<{ firstName: string; lastName: string }> = [
  * Login: admin@admin.fr / password123!
  * Players: player01@rosti.dev … player15@rosti.dev / password123!
  */
-export class rostiSeeder extends Seeder {
+export class RostiSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     const admin = await createUserData(
       em,
@@ -106,7 +106,7 @@ export class rostiSeeder extends Seeder {
       await em.persist(membership).flush()
     }
 
-    console.info('rostiSeeder: admin@admin.fr / password123!')
-    console.info(`rostiSeeder: club "${CLUB.name}" with ${PLAYERS.length} players`)
+    console.info('RostiSeeder: admin@admin.fr / password123!')
+    console.info(`RostiSeeder: club "${CLUB.name}" with ${PLAYERS.length} players`)
   }
 }

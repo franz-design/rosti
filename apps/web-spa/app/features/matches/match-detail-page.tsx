@@ -400,14 +400,14 @@ export default function MatchDetailPage() {
             <h2 className="text-base font-medium">{t('matches.detail.stats.score')}</h2>
             <div className="flex items-center justify-center gap-6 rounded-lg border px-6 py-8">
               <div className="text-center">
-                <p className="text-sm font-medium text-blue-600">
+                <p className="text-sm font-medium text-team-blue">
                   {t('matches.detail.stats.teamBlue')}
                 </p>
                 <p className="text-4xl font-semibold tabular-nums">{teamScore.blue}</p>
               </div>
               <span className="text-2xl text-muted-foreground">–</span>
               <div className="text-center">
-                <p className="text-sm font-medium text-red-600">
+                <p className="text-sm font-medium text-primary">
                   {t('matches.detail.stats.teamRed')}
                 </p>
                 <p className="text-4xl font-semibold tabular-nums">{teamScore.red}</p>
@@ -691,7 +691,7 @@ function LineupSection({
       {title ? <h2 className="text-base font-medium">{title}</h2> : null}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-lg border p-3">
-          <h3 className="mb-2 text-sm font-medium text-blue-600">{blueLabel}</h3>
+          <h3 className="mb-2 text-sm font-medium text-team-blue">{blueLabel}</h3>
           <ul className="space-y-1 text-sm">
             {blue.map((l) => (
               <li key={l.id}>{l.userName}</li>
@@ -699,7 +699,7 @@ function LineupSection({
           </ul>
         </div>
         <div className="rounded-lg border p-3">
-          <h3 className="mb-2 text-sm font-medium text-red-600">{redLabel}</h3>
+          <h3 className="mb-2 text-sm font-medium text-primary">{redLabel}</h3>
           <ul className="space-y-1 text-sm">
             {red.map((l) => (
               <li key={l.id}>{l.userName}</li>

@@ -113,18 +113,11 @@ function AppSidebar({ onOpenCommandPalette }: { onOpenCommandPalette: () => void
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" render={<Link to="/dashboard" />}>
-              <img
-                src={RostiLogo}
-                alt=""
-                className="h-7 w-7 shrink-0 rounded-md object-contain"
-              />
-              <div className="flex flex-col leading-none">
-                <span className="font-logo text-sm font-bold tracking-tight text-foreground">
-                  Rösti
-                </span>
-                <span className="text-[10px] font-medium text-muted-foreground tracking-widest uppercase">
-                  {t('dashboard.subtitle')}
-                </span>
+              <div className="flex justify-center gap-2 md:justify-start">
+                <a href="/" className="flex items-center gap-1">
+                  <img src={RostiLogo} alt="" className="size-7 rounded-md object-contain" />
+                  <span className="font-logo font-medium tracking-tight text-2xl text-primary">Rösti</span>
+                </a>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

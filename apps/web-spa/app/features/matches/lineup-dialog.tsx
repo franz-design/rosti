@@ -209,8 +209,8 @@ function TeamToggleButton({
       aria-pressed={active}
       className={cn(
         'rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
-        active && tone === 'blue' && 'bg-blue-600 text-white',
-        active && tone === 'red' && 'bg-red-600 text-white',
+        active && tone === 'blue' && 'bg-team-blue text-white',
+        active && tone === 'red' && 'bg-primary text-primary-foreground',
         !active && 'text-muted-foreground hover:text-foreground',
       )}
     >

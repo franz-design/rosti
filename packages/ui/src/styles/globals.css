@@ -33,7 +33,7 @@
   /* ── Light mode ─────────────────────────────────────────────────────── */
   --background: oklch(1 0 0);
   /* pure white          */
-  --foreground: #7E0000;
+  --foreground: #27635E;
   /* #0a0a0a near-black  */
 
   --card: oklch(1 0 0);
@@ -43,7 +43,7 @@
   --popover-foreground: oklch(0.097 0 0);
 
   /* Primary = Rösti yellow; foreground always black */
-  --primary: #F5A900;
+  --primary: #C74209;
   /* #fff056             */
   --primary-foreground: white;
   /* black on yellow     */
@@ -77,6 +77,11 @@
   --info: oklch(0.6 0.15 240);
   --info-foreground: oklch(0.985 0 0);
 
+  /* Blue team — never use Tailwind's native blue palette */
+  --team-blue: #009bde;
+  --team-blue-dark: oklch(from var(--team-blue) calc(l - 0.12) c h);
+  --primary-dark: oklch(from var(--primary) calc(l - 0.12) c h);
+
   /* Borders / inputs — distinct from accent */
   --border: oklch(0.924 0 0);
   /* #e7e7e7 gray-200    */
@@ -107,7 +112,7 @@
   /* ── Dark mode ──────────────────────────────────────────────────────── */
   --background: oklch(0.097 0 0);
   /* #0a0a0a             */
-  --foreground: oklch(0.979 0 0);
+  --foreground: white;
   /* #f9f9f9             */
 
   --card: oklch(0.155 0 0);
@@ -118,9 +123,9 @@
   --popover-foreground: oklch(0.979 0 0);
 
   /* Primary = same Rösti yellow; foreground still black */
-  --primary: #F5A900;
+  --primary: #C74209;
   /* #fff056             */
-  --primary-foreground: oklch(0.097 0 0);
+  --primary-foreground: white;
   /* black on yellow     */
 
   /* Secondary = mid dark — clearly different from muted/accent */
@@ -149,6 +154,8 @@
   --warning-foreground: oklch(0.097 0 0);
   --info: oklch(0.55 0.14 240);
   --info-foreground: oklch(0.969 0 0);
+
+  --team-blue: #009bde;
 
   /* Borders / inputs */
   --border: oklch(0.293 0 0);
@@ -200,6 +207,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-dark: var(--primary-dark);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -214,6 +222,8 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
+  --color-team-blue: var(--team-blue);
+  --color-team-blue-dark: var(--team-blue-dark);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

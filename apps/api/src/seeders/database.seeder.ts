@@ -2,7 +2,7 @@
 
 import { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
-import { rostiSeeder } from './rosti.seeder'
+import { RostiSeeder } from './rosti.seeder'
 
 /**
  * Default development seeder.
@@ -10,7 +10,7 @@ import { rostiSeeder } from './rosti.seeder'
  */
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
-    await new rostiSeeder().run(em)
+    await new RostiSeeder().run(em)
     console.info('DatabaseSeeder done')
   }
 }
