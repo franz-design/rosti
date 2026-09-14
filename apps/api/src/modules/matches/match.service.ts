@@ -247,6 +247,8 @@ export class MatchService {
     if (data.startsAt !== undefined) match.startsAt = data.startsAt
     if (data.location !== undefined) match.location = data.location ?? undefined
     if (data.maxCapacity !== undefined) match.maxCapacity = data.maxCapacity
+    if (data.blueScore !== undefined) match.blueScore = data.blueScore ?? undefined
+    if (data.redScore !== undefined) match.redScore = data.redScore ?? undefined
     if (data.reminderOffsetsHours !== undefined) {
       match.reminderOffsetsHours = data.reminderOffsetsHours ?? undefined
     }

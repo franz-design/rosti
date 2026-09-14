@@ -35,6 +35,8 @@ export const matchSchema = z
     location: z.string().nullish(),
     maxCapacity: z.number().int().positive(),
     status: z.nativeEnum(MatchStatus),
+    blueScore: z.number().int().nonnegative().nullish(),
+    redScore: z.number().int().nonnegative().nullish(),
     reminderOffsetsHours: z.array(z.number().int().positive()).nullish(),
     presentCount: z.number().int().optional(),
     cancellationReason: z.string().nullish(),
@@ -72,6 +74,8 @@ export const updateMatchSchema = z
     startsAt: z.coerce.date().optional(),
     location: z.string().nullish(),
     maxCapacity: z.number().int().positive().optional(),
+    blueScore: z.number().int().nonnegative().nullish(),
+    redScore: z.number().int().nonnegative().nullish(),
     reminderOffsetsHours: z.array(z.number().int().positive()).nullish(),
   })
   .meta({ title: 'UpdateMatchSchema' })

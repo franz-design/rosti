@@ -98,10 +98,12 @@
   "home": {
     "eyebrow": "Your club",
     "fallbackClub": "Club",
-    "nextMatch": "Next occurrence",
+    "lastMatch": "Last match",
+    "nextMatch": "Next match",
     "capacity": "{{present}} / {{max}} players",
     "viewMatch": "View match",
     "noUpcoming": "No upcoming matches yet.",
+    "noPast": "No past matches yet.",
     "goToMatches": "Go to matches",
     "allMatches": "All matches"
   },
@@ -109,8 +111,15 @@
     "title": "Matches",
     "create": "Create a match",
     "loading": "Loading matches…",
+    "tabs": {
+      "upcoming": "Upcoming matches",
+      "past": "Past matches"
+    },
     "emptyTitle": "No upcoming matches",
     "emptyDescription": "Create your next match so the team can get organized.",
+    "emptyPastTitle": "No past matches",
+    "emptyPastDescription": "Matches that have already been played will show up here.",
+    "noScore": "No score recorded",
     "selectClub": "Select or create a club first.",
     "capacity": "{{present}} / {{max}} players",
     "menuOpen": "Match actions",
@@ -193,8 +202,10 @@
         "player": "Player",
         "save": "Save stats",
         "saved": "Stats saved",
+        "saveScore": "Save score",
+        "scoreSaved": "Score saved",
         "noPlayers": "No present players to enter stats for.",
-        "hint": "Enter goals and assists. The score is computed from each team's goals."
+        "hint": "Goals and assists are indicative: they do not affect the score."
       }
     }
   },

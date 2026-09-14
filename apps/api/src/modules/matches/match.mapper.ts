@@ -17,6 +17,8 @@ export class MatchMapper {
       location: match.location,
       maxCapacity: match.maxCapacity,
       status: match.status,
+      blueScore: match.blueScore,
+      redScore: match.redScore,
       reminderOffsetsHours: match.reminderOffsetsHours,
       presentCount,
       cancellationReason: match.cancellationReason,

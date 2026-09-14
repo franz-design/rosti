@@ -7,14 +7,19 @@ import {
   DropdownMenuTrigger,
 } from '@rosti/ui/components/primitives/dropdown-menu'
 import { toast } from '@rosti/ui/components/primitives/sonner'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@rosti/ui/components/primitives/tabs'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CalendarDays, MapPin, MoreVertical, Plus, Users } from 'lucide-react'
+import { CalendarDays, MoreVertical, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router'
 import { useClub } from '@/features/clubs/club-context'
 import { rostiApi, type Match } from '@/lib/rosti-api'
+import MatchCard from './match-card'
+import { listPastMatches, listUpcomingMatches } from './match-filters'
 import { PostponeMatchDialog } from './postpone-match-dialog'
+
+type MatchesTab = 'upcoming' | 'past'
 
 export default function MatchesPage() {
   const { t, i18n } = useTranslation()
@@ -23,6 +28,7 @@ export default function MatchesPage() {
   const queryClient = useQueryClient()
   const orgId = activeClub?.id
   const [postponeMatch, setPostponeMatch] = useState<Match | null>(null)
+  const [listTab, setListTab] = useState<MatchesTab>('upcoming')
 
   const { data: matches = [], isLoading } = useQuery({
     queryKey: ['matches', orgId],
@@ -30,12 +36,8 @@ export default function MatchesPage() {
     enabled: !!orgId,
   })
 
-  const upcoming = useMemo(() => {
-    const now = Date.now()
-    return matches
-      .filter((m) => m.status === 'scheduled' && new Date(m.startsAt).getTime() >= now)
-      .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())
-  }, [matches])
+  const upcoming = useMemo(() => listUpcomingMatches(matches), [matches])
+  const past = useMemo(() => listPastMatches(matches), [matches])
 
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: ['matches', orgId] })
@@ -52,7 +54,9 @@ export default function MatchesPage() {
 
   const postpone = useMutation({
     mutationFn: ({ matchId, startsAt }: { matchId: string; startsAt: Date }) =>
-      rostiApi.updateMatch(orgId!, matchId, { startsAt: startsAt.toISOString() }),
+      rostiApi.updateMatch(orgId!, matchId, {
+        startsAt: startsAt.toISOString(),
+      }),
     onSuccess: () => {
       toast.success(t('matches.postponeSuccess'))
       setPostponeMatch(null)
@@ -80,101 +84,102 @@ export default function MatchesPage() {
         </Button>
       </div>
 
-      {isLoading ? (
-        <p className="text-sm text-muted-foreground">{t('matches.loading')}</p>
-      ) : upcoming.length === 0 ? (
-        <EmptyState
-          icon={<CalendarDays className="size-6 text-muted-foreground" />}
-          title={t('matches.emptyTitle')}
-          description={t('matches.emptyDescription')}
-          action={{
-            label: t('matches.create'),
-            onClick: () => navigate('/matches/new'),
-          }}
-        />
-      ) : (
-        <ul className="grid gap-3">
-          {upcoming.map((match) => (
-            <li key={match.id}>
-              <div className="relative rounded-xl border bg-card p-5 shadow-sm transition-colors hover:bg-accent/40">
-                <Link
-                  to={`/matches/${match.id}`}
-                  className="absolute inset-0 rounded-xl"
-                  aria-label={match.title}
-                />
-                <div className="relative z-10 flex items-start justify-between gap-3 pointer-events-none">
-                  <div className="space-y-2 min-w-0">
-                    <p className="font-medium text-lg truncate">{match.title}</p>
-                    <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <CalendarDays className="size-4 shrink-0" />
-                      {new Date(match.startsAt).toLocaleString(dateLocale, {
-                        weekday: 'long',
-                        day: 'numeric',
-                        month: 'long',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </p>
-                    {match.location ? (
-                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="size-4 shrink-0" />
-                        {match.location}
-                      </p>
-                    ) : null}
-                    <p
-                      className={`flex items-center gap-2 text-sm ${
-                        (match.presentCount ?? 0) >= match.maxCapacity
-                          ? 'text-success'
-                          : 'text-muted-foreground'
-                      }`}
-                    >
-                      <Users className="size-4 shrink-0" />
-                      {t('matches.capacity', {
-                        present: match.presentCount ?? 0,
-                        max: match.maxCapacity,
-                      })}
-                    </p>
-                  </div>
-                  <div className="pointer-events-auto shrink-0">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        render={
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label={t('matches.menuOpen')}
-                          />
-                        }
-                      >
-                        <MoreVertical className="size-4" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="min-w-44">
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.preventDefault()
-                            setPostponeMatch(match)
-                          }}
+      <Tabs
+        value={listTab}
+        onValueChange={(value) => setListTab(value as MatchesTab)}
+        className="gap-4"
+      >
+        <TabsList className="h-9 w-fit justify-start gap-1 rounded-lg border border-border bg-muted p-1">
+          <TabsTrigger value="upcoming" className="px-3">
+            {t('matches.tabs.upcoming')}
+          </TabsTrigger>
+          <TabsTrigger value="past" className="px-3">
+            {t('matches.tabs.past')}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="upcoming" className="outline-none">
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">{t('matches.loading')}</p>
+          ) : upcoming.length === 0 ? (
+            <EmptyState
+              icon={<CalendarDays className="size-6 text-muted-foreground" />}
+              title={t('matches.emptyTitle')}
+              description={t('matches.emptyDescription')}
+              action={{
+                label: t('matches.create'),
+                onClick: () => navigate('/matches/new'),
+              }}
+            />
+          ) : (
+            <ul className="grid gap-3">
+              {upcoming.map((match) => (
+                <li key={match.id}>
+                  <MatchCard
+                    match={match}
+                    dateLocale={dateLocale}
+                    variant="upcoming"
+                    actions={
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t('matches.menuOpen')}
+                            />
+                          }
                         >
-                          {t('matches.postpone')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          variant="destructive"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            cancel.mutate(match.id)
-                          }}
-                        >
-                          {t('matches.cancel')}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+                          <MoreVertical className="size-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="min-w-44">
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setPostponeMatch(match)
+                            }}
+                          >
+                            {t('matches.postpone')}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              cancel.mutate(match.id)
+                            }}
+                          >
+                            {t('matches.cancel')}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    }
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </TabsContent>
+
+        <TabsContent value="past" className="outline-none">
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">{t('matches.loading')}</p>
+          ) : past.length === 0 ? (
+            <EmptyState
+              icon={<CalendarDays className="size-6 text-muted-foreground" />}
+              title={t('matches.emptyPastTitle')}
+              description={t('matches.emptyPastDescription')}
+            />
+          ) : (
+            <ul className="grid gap-3">
+              {past.map((match) => (
+                <li key={match.id}>
+                  <MatchCard match={match} dateLocale={dateLocale} variant="past" />
+                </li>
+              ))}
+            </ul>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {postponeMatch ? (
         <PostponeMatchDialog
@@ -184,9 +189,7 @@ export default function MatchesPage() {
           }}
           currentStartsAt={postponeMatch.startsAt}
           isPending={postpone.isPending}
-          onConfirm={(startsAt) =>
-            postpone.mutate({ matchId: postponeMatch.id, startsAt })
-          }
+          onConfirm={(startsAt) => postpone.mutate({ matchId: postponeMatch.id, startsAt })}
         />
       ) : null}
     </div>

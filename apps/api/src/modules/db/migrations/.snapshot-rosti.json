@@ -828,6 +828,23 @@
       "name": "match",
       "schema": "public",
       "columns": {
+        "blueScore": {
+          "name": "blueScore",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
         "cancellationReason": {
           "name": "cancellationReason",
           "type": "text",
@@ -844,8 +861,7 @@
           "collation": null,
           "enumItems": [],
           "mappedType": "text"
-        },
-        "createdAt": {
+        },        "createdAt": {
           "name": "createdAt",
           "type": "timestamptz(6)",
           "unsigned": false,
@@ -963,6 +979,23 @@
           "collation": null,
           "enumItems": [],
           "mappedType": "json"
+        },
+        "redScore": {
+          "name": "redScore",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
         },
         "seasonId": {
           "name": "seasonId",

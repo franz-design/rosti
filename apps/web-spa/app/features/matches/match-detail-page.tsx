@@ -10,13 +10,7 @@ import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router'
 import { useClub } from '@/features/clubs/club-context'
 import { authClient } from '@/lib/auth-client'
-import {
-  rostiApi,
-  type Attendance,
-  type Lineup,
-  type MatchMessage,
-  type MatchStat,
-} from '@/lib/rosti-api'
+import { rostiApi, type Attendance, type Lineup, type MatchMessage } from '@/lib/rosti-api'
 import { LineupDialog } from './lineup-dialog'
 
 type MatchTab = 'summary' | 'attendance' | 'chat' | 'stats'
@@ -36,6 +30,7 @@ export default function MatchDetailPage() {
   const [tab, setTab] = useState<MatchTab>('summary')
   const [message, setMessage] = useState('')
   const [statDrafts, setStatDrafts] = useState<Record<string, PlayerStatDraft>>({})
+  const [scoreDraft, setScoreDraft] = useState({ blue: 0, red: 0 })
   const [busyUserId, setBusyUserId] = useState<string | null>(null)
   const [isLineupOpen, setIsLineupOpen] = useState(false)
   const chatEndRef = useRef<HTMLDivElement>(null)
@@ -103,6 +98,14 @@ export default function MatchDetailPage() {
     }
     setStatDrafts(next)
   }, [presentPlayers, stats])
+
+  useEffect(() => {
+    if (!match) return
+    setScoreDraft({
+      blue: match.blueScore ?? 0,
+      red: match.redScore ?? 0,
+    })
+  }, [match?.id, match?.blueScore, match?.redScore])
 
   useEffect(() => {
     if (tab !== 'chat') return
@@ -194,10 +197,18 @@ export default function MatchDetailPage() {
     onError: (e: Error) => toast.error(e.message),
   })
 
-  const teamScore = useMemo(
-    () => computeTeamScore(lineups, presentPlayers, statDrafts, stats),
-    [lineups, presentPlayers, statDrafts, stats],
-  )
+  const saveScore = useMutation({
+    mutationFn: () =>
+      rostiApi.updateMatch(orgId!, matchId!, {
+        blueScore: scoreDraft.blue,
+        redScore: scoreDraft.red,
+      }),
+    onSuccess: () => {
+      toast.success(t('matches.detail.stats.scoreSaved'))
+      invalidate()
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
 
   if (isLoading || !match) {
     return <div className="text-muted-foreground">{t('matches.detail.loading')}</div>
@@ -396,23 +407,30 @@ export default function MatchDetailPage() {
         </TabsContent>
 
         <TabsContent value="stats" className={cn('mt-6 space-y-6 outline-none', isChat && 'px-6')}>
-          <section className="space-y-2">
+          <section className="space-y-3">
             <h2 className="text-base font-medium">{t('matches.detail.stats.score')}</h2>
             <div className="flex items-center justify-center gap-6 rounded-lg border px-6 py-8">
-              <div className="text-center">
-                <p className="text-sm font-medium text-team-blue">
-                  {t('matches.detail.stats.teamBlue')}
-                </p>
-                <p className="text-4xl font-semibold tabular-nums">{teamScore.blue}</p>
-              </div>
+              <ScoreSide
+                label={t('matches.detail.stats.teamBlue')}
+                labelClassName="text-team-blue"
+                value={scoreDraft.blue}
+                canEdit={canManageComposition}
+                onChange={(blue) => setScoreDraft((prev) => ({ ...prev, blue }))}
+              />
               <span className="text-2xl text-muted-foreground">–</span>
-              <div className="text-center">
-                <p className="text-sm font-medium text-primary">
-                  {t('matches.detail.stats.teamRed')}
-                </p>
-                <p className="text-4xl font-semibold tabular-nums">{teamScore.red}</p>
-              </div>
+              <ScoreSide
+                label={t('matches.detail.stats.teamRed')}
+                labelClassName="text-primary"
+                value={scoreDraft.red}
+                canEdit={canManageComposition}
+                onChange={(red) => setScoreDraft((prev) => ({ ...prev, red }))}
+              />
             </div>
+            {canManageComposition ? (
+              <Button onClick={() => saveScore.mutate()} disabled={saveScore.isPending}>
+                {t('matches.detail.stats.saveScore')}
+              </Button>
+            ) : null}
             <p className="text-xs text-muted-foreground">{t('matches.detail.stats.hint')}</p>
           </section>
 
@@ -432,42 +450,57 @@ export default function MatchDetailPage() {
                     className="grid grid-cols-[1fr_5rem_5rem] items-center gap-2"
                   >
                     <span className="truncate text-sm">{player.userName}</span>
-                    <Input
-                      type="number"
-                      min={0}
-                      className="text-center"
-                      value={statDrafts[player.userId]?.goals ?? 0}
-                      onChange={(e) =>
-                        setStatDrafts((prev) => ({
-                          ...prev,
-                          [player.userId]: {
-                            goals: Number(e.target.value) || 0,
-                            assists: prev[player.userId]?.assists ?? 0,
-                          },
-                        }))
-                      }
-                    />
-                    <Input
-                      type="number"
-                      min={0}
-                      className="text-center"
-                      value={statDrafts[player.userId]?.assists ?? 0}
-                      onChange={(e) =>
-                        setStatDrafts((prev) => ({
-                          ...prev,
-                          [player.userId]: {
-                            goals: prev[player.userId]?.goals ?? 0,
-                            assists: Number(e.target.value) || 0,
-                          },
-                        }))
-                      }
-                    />
+                    {canManageComposition ? (
+                      <>
+                        <Input
+                          type="number"
+                          min={0}
+                          className="text-center"
+                          value={statDrafts[player.userId]?.goals ?? 0}
+                          onChange={(e) =>
+                            setStatDrafts((prev) => ({
+                              ...prev,
+                              [player.userId]: {
+                                goals: Number(e.target.value) || 0,
+                                assists: prev[player.userId]?.assists ?? 0,
+                              },
+                            }))
+                          }
+                        />
+                        <Input
+                          type="number"
+                          min={0}
+                          className="text-center"
+                          value={statDrafts[player.userId]?.assists ?? 0}
+                          onChange={(e) =>
+                            setStatDrafts((prev) => ({
+                              ...prev,
+                              [player.userId]: {
+                                goals: prev[player.userId]?.goals ?? 0,
+                                assists: Number(e.target.value) || 0,
+                              },
+                            }))
+                          }
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-center text-sm tabular-nums">
+                          {statDrafts[player.userId]?.goals ?? 0}
+                        </span>
+                        <span className="text-center text-sm tabular-nums">
+                          {statDrafts[player.userId]?.assists ?? 0}
+                        </span>
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>
-              <Button onClick={() => saveStats.mutate()} disabled={saveStats.isPending}>
-                {t('matches.detail.stats.save')}
-              </Button>
+              {canManageComposition ? (
+                <Button onClick={() => saveStats.mutate()} disabled={saveStats.isPending}>
+                  {t('matches.detail.stats.save')}
+                </Button>
+              ) : null}
             </section>
           )}
         </TabsContent>
@@ -711,6 +744,37 @@ function LineupSection({
   )
 }
 
+function ScoreSide({
+  label,
+  labelClassName,
+  value,
+  canEdit,
+  onChange,
+}: {
+  label: string
+  labelClassName: string
+  value: number
+  canEdit: boolean
+  onChange: (value: number) => void
+}) {
+  return (
+    <div className="text-center">
+      <p className={cn('text-sm font-medium', labelClassName)}>{label}</p>
+      {canEdit ? (
+        <Input
+          type="number"
+          min={0}
+          className="mx-auto mt-1 w-20 py-2 text-center text-4xl font-semibold tabular-nums"
+          value={value}
+          onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
+        />
+      ) : (
+        <p className="text-4xl font-semibold tabular-nums">{value}</p>
+      )}
+    </div>
+  )
+}
+
 function ChatBubble({ message, isMine }: { message: MatchMessage; isMine: boolean }) {
   return (
     <div className={cn('flex flex-col gap-0.5', isMine ? 'items-end' : 'items-start')}>
@@ -727,26 +791,4 @@ function ChatBubble({ message, isMine }: { message: MatchMessage; isMine: boolea
       </div>
     </div>
   )
-}
-
-function computeTeamScore(
-  lineups: Lineup[],
-  presentPlayers: Attendance[],
-  drafts: Record<string, PlayerStatDraft>,
-  stats: MatchStat[],
-): { blue: number; red: number } {
-  const teamByUser = new Map(lineups.map((l) => [l.userId, l.team]))
-
-  let blue = 0
-  let red = 0
-
-  for (const player of presentPlayers) {
-    const goals =
-      drafts[player.userId]?.goals ?? stats.find((s) => s.userId === player.userId)?.goals ?? 0
-    const team = teamByUser.get(player.userId)
-    if (team === 'blue') blue += goals
-    else if (team === 'red') red += goals
-  }
-
-  return { blue, red }
 }

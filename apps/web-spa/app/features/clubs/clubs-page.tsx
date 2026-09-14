@@ -1,8 +1,10 @@
 import { Button } from '@rosti/ui/components/primitives/button'
 import { useQuery } from '@tanstack/react-query'
-import { CalendarDays, MapPin, Users } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link, Navigate } from 'react-router'
+import MatchCard from '@/features/matches/match-card'
+import { getLastMatch, getNextMatch } from '@/features/matches/match-filters'
 import { rostiApi } from '@/lib/rosti-api'
 import { useClub } from './club-context'
 
@@ -11,7 +13,7 @@ export default function ClubsPage() {
   const { clubs, activeClub, isLoading, isClubAdmin } = useClub()
 
   const { data: matches = [], isLoading: isMatchesLoading } = useQuery({
-    queryKey: ['matches', activeClub?.id, 'dashboard'],
+    queryKey: ['matches', activeClub?.id],
     queryFn: () => rostiApi.listMatches(activeClub!.id),
     enabled: !!activeClub,
   })
@@ -24,10 +26,8 @@ export default function ClubsPage() {
     return <Navigate to="/onboarding" replace />
   }
 
-  const nextMatch = matches
-    .filter((m) => m.status === 'scheduled' && new Date(m.startsAt) >= new Date())
-    .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())[0]
-
+  const lastMatch = getLastMatch(matches)
+  const nextMatch = getNextMatch(matches)
   const dateLocale = i18n.language?.startsWith('en') ? 'en-GB' : 'fr-FR'
 
   return (
@@ -45,57 +45,36 @@ export default function ClubsPage() {
         ) : null}
       </div>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-medium">{t('home.nextMatch')}</h2>
-        {isMatchesLoading ? (
-          <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
-        ) : nextMatch ? (
-          <Link
-            to={`/matches/${nextMatch.id}`}
-            className="block rounded-xl border bg-card p-5 shadow-sm transition-colors hover:bg-accent/40"
-          >
-            <div className="space-y-2">
-              <p className="font-medium text-lg">{nextMatch.title}</p>
-              <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CalendarDays className="size-4 shrink-0" />
-                {new Date(nextMatch.startsAt).toLocaleString(dateLocale, {
-                  weekday: 'long',
-                  day: 'numeric',
-                  month: 'long',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </p>
-              {nextMatch.location ? (
-                <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="size-4 shrink-0" />
-                  {nextMatch.location}
-                </p>
-              ) : null}
-              <p
-                className={`flex items-center gap-2 text-sm ${
-                  (nextMatch.presentCount ?? 0) >= nextMatch.maxCapacity
-                    ? 'text-success'
-                    : 'text-muted-foreground'
-                }`}
-              >
-                <Users className="size-4 shrink-0" />
-                {t('home.capacity', {
-                  present: nextMatch.presentCount ?? 0,
-                  max: nextMatch.maxCapacity,
-                })}
-              </p>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <section className="space-y-3">
+          <h2 className="text-lg font-medium">{t('home.lastMatch')}</h2>
+          {isMatchesLoading ? (
+            <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
+          ) : lastMatch ? (
+            <MatchCard match={lastMatch} dateLocale={dateLocale} variant="past" />
+          ) : (
+            <div className="rounded-xl border border-dashed p-6 text-center">
+              <p className="text-muted-foreground">{t('home.noPast')}</p>
             </div>
-          </Link>
-        ) : (
-          <div className="rounded-xl border border-dashed p-6 text-center space-y-3">
-            <p className="text-muted-foreground">{t('home.noUpcoming')}</p>
-            <Button variant="outline" render={<Link to="/matches" />}>
-              {t('home.goToMatches')}
-            </Button>
-          </div>
-        )}
-      </section>
+          )}
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-lg font-medium">{t('home.nextMatch')}</h2>
+          {isMatchesLoading ? (
+            <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
+          ) : nextMatch ? (
+            <MatchCard match={nextMatch} dateLocale={dateLocale} variant="upcoming" />
+          ) : (
+            <div className="rounded-xl border border-dashed p-6 text-center space-y-3">
+              <p className="text-muted-foreground">{t('home.noUpcoming')}</p>
+              <Button variant="outline" render={<Link to="/matches" />}>
+                {t('home.goToMatches')}
+              </Button>
+            </div>
+          )}
+        </section>
+      </div>
 
       <div className="flex flex-wrap gap-3">
         <Button variant="outline" render={<Link to="/matches" />}>

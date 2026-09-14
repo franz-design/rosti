@@ -44,6 +44,12 @@ export class Match {
   @Enum({ items: () => MatchStatus, default: MatchStatus.Scheduled })
   status: MatchStatus = MatchStatus.Scheduled
 
+  @Property({ nullable: true })
+  blueScore?: number
+
+  @Property({ nullable: true })
+  redScore?: number
+
   @Property({ type: 'json', nullable: true })
   reminderOffsetsHours?: number[]
 

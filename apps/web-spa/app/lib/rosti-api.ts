@@ -60,6 +60,8 @@ export const rostiApi = {
       startsAt?: string
       location?: string | null
       maxCapacity?: number
+      blueScore?: number | null
+      redScore?: number | null
     },
   ) =>
     request<Match>(`/clubs/${orgId}/matches/${matchId}`, {
@@ -231,6 +233,8 @@ export interface Match {
   location?: string | null
   maxCapacity: number
   status: 'scheduled' | 'cancelled' | 'played'
+  blueScore?: number | null
+  redScore?: number | null
   reminderOffsetsHours?: number[] | null
   presentCount?: number
   cancellationReason?: string | null

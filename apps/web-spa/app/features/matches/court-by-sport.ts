@@ -5,6 +5,14 @@ import tennisCourt from '@/assets/images/courts/tennis.jpg'
 import volleyballCourt from '@/assets/images/courts/volleyball.jpg'
 import type { SportType } from '@/lib/rosti-api'
 
+export const COURT_IMAGES: string[] = [
+  footballCourt,
+  basketballCourt,
+  volleyballCourt,
+  tennisCourt,
+  badmintonCourt,
+]
+
 export function getCourtImage(sportType: SportType | null | undefined): string {
   switch (sportType) {
     case 'basketball':

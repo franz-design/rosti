@@ -98,10 +98,12 @@
   "home": {
     "eyebrow": "Ton club",
     "fallbackClub": "Club",
-    "nextMatch": "Prochaine occurrence",
+    "lastMatch": "Dernier match",
+    "nextMatch": "Prochain match",
     "capacity": "{{present}} / {{max}} joueurs",
     "viewMatch": "Voir le match",
     "noUpcoming": "Aucun match à venir pour le moment.",
+    "noPast": "Aucun match passé pour le moment.",
     "goToMatches": "Aller aux matchs",
     "allMatches": "Tous les matchs"
   },
@@ -109,8 +111,15 @@
     "title": "Matchs",
     "create": "Créer un match",
     "loading": "Chargement des matchs…",
+    "tabs": {
+      "upcoming": "Matchs à venir",
+      "past": "Matchs passés"
+    },
     "emptyTitle": "Aucun match à venir",
     "emptyDescription": "Crée ton prochain match pour que l’équipe puisse s’organiser.",
+    "emptyPastTitle": "Aucun match passé",
+    "emptyPastDescription": "Les matchs déjà joués apparaîtront ici.",
+    "noScore": "Score non renseigné",
     "selectClub": "Sélectionne ou crée un club d’abord.",
     "capacity": "{{present}} / {{max}} joueurs",
     "menuOpen": "Actions du match",
@@ -193,8 +202,10 @@
         "player": "Joueur",
         "save": "Enregistrer les stats",
         "saved": "Stats enregistrées",
+        "saveScore": "Enregistrer le score",
+        "scoreSaved": "Score enregistré",
         "noPlayers": "Aucun joueur présent pour saisir les stats.",
-        "hint": "Saisis les buts et passes décisives. Le score se calcule à partir des buts de chaque équipe."
+        "hint": "Les buts et passes décisives sont indicatifs : ils n’ont aucun impact sur le score."
       }
     }
   },
