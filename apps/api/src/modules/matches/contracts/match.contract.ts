@@ -39,6 +39,7 @@ export const matchSchema = z
     redScore: z.number().int().nonnegative().nullish(),
     reminderOffsetsHours: z.array(z.number().int().positive()).nullish(),
     presentCount: z.number().int().optional(),
+    viewerTeam: z.nativeEnum(TeamSide).nullish(),
     cancellationReason: z.string().nullish(),
     createdAt: z.coerce.date(),
   })

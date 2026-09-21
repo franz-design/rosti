@@ -2,11 +2,21 @@ import { Injectable } from '@nestjs/common'
 import { MatchLineup } from './match-lineup.entity'
 import { Match } from './match.entity'
 import { MatchAttendance } from './match-attendance.entity'
-import { AttendanceDto, LineupDto, MatchDto } from './contracts/match.contract'
+import { AttendanceDto, LineupDto, MatchDto, TeamSide } from './contracts/match.contract'
+
+interface MatchDtoExtras {
+  presentCount?: number
+  viewerTeam?: TeamSide
+}
+
+interface MatchListDtoExtras {
+  presentCounts?: Map<string, number>
+  viewerTeams?: Map<string, TeamSide>
+}
 
 @Injectable()
 export class MatchMapper {
-  toDto(match: Match, presentCount?: number): MatchDto {
+  toDto(match: Match, extras: MatchDtoExtras = {}): MatchDto {
     return {
       id: match.id,
       organizationId: match.organization.id,
@@ -20,14 +30,20 @@ export class MatchMapper {
       blueScore: match.blueScore,
       redScore: match.redScore,
       reminderOffsetsHours: match.reminderOffsetsHours,
-      presentCount,
+      presentCount: extras.presentCount,
+      viewerTeam: extras.viewerTeam,
       cancellationReason: match.cancellationReason,
       createdAt: match.createdAt,
     }
   }
 
-  toDtos(matches: Match[], presentCountByMatchId?: Map<string, number>): MatchDto[] {
-    return matches.map((m) => this.toDto(m, presentCountByMatchId?.get(m.id)))
+  toDtos(matches: Match[], extras: MatchListDtoExtras = {}): MatchDto[] {
+    return matches.map((match) =>
+      this.toDto(match, {
+        presentCount: extras.presentCounts?.get(match.id),
+        viewerTeam: extras.viewerTeams?.get(match.id),
+      }),
+    )
   }
 
   toAttendanceDto(a: MatchAttendance): AttendanceDto {

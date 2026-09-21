@@ -6,6 +6,7 @@ import { Session } from '../auth/auth.decorator'
 import { AuthGuard } from '../auth/auth.guard'
 import {
   matchStatsSchema,
+  seasonHomeStatsSchema,
   seasonPlayerStatsSchema,
   UpsertMatchStatsInput,
   upsertMatchStatsSchema,
@@ -62,5 +63,13 @@ export class StatsController {
     @TypedParam('seasonId', z.string().uuid()) seasonId: string,
   ) {
     return this.statsService.seasonAggregates(organizationId, session.user.id, seasonId)
+  }
+
+  @TypedRoute.Get('home-stats', seasonHomeStatsSchema)
+  async homeStats(
+    @Session() session: LoggedInBetterAuthSession,
+    @TypedParam('organizationId', z.string().uuid()) organizationId: string,
+  ) {
+    return this.statsService.getHomeStats(organizationId, session.user.id)
   }
 }

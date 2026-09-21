@@ -1,12 +1,9 @@
 import { EntityManager } from '@mikro-orm/core'
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { Organization } from '../auth/auth.entity'
 import { OrganizationService } from '../auth/organization.service'
-import {
-  CreateSeasonInput,
-  SeasonStatus,
-  UpdateSeasonInput,
-} from './contracts/season.contract'
+import { CreateSeasonInput, SeasonStatus, UpdateSeasonInput } from './contracts/season.contract'
+import { dayBeforeUtc, isEndBeforeStart, windowAfterClose } from './season-activity'
 import { Season } from './season.entity'
 
 @Injectable()
@@ -20,6 +17,7 @@ export class SeasonService {
     await this.organizationService.requireRole(organizationId, userId, ['owner', 'admin'])
     const organization = await this.em.findOne(Organization, { id: organizationId })
     if (!organization) throw new NotFoundException('Club not found')
+    this.assertDateOrder(data.startsAt, data.endsAt)
 
     const season = new Season()
     season.organization = organization
@@ -28,6 +26,7 @@ export class SeasonService {
     season.endsAt = data.endsAt
     season.status = SeasonStatus.Active
 
+    await this.closeOtherActiveSeasons(organizationId, undefined, dayBeforeUtc(data.startsAt))
     this.em.persist(season)
     await this.em.flush()
     return season
@@ -63,9 +62,39 @@ export class SeasonService {
     const season = await this.get(organizationId, userId, seasonId)
     if (data.name !== undefined) season.name = data.name
     if (data.startsAt !== undefined) season.startsAt = data.startsAt
-    if (data.endsAt !== undefined) season.endsAt = data.endsAt ?? undefined
+    if (data.endsAt !== undefined) season.endsAt = data.endsAt ?? null
     if (data.status !== undefined) season.status = data.status
+    this.assertDateOrder(season.startsAt, season.endsAt)
+
+    if (season.status === SeasonStatus.Active) {
+      await this.closeOtherActiveSeasons(organizationId, season.id, dayBeforeUtc(season.startsAt))
+    }
+
     await this.em.flush()
     return season
+  }
+
+  private assertDateOrder(startsAt: Date, endsAt?: Date | null): void {
+    if (isEndBeforeStart(startsAt, endsAt)) {
+      throw new BadRequestException('Season end date must be on or after the start date')
+    }
+  }
+
+  private async closeOtherActiveSeasons(
+    organizationId: string,
+    keepSeasonId: string | undefined,
+    closedEndsAt: Date,
+  ): Promise<void> {
+    const activeSeasons = await this.em.find(Season, {
+      organization: { id: organizationId },
+      status: SeasonStatus.Active,
+    })
+
+    for (const season of activeSeasons) {
+      if (season.id === keepSeasonId) continue
+      const next = windowAfterClose(season, closedEndsAt)
+      season.status = next.status
+      if (next.endsAt) season.endsAt = next.endsAt
+    }
   }
 }

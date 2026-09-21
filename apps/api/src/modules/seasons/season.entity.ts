@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Enum,
-  Index,
-  ManyToOne,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/decorators/legacy'
+import { Entity, Enum, Index, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy'
 import { Organization } from '../auth/entities/organization.entity'
 import { SeasonStatus } from './contracts/season.contract'
 
@@ -25,7 +18,7 @@ export class Season {
   startsAt!: Date
 
   @Property({ fieldName: 'endsAt', type: 'date', nullable: true })
-  endsAt?: Date
+  endsAt?: Date | null
 
   @Enum({ items: () => SeasonStatus, default: SeasonStatus.Active })
   status: SeasonStatus = SeasonStatus.Active

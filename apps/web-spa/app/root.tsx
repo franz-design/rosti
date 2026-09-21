@@ -53,7 +53,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <title>Rösti</title>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="author" content="Rösti" />
         <meta name="keywords" content="Rösti, club, match, RSVP, sport" />
 

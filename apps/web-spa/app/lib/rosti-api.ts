@@ -41,13 +41,27 @@ export const rostiApi = {
     }),
 
   listSeasons: (orgId: string) => request<Season[]>(`/clubs/${orgId}/seasons`),
+  getSeason: (orgId: string, seasonId: string) =>
+    request<Season>(`/clubs/${orgId}/seasons/${seasonId}`),
   createSeason: (orgId: string, body: { name: string; startsAt: string; endsAt?: string }) =>
     request<Season>(`/clubs/${orgId}/seasons`, { method: 'POST', body: JSON.stringify(body) }),
+  updateSeason: (
+    orgId: string,
+    seasonId: string,
+    body: {
+      name?: string
+      startsAt?: string
+      endsAt?: string | null
+      status?: 'active' | 'closed'
+    },
+  ) =>
+    request<Season>(`/clubs/${orgId}/seasons/${seasonId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
 
   listMatches: (orgId: string, seasonId?: string) =>
-    request<Match[]>(
-      `/clubs/${orgId}/matches${seasonId ? `?seasonId=${seasonId}` : ''}`,
-    ),
+    request<Match[]>(`/clubs/${orgId}/matches${seasonId ? `?seasonId=${seasonId}` : ''}`),
   getMatch: (orgId: string, matchId: string) =>
     request<Match>(`/clubs/${orgId}/matches/${matchId}`),
   createMatches: (orgId: string, body: CreateMatchBody) =>
@@ -101,12 +115,7 @@ export const rostiApi = {
       method: 'PUT',
       body: JSON.stringify({ assignments }),
     }),
-  setPlayerTeam: (
-    orgId: string,
-    matchId: string,
-    userId: string,
-    team: 'blue' | 'red' | null,
-  ) =>
+  setPlayerTeam: (orgId: string, matchId: string, userId: string, team: 'blue' | 'red' | null) =>
     request<Lineup[]>(`/clubs/${orgId}/matches/${matchId}/lineups/${userId}`, {
       method: 'PUT',
       body: JSON.stringify({ team }),
@@ -125,22 +134,17 @@ export const rostiApi = {
     }),
   seasonStats: (orgId: string, seasonId: string) =>
     request<SeasonPlayerStat[]>(`/clubs/${orgId}/seasons/${seasonId}/stats`),
+  getHomeStats: (orgId: string) => request<SeasonHomeStats>(`/clubs/${orgId}/home-stats`),
 
   listMessages: (orgId: string, matchId: string) =>
     request<MatchMessage[]>(`/clubs/${orgId}/matches/${matchId}/messages`),
-  postMessage: (
-    orgId: string,
-    matchId: string,
-    body: string,
-    mentionedUserIds?: string[],
-  ) =>
+  postMessage: (orgId: string, matchId: string, body: string, mentionedUserIds?: string[]) =>
     request<MatchMessage>(`/clubs/${orgId}/matches/${matchId}/messages`, {
       method: 'POST',
       body: JSON.stringify({ body, mentionedUserIds }),
     }),
 
-  getNotificationPreferences: () =>
-    request<NotificationPreference>('/notifications/preferences'),
+  getNotificationPreferences: () => request<NotificationPreference>('/notifications/preferences'),
   updateNotificationPreferences: (body: Partial<NotificationPreference>) =>
     request<NotificationPreference>('/notifications/preferences', {
       method: 'PUT',
@@ -237,6 +241,7 @@ export interface Match {
   redScore?: number | null
   reminderOffsetsHours?: number[] | null
   presentCount?: number
+  viewerTeam?: 'blue' | 'red' | null
   cancellationReason?: string | null
   createdAt: string
 }
@@ -288,6 +293,35 @@ export interface SeasonPlayerStat {
   goals: number
   assists: number
   matchesPlayed: number
+}
+
+export interface PlayerHighlight {
+  userId: string
+  userName: string
+  value: number
+}
+
+export interface PlayedTogether {
+  playerA: { userId: string; userName: string }
+  playerB: { userId: string; userName: string }
+  matchesTogether: number
+}
+
+export interface SeasonHomeStats {
+  season: { id: string; name: string } | null
+  club: {
+    matchesPlayed: number
+    topScorer: PlayerHighlight | null
+    mostWins: PlayerHighlight | null
+    mostLosses: PlayerHighlight | null
+    mostPlayedTogether: PlayedTogether | null
+  }
+  me: {
+    matchesPlayed: number
+    goals: number
+    wins: number
+    losses: number
+  }
 }
 
 export interface MatchMessage {

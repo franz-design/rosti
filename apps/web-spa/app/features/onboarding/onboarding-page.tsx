@@ -1,73 +1,25 @@
-import { Button } from '@rosti/ui/components/primitives/button'
-import { DatePicker } from '@rosti/ui/components/primitives/date-picker'
-import { Input } from '@rosti/ui/components/primitives/input'
-import { Label } from '@rosti/ui/components/primitives/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@rosti/ui/components/primitives/select'
 import { toast } from '@rosti/ui/components/primitives/sonner'
 import { AppLoader } from '@rosti/ui/components/app'
-import { cn } from '@rosti/ui/lib/utils'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Navigate, useNavigate } from 'react-router'
 import { acceptPendingInvitations } from '@/features/auth/utils/pending-invitation'
+import {
+  combineDateAndTime,
+  defaultNextMatchDate,
+  type RecurrenceChoice,
+} from '@/features/matches/utils/match-schedule-utils'
 import { authClient } from '@/lib/auth-client'
 import { rostiApi, type SportType } from '@/lib/rosti-api'
-import { EmailPillsInput } from './email-pills-input'
+import { OnboardingHeader } from './components/onboarding-header'
+import { ClubStep } from './components/steps/club-step'
+import { InvitesStep } from './components/steps/invites-step'
+import { ScheduleStep } from './components/steps/schedule-step'
+import { SportStep } from './components/steps/sport-step'
+import { slugify } from './utils/slugify'
 
-const SPORTS: SportType[] = [
-  'football',
-  'futsal',
-  'basketball',
-  'volleyball',
-  'tennis',
-  'padel',
-  'badminton',
-  'other',
-]
-
-type RecurrenceChoice = 'weekly' | 'monthly_nth_weekday' | 'monthly'
-
-const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
-  const h = Math.floor(i / 2)
-  const m = i % 2 === 0 ? '00' : '30'
-  return `${String(h).padStart(2, '0')}:${m}`
-})
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-}
-
-function combineDateAndTime(date: Date, time: string): Date {
-  const [hours, minutes] = time.split(':').map(Number)
-  const next = new Date(date)
-  next.setHours(hours ?? 19, minutes ?? 0, 0, 0)
-  return next
-}
-
-function getNthWeekdayLabel(
-  date: Date,
-  t: (key: string, opts?: Record<string, unknown>) => string,
-): string {
-  const nth = Math.floor((date.getDate() - 1) / 7) + 1
-  const day = date.toLocaleDateString('fr-FR', { weekday: 'long' })
-  const ordinals = ['', '1ers', '2es', '3es', '4es', '5es']
-  return t('onboarding.step3.everyNthWeekday', {
-    ordinal: ordinals[nth] ?? `${nth}es`,
-    day,
-  })
-}
+type OnboardingRecurrence = Exclude<RecurrenceChoice, 'once'>
 
 export default function OnboardingPage() {
   const { t } = useTranslation()
@@ -79,13 +31,9 @@ export default function OnboardingPage() {
   const [venue, setVenue] = useState('')
   const [sportType, setSportType] = useState<SportType>('football')
   const [maxPlayers, setMaxPlayers] = useState(10)
-  const [matchDate, setMatchDate] = useState<Date | undefined>(() => {
-    const d = new Date()
-    d.setDate(d.getDate() + ((1 + 7 - d.getDay()) % 7 || 7))
-    return d
-  })
+  const [matchDate, setMatchDate] = useState<Date | undefined>(() => defaultNextMatchDate())
   const [matchTime, setMatchTime] = useState('19:00')
-  const [recurrence, setRecurrence] = useState<RecurrenceChoice>('weekly')
+  const [recurrence, setRecurrence] = useState<OnboardingRecurrence>('weekly')
   const [emails, setEmails] = useState<string[]>([])
 
   const { data: existingClubs, isLoading: isClubsLoading } = useQuery({
@@ -187,8 +135,7 @@ export default function OnboardingPage() {
     onError: (err: Error) => toast.error(err.message),
   })
 
-  const isPending =
-    step1.isPending || step2.isPending || step3.isPending || step4.isPending
+  const isPending = step1.isPending || step2.isPending || step3.isPending || step4.isPending
 
   if (isSessionPending || (session && isClubsLoading && !clubId)) {
     return <AppLoader />
@@ -204,204 +151,56 @@ export default function OnboardingPage() {
 
   return (
     <div className="mx-auto w-full max-w-lg space-y-8 py-4">
-      <div className="space-y-2 text-center">
-        <p className="font-logo text-lg font-bold tracking-tight text-foreground">Rösti</p>
-        <h1 className="text-2xl font-semibold tracking-tight">{t('onboarding.title')}</h1>
-        <p className="text-sm text-muted-foreground">
-          {t('onboarding.stepOf', { current: step, total: 4 })}
-        </p>
-        <div className="flex justify-center gap-2 pt-2">
-          {[1, 2, 3, 4].map((n) => (
-            <div
-              key={n}
-              className={cn(
-                'h-1.5 w-10 rounded-full',
-                n <= step ? 'bg-primary' : 'bg-muted',
-              )}
-            />
-          ))}
-        </div>
-      </div>
+      <OnboardingHeader step={step} total={4} />
 
       {step === 1 ? (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="clubName">{t('onboarding.step1.clubName')}</Label>
-            <Input
-              id="clubName"
-              value={clubName}
-              onChange={(e) => setClubName(e.target.value)}
-              placeholder={t('onboarding.step1.clubNamePlaceholder')}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="venue">{t('onboarding.step1.venue')}</Label>
-            <Input
-              id="venue"
-              value={venue}
-              onChange={(e) => setVenue(e.target.value)}
-              placeholder={t('onboarding.step1.venuePlaceholder')}
-            />
-          </div>
-          <Button
-            className="w-full"
-            disabled={isPending || !clubName.trim() || !venue.trim()}
-            onClick={() => step1.mutate()}
-          >
-            {t('onboarding.next')}
-          </Button>
-        </div>
+        <ClubStep
+          clubName={clubName}
+          venue={venue}
+          isPending={isPending}
+          onClubNameChange={setClubName}
+          onVenueChange={setVenue}
+          onNext={() => step1.mutate()}
+        />
       ) : null}
 
       {step === 2 ? (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>{t('onboarding.step2.sport')}</Label>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {SPORTS.map((sport) => (
-                <Button
-                  key={sport}
-                  type="button"
-                  variant={sportType === sport ? 'default' : 'outline'}
-                  className="h-auto py-3"
-                  onClick={() => setSportType(sport)}
-                >
-                  {t(`onboarding.sports.${sport}`)}
-                </Button>
-              ))}
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="maxPlayers">{t('onboarding.step2.maxPlayers')}</Label>
-            <Input
-              id="maxPlayers"
-              type="number"
-              min={2}
-              max={40}
-              value={maxPlayers}
-              onChange={(e) => setMaxPlayers(Number(e.target.value) || 0)}
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex-1" onClick={() => setStep(1)}>
-              {t('onboarding.back')}
-            </Button>
-            <Button
-              className="flex-1"
-              disabled={isPending || maxPlayers < 2}
-              onClick={() => step2.mutate()}
-            >
-              {t('onboarding.next')}
-            </Button>
-          </div>
-        </div>
+        <SportStep
+          sportType={sportType}
+          maxPlayers={maxPlayers}
+          isPending={isPending}
+          onSportChange={setSportType}
+          onMaxPlayersChange={setMaxPlayers}
+          onBack={() => setStep(1)}
+          onNext={() => step2.mutate()}
+        />
       ) : null}
 
       {step === 3 ? (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>{t('onboarding.step3.date')}</Label>
-            <DatePicker
-              value={matchDate}
-              onDateChange={setMatchDate}
-              localeCode="fr-FR"
-              placeholder={t('onboarding.step3.datePlaceholder')}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>{t('onboarding.step3.time')}</Label>
-            <Select value={matchTime} onValueChange={(v) => v && setMatchTime(v)}>
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {TIME_OPTIONS.map((time) => (
-                  <SelectItem key={time} value={time}>
-                    {time}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>{t('onboarding.step3.recurrence')}</Label>
-            <div className="flex flex-col gap-2">
-              <Button
-                type="button"
-                variant={recurrence === 'weekly' ? 'default' : 'outline'}
-                className="justify-start h-auto py-3"
-                onClick={() => setRecurrence('weekly')}
-              >
-                {t('onboarding.step3.everyWeek', { day: weekdayName })}
-              </Button>
-              <Button
-                type="button"
-                variant={recurrence === 'monthly_nth_weekday' ? 'default' : 'outline'}
-                className="justify-start h-auto py-3"
-                onClick={() => setRecurrence('monthly_nth_weekday')}
-              >
-                {matchDate
-                  ? getNthWeekdayLabel(matchDate, t)
-                  : t('onboarding.step3.monthlyNthFallback')}
-              </Button>
-              <Button
-                type="button"
-                variant={recurrence === 'monthly' ? 'default' : 'outline'}
-                className="justify-start h-auto py-3"
-                onClick={() => setRecurrence('monthly')}
-              >
-                {t('onboarding.step3.everyMonthDate', { day: dayOfMonth })}
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">{t('onboarding.step3.recurrenceHint')}</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex-1" onClick={() => setStep(2)}>
-              {t('onboarding.back')}
-            </Button>
-            <Button
-              className="flex-1"
-              disabled={isPending || !matchDate}
-              onClick={() => step3.mutate()}
-            >
-              {t('onboarding.next')}
-            </Button>
-          </div>
-        </div>
+        <ScheduleStep
+          matchDate={matchDate}
+          matchTime={matchTime}
+          recurrence={recurrence}
+          weekdayName={weekdayName}
+          dayOfMonth={dayOfMonth}
+          isPending={isPending}
+          onDateChange={setMatchDate}
+          onTimeChange={setMatchTime}
+          onRecurrenceChange={setRecurrence}
+          onBack={() => setStep(2)}
+          onNext={() => step3.mutate()}
+        />
       ) : null}
 
       {step === 4 ? (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>{t('onboarding.step4.emails')}</Label>
-            <p className="text-sm text-muted-foreground">{t('onboarding.step4.emailsHint')}</p>
-            <EmailPillsInput
-              emails={emails}
-              onChange={setEmails}
-              placeholder={t('onboarding.step4.emailsPlaceholder')}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Button
-              className="w-full"
-              disabled={isPending || emails.length === 0}
-              onClick={() => step4.mutate()}
-            >
-              {t('onboarding.step4.sendInvites')}
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full"
-              disabled={isPending}
-              onClick={() => navigate('/dashboard')}
-            >
-              {t('onboarding.step4.skip')}
-            </Button>
-            <Button variant="outline" disabled={isPending} onClick={() => setStep(3)}>
-              {t('onboarding.back')}
-            </Button>
-          </div>
-        </div>
+        <InvitesStep
+          emails={emails}
+          isPending={isPending}
+          onEmailsChange={setEmails}
+          onSend={() => step4.mutate()}
+          onSkip={() => navigate('/dashboard')}
+          onBack={() => setStep(3)}
+        />
       ) : null}
     </div>
   )

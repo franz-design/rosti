@@ -76,8 +76,6 @@
     "title": "Tableau de bord",
     "subtitle": "Gestion de club",
     "brand": "Rösti - Tableau de bord",
-    "newPost": "Nouveau post",
-    "ai": "IA",
     "userMenu": "Menu utilisateur",
     "settings": "Paramètres",
     "lightMode": "Mode clair",
@@ -85,15 +83,14 @@
     "logOut": "Se déconnecter",
     "language": "Langue",
     "navigation": "Navigation",
-    "actions": "Actions rapides",
-    "profile": "Profil",
-    "components": "Composants"
+    "profile": "Profil"
   },
   "nav": {
     "home": "Accueil",
     "matches": "Matchs",
     "notifications": "Notifications",
-    "clubSettings": "Paramètres du club"
+    "clubSettings": "Paramètres du club",
+    "settings": "Paramètres"
   },
   "home": {
     "eyebrow": "Ton club",
@@ -105,7 +102,26 @@
     "noUpcoming": "Aucun match à venir pour le moment.",
     "noPast": "Aucun match passé pour le moment.",
     "goToMatches": "Aller aux matchs",
-    "allMatches": "Tous les matchs"
+    "allMatches": "Tous les matchs",
+    "stats": {
+      "clubTitle": "Le club cette saison",
+      "personalTitle": "Tes stats",
+      "noSeason": "Aucune saison en cours",
+      "matchesPlayed": "Matchs joués",
+      "topScorer": "Meilleur buteur",
+      "mostWins": "Le plus de victoires",
+      "mostLosses": "Le plus de défaites",
+      "duo": "Le plus souvent ensemble",
+      "duoNames": "{{playerA}} & {{playerB}}",
+      "duoCount": "{{count}} matchs ensemble",
+      "goals": "Buts",
+      "wins": "Victoires",
+      "losses": "Défaites",
+      "emptyScorer": "Pas encore de buts cette saison.",
+      "emptyWins": "Pas encore de victoire enregistrée.",
+      "emptyLosses": "Pas encore de défaite enregistrée.",
+      "emptyDuo": "Pas encore assez de compos communes."
+    }
   },
   "matches": {
     "title": "Matchs",
@@ -120,6 +136,7 @@
     "emptyPastTitle": "Aucun match passé",
     "emptyPastDescription": "Les matchs déjà joués apparaîtront ici.",
     "noScore": "Score non renseigné",
+    "enterScore": "Renseigne le score",
     "selectClub": "Sélectionne ou crée un club d’abord.",
     "capacity": "{{present}} / {{max}} joueurs",
     "menuOpen": "Actions du match",
@@ -161,6 +178,8 @@
         "lineup": "Composition",
         "teamBlue": "Bleu",
         "teamRed": "Rouge",
+        "goals": "Buts",
+        "assists": "Passes",
         "noPresent": "Personne n’a encore répondu présent.",
         "noLineup": "Pas encore de composition."
       },
@@ -199,9 +218,15 @@
         "teamRed": "Rouge",
         "goals": "Buts",
         "assists": "Passes décisives",
+        "decreaseGoals": "Diminuer les buts de {{player}}",
+        "increaseGoals": "Augmenter les buts de {{player}}",
+        "decreaseAssists": "Diminuer les passes de {{player}}",
+        "increaseAssists": "Augmenter les passes de {{player}}",
         "player": "Joueur",
         "save": "Enregistrer les stats",
         "saved": "Stats enregistrées",
+        "decreaseScore": "Diminuer le score {{team}}",
+        "increaseScore": "Augmenter le score {{team}}",
         "saveScore": "Enregistrer le score",
         "scoreSaved": "Score enregistré",
         "noPlayers": "Aucun joueur présent pour saisir les stats.",
@@ -263,6 +288,12 @@
   "clubSettings": {
     "title": "Paramètres du club",
     "noClub": "Aucun club sélectionné.",
+    "tabs": {
+      "players": "Joueurs",
+      "invite": "Invitations",
+      "seasons": "Saisons",
+      "payment": "Paiement"
+    },
     "invite": {
       "title": "Inviter des joueurs",
       "hint": "Saisis des emails séparés par une virgule. Chaque email devient une pastille.",
@@ -273,7 +304,10 @@
     "players": {
       "title": "Joueurs",
       "hint": "Membres du club et invitations en attente.",
+      "searchLabel": "Rechercher un joueur",
+      "searchPlaceholder": "Nom ou prénom",
       "empty": "Aucun joueur pour le moment.",
+      "noResults": "Aucun joueur ne correspond à cette recherche.",
       "statusInvited": "Invitation envoyée",
       "resend": "Renvoyer",
       "resent": "Invitation renvoyée",
@@ -294,6 +328,66 @@
       "hint": "Peer-to-peer uniquement (Lydia, PayPal.me, Revolut…). Pas de PSP commercial pour l’instant.",
       "save": "Enregistrer",
       "saved": "Lien de paiement enregistré"
+    },
+    "seasons": {
+      "title": "Saisons",
+      "hint": "Crée, renomme ou clôture les saisons du club. Une seule est en cours.",
+      "manage": "Gérer les saisons"
+    }
+  },
+  "seasons": {
+    "title": "Saisons",
+    "description": "Une seule saison est en cours. Les stats de l'accueil et les nouveaux matchs suivent cette saison.",
+    "noClub": "Aucun club sélectionné.",
+    "loading": "Chargement des saisons…",
+    "emptyTitle": "Aucune saison",
+    "emptyDescription": "Crée une saison pour regrouper les matchs et les stats.",
+    "create": "Nouvelle saison",
+    "edit": "Modifier",
+    "stats": "Stats",
+    "close": "Clôturer",
+    "reopen": "Rouvrir",
+    "statusActive": "En cours",
+    "statusClosed": "Terminée",
+    "rangeOpen": "{{start}} — en cours",
+    "rangeClosed": "{{start}} — {{end}}",
+    "rangeStartOnly": "Depuis le {{start}}",
+    "saved": "{{name}} est enregistrée",
+    "savedClosedPrevious": "{{name}} est en cours. {{previous}} a été clôturée.",
+    "closed": "{{name}} est clôturée",
+    "reopened": "{{name}} est de nouveau en cours",
+    "saveError": "Impossible d'enregistrer la saison",
+    "defaultName": "Saison {{year}}",
+    "form": {
+      "createTitle": "Nouvelle saison",
+      "editTitle": "Modifier la saison",
+      "createDescription": "Les matchs créés ensuite seront rattachés à cette saison.",
+      "createClosesActive": "La saison en cours, {{name}}, sera clôturée.",
+      "editDescription": "Le nom et les dates peuvent être changés à tout moment.",
+      "name": "Nom",
+      "namePlaceholder": "Saison 2026",
+      "startsAt": "Début",
+      "endsAt": "Fin",
+      "endsAtHint": "Optionnel. Tu pourras la renseigner plus tard.",
+      "datePlaceholder": "Choisir une date",
+      "clearEnd": "Retirer la date de fin",
+      "nameRequired": "Indique un nom",
+      "endBeforeStart": "La fin doit être le même jour ou après le début",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…"
+    }
+  },
+  "seasonStats": {
+    "title": "Stats de saison",
+    "back": "Saisons",
+    "loading": "Chargement des stats…",
+    "empty": "Aucune stat pour cette saison.",
+    "columns": {
+      "player": "Joueur",
+      "goals": "Buts",
+      "assists": "Passes",
+      "matches": "Matchs"
     }
   },
   "onboarding": {
@@ -358,118 +452,28 @@
     "description": "Rechercher une commande à exécuter",
     "groups": {
       "navigate": "Naviguer",
-      "actions": "Actions",
       "preferences": "Préférences"
     },
     "items": {
       "dashboard": "Tableau de bord",
-      "newPost": "Nouveau post",
-      "ai": "Terrain de jeu IA",
-      "components": "Composants",
+      "seasons": "Saisons",
       "profile": "Profil",
       "toggleTheme": "Changer le thème",
       "lightMode": "Passer en mode clair",
       "darkMode": "Passer en mode sombre"
     }
   },
-  "breadcrumbs": {
-    "dashboard": "Tableau de bord",
-    "posts": "Articles",
-    "newPost": "Nouvel article",
-    "editPost": "Modifier l'article",
-    "ai": "IA",
-    "components": "Composants",
-    "profile": "Profil"
-  },
-  "toasts": {
-    "postCreated": "Article créé avec succès",
-    "postUpdated": "Article sauvegardé",
-    "postPublished": "Article publié",
-    "postUnpublished": "Article dépublié",
-    "postCreateError": "Échec de la création de l'article",
-    "postUpdateError": "Échec de la sauvegarde de l'article",
-    "postPublishError": "Échec de la publication de l'article"
-  },
-  "components": {
-    "title": "Composants",
-    "description": "Explorez la bibliothèque de composants @rosti/ui — tout ce qui est inclus dans ce boilerplate.",
-    "subtitle": "Galerie complète",
-    "sections": {
-      "buttons": "Boutons",
-      "badges": "Badges",
-      "inputs": "Champs",
-      "controls": "Contrôles",
-      "layout": "Mise en page & Affichage",
-      "feedback": "Retour utilisateur",
-      "dataDisplay": "Données & Tableaux",
-      "overlays": "Superpositions"
-    }
-  },
-  "ai": {
-    "title": "Terrain de jeu IA",
-    "subtitle": "Démos interactives",
-    "description": "Explorez les vraies capacités IA. Chaque démo se connecte à l'API en direct.",
-    "sections": {
-      "textGeneration": "Génération de texte",
-      "structuredOutput": "Sortie structurée",
-      "chatStream": "Chat en streaming"
-    }
-  },
-  "posts": {
-    "title": "Articles de blog",
-    "description": "Parcourez vos articles de blog",
-    "searchPlaceholder": "Rechercher des articles...",
-    "noPosts": "Aucun article trouvé",
-    "noResults": "Aucun résultat",
-    "noResultsDescription": "Aucun article ne correspond à « {{search}} ». Essayez une autre recherche.",
-    "emptyDescription": "Créez votre premier article pour commencer.",
-    "createNew": "Créer un nouvel article",
-    "showing": "Affichage",
-    "to": "à",
-    "of": "sur",
-    "previous": "Précédent",
-    "next": "Suivant",
-    "page": "Page",
-    "create": {
-      "title": "Créer un nouvel article",
-      "description": "Partagez vos pensées, images et vidéos avec le monde.",
-      "creating": "Création...",
-      "created": "Créé !",
-      "error": "Une erreur s'est produite lors de la création de l'article"
-    },
-    "form": {
-      "title": "Titre",
-      "titlePlaceholder": "Entrez un titre accrocheur...",
-      "titleRequired": "Le titre est requis",
-      "titleMinLength": "Le titre doit contenir au moins 3 caractères",
-      "coverImage": "URL de l'image de couverture",
-      "coverImagePlaceholder": "https://images.example.com/cover.jpg",
-      "tags": "Tags",
-      "tagsPlaceholder": "Séparés par des virgules, ex. TypeScript, React",
-      "content": "Contenu",
-      "addContent": "Ajouter {{type}}",
-      "contentEmpty": "Aucun contenu pour l'instant. Utilisez les boutons ci-dessus pour en ajouter.",
-      "contentLabel": "Contenu {{type}}",
-      "contentRequired": "Le contenu {{type}} est requis",
-      "textPlaceholder": "Saisissez votre texte ici...",
-      "imagePlaceholder": "Entrez l'URL de l'image ou importez-en une...",
-      "videoPlaceholder": "Entrez l'URL de la vidéo (YouTube, Vimeo, etc.)",
-      "videoUrl": "URL de la vidéo :",
-      "imagePreviewAlt": "Aperçu",
-      "save": "Enregistrer l'article",
-      "saving": "Enregistrement..."
-    }
-  },
   "profile": {
     "eyebrow": "Compte",
     "title": "Profil",
     "description": "Les détails de votre compte.",
-    "name": "Nom",
+    "firstName": "Prénom",
+    "lastName": "Nom",
     "email": "Email",
-    "emailVerified": "Statut de l'email",
-    "verified": "Vérifié",
-    "unverified": "Non vérifié",
-    "userId": "ID utilisateur"
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Profil mis à jour",
+    "saveError": "Impossible de mettre à jour le profil"
   },
   "errorCodes": {
     "PASSWORDS_DO_NOT_MATCH": "Les mots de passe ne correspondent pas"

@@ -76,8 +76,6 @@
     "title": "Dashboard",
     "subtitle": "Club manager",
     "brand": "Rösti - Dashboard",
-    "newPost": "New post",
-    "ai": "AI",
     "userMenu": "User menu",
     "settings": "Settings",
     "lightMode": "Light mode",
@@ -85,15 +83,14 @@
     "logOut": "Log out",
     "language": "Language",
     "navigation": "Navigation",
-    "actions": "Quick actions",
-    "profile": "Profile",
-    "components": "Components"
+    "profile": "Profile"
   },
   "nav": {
     "home": "Home",
     "matches": "Matches",
     "notifications": "Notifications",
-    "clubSettings": "Club settings"
+    "clubSettings": "Club settings",
+    "settings": "Settings"
   },
   "home": {
     "eyebrow": "Your club",
@@ -105,7 +102,26 @@
     "noUpcoming": "No upcoming matches yet.",
     "noPast": "No past matches yet.",
     "goToMatches": "Go to matches",
-    "allMatches": "All matches"
+    "allMatches": "All matches",
+    "stats": {
+      "clubTitle": "The club this season",
+      "personalTitle": "Your stats",
+      "noSeason": "No active season",
+      "matchesPlayed": "Matches played",
+      "topScorer": "Top scorer",
+      "mostWins": "Most wins",
+      "mostLosses": "Most losses",
+      "duo": "Most often together",
+      "duoNames": "{{playerA}} & {{playerB}}",
+      "duoCount": "{{count}} matches as teammates",
+      "goals": "Goals",
+      "wins": "Wins",
+      "losses": "Losses",
+      "emptyScorer": "No goals recorded this season yet.",
+      "emptyWins": "No wins recorded yet.",
+      "emptyLosses": "No losses recorded yet.",
+      "emptyDuo": "Not enough shared lineups yet."
+    }
   },
   "matches": {
     "title": "Matches",
@@ -120,6 +136,7 @@
     "emptyPastTitle": "No past matches",
     "emptyPastDescription": "Matches that have already been played will show up here.",
     "noScore": "No score recorded",
+    "enterScore": "Enter the score",
     "selectClub": "Select or create a club first.",
     "capacity": "{{present}} / {{max}} players",
     "menuOpen": "Match actions",
@@ -161,6 +178,8 @@
         "lineup": "Lineup",
         "teamBlue": "Blue",
         "teamRed": "Red",
+        "goals": "Goals",
+        "assists": "Assists",
         "noPresent": "Nobody has confirmed yet.",
         "noLineup": "No lineup yet."
       },
@@ -199,9 +218,15 @@
         "teamRed": "Red",
         "goals": "Goals",
         "assists": "Assists",
+        "decreaseGoals": "Decrease {{player}} goals",
+        "increaseGoals": "Increase {{player}} goals",
+        "decreaseAssists": "Decrease {{player}} assists",
+        "increaseAssists": "Increase {{player}} assists",
         "player": "Player",
         "save": "Save stats",
         "saved": "Stats saved",
+        "decreaseScore": "Decrease {{team}} score",
+        "increaseScore": "Increase {{team}} score",
         "saveScore": "Save score",
         "scoreSaved": "Score saved",
         "noPlayers": "No present players to enter stats for.",
@@ -263,6 +288,12 @@
   "clubSettings": {
     "title": "Club settings",
     "noClub": "No club selected.",
+    "tabs": {
+      "players": "Players",
+      "invite": "Invitations",
+      "seasons": "Seasons",
+      "payment": "Payment"
+    },
     "invite": {
       "title": "Invite players",
       "hint": "Enter emails separated by commas. Each email becomes a pill.",
@@ -273,7 +304,10 @@
     "players": {
       "title": "Players",
       "hint": "Members of the club and pending invitations.",
+      "searchLabel": "Search players",
+      "searchPlaceholder": "First or last name",
       "empty": "No players yet.",
+      "noResults": "No players match this search.",
       "statusInvited": "Invitation sent",
       "resend": "Resend",
       "resent": "Invitation resent",
@@ -294,6 +328,66 @@
       "hint": "Peer-to-peer only (Lydia, PayPal.me, Revolut…). No commercial PSP yet.",
       "save": "Save",
       "saved": "Payment link saved"
+    },
+    "seasons": {
+      "title": "Seasons",
+      "hint": "Create, rename, or close the club seasons. Only one stays active.",
+      "manage": "Manage seasons"
+    }
+  },
+  "seasons": {
+    "title": "Seasons",
+    "description": "Only one season is active. Home stats and new matches follow that season.",
+    "noClub": "No club selected.",
+    "loading": "Loading seasons…",
+    "emptyTitle": "No season yet",
+    "emptyDescription": "Create a season to group matches and stats.",
+    "create": "New season",
+    "edit": "Edit",
+    "stats": "Stats",
+    "close": "Close",
+    "reopen": "Reopen",
+    "statusActive": "Active",
+    "statusClosed": "Closed",
+    "rangeOpen": "{{start}} — ongoing",
+    "rangeClosed": "{{start}} — {{end}}",
+    "rangeStartOnly": "Since {{start}}",
+    "saved": "{{name}} saved",
+    "savedClosedPrevious": "{{name}} is now active. {{previous}} was closed.",
+    "closed": "{{name}} is closed",
+    "reopened": "{{name}} is active again",
+    "saveError": "Could not save the season",
+    "defaultName": "Season {{year}}",
+    "form": {
+      "createTitle": "New season",
+      "editTitle": "Edit season",
+      "createDescription": "Matches created after this will belong to this season.",
+      "createClosesActive": "The current season, {{name}}, will be closed.",
+      "editDescription": "You can change the name and dates at any time.",
+      "name": "Name",
+      "namePlaceholder": "Season 2026",
+      "startsAt": "Start",
+      "endsAt": "End",
+      "endsAtHint": "Optional. You can fill it in later.",
+      "datePlaceholder": "Choose a date",
+      "clearEnd": "Remove end date",
+      "nameRequired": "Enter a name",
+      "endBeforeStart": "The end must be on or after the start",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving…"
+    }
+  },
+  "seasonStats": {
+    "title": "Season stats",
+    "back": "Seasons",
+    "loading": "Loading stats…",
+    "empty": "No stats for this season yet.",
+    "columns": {
+      "player": "Player",
+      "goals": "Goals",
+      "assists": "Assists",
+      "matches": "Matches"
     }
   },
   "onboarding": {
@@ -358,118 +452,28 @@
     "description": "Search for a command to run",
     "groups": {
       "navigate": "Navigate",
-      "actions": "Actions",
       "preferences": "Preferences"
     },
     "items": {
       "dashboard": "Dashboard",
-      "newPost": "New post",
-      "ai": "AI Playground",
-      "components": "Components",
+      "seasons": "Seasons",
       "profile": "Profile",
       "toggleTheme": "Toggle theme",
       "lightMode": "Switch to light mode",
       "darkMode": "Switch to dark mode"
     }
   },
-  "breadcrumbs": {
-    "dashboard": "Dashboard",
-    "posts": "Posts",
-    "newPost": "New post",
-    "editPost": "Edit post",
-    "ai": "AI",
-    "components": "Components",
-    "profile": "Profile"
-  },
-  "toasts": {
-    "postCreated": "Post created successfully",
-    "postUpdated": "Post saved",
-    "postPublished": "Post published",
-    "postUnpublished": "Post unpublished",
-    "postCreateError": "Failed to create post",
-    "postUpdateError": "Failed to save post",
-    "postPublishError": "Failed to publish post"
-  },
-  "components": {
-    "title": "Components",
-    "description": "Explore the full @rosti/ui component library — everything included in this boilerplate.",
-    "subtitle": "Kitchen-sink gallery",
-    "sections": {
-      "buttons": "Buttons",
-      "badges": "Badges",
-      "inputs": "Inputs",
-      "controls": "Controls",
-      "layout": "Layout & Display",
-      "feedback": "Feedback",
-      "dataDisplay": "Data & Tables",
-      "overlays": "Overlays"
-    }
-  },
-  "ai": {
-    "title": "AI Playground",
-    "subtitle": "Interactive demos",
-    "description": "Explore real AI capabilities. Each demo connects to the live API.",
-    "sections": {
-      "textGeneration": "Text generation",
-      "structuredOutput": "Structured output",
-      "chatStream": "Chat with streaming"
-    }
-  },
-  "posts": {
-    "title": "Blog posts",
-    "description": "Browse your blog posts",
-    "searchPlaceholder": "Search posts...",
-    "noPosts": "No posts found",
-    "noResults": "No results found",
-    "noResultsDescription": "No posts match \"{{search}}\". Try a different search.",
-    "emptyDescription": "Create your first post to get started.",
-    "createNew": "Create a new post",
-    "showing": "Showing",
-    "to": "to",
-    "of": "of",
-    "previous": "Previous",
-    "next": "Next",
-    "page": "Page",
-    "create": {
-      "title": "Create new post",
-      "description": "Share your thoughts, images and videos with the world.",
-      "creating": "Creating...",
-      "created": "Created!",
-      "error": "An error occurred while creating the post"
-    },
-    "form": {
-      "title": "Title",
-      "titlePlaceholder": "Enter a captivating title...",
-      "titleRequired": "Title is required",
-      "titleMinLength": "Title must be at least 3 characters",
-      "coverImage": "Cover image URL",
-      "coverImagePlaceholder": "https://images.example.com/cover.jpg",
-      "tags": "Tags",
-      "tagsPlaceholder": "Comma-separated, e.g. TypeScript, React",
-      "content": "Content",
-      "addContent": "Add {{type}}",
-      "contentEmpty": "No content added yet. Use the buttons above to add content.",
-      "contentLabel": "{{type}} content",
-      "contentRequired": "{{type}} content is required",
-      "textPlaceholder": "Enter your text content here...",
-      "imagePlaceholder": "Enter image URL or upload...",
-      "videoPlaceholder": "Enter video URL (YouTube, Vimeo, etc.)",
-      "videoUrl": "Video URL:",
-      "imagePreviewAlt": "Preview",
-      "save": "Save post",
-      "saving": "Saving post..."
-    }
-  },
   "profile": {
     "eyebrow": "Account",
     "title": "Profile",
     "description": "Your account details.",
-    "name": "Name",
+    "firstName": "First name",
+    "lastName": "Last name",
     "email": "Email",
-    "emailVerified": "Email status",
-    "verified": "Verified",
-    "unverified": "Unverified",
-    "userId": "User ID"
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Profile updated",
+    "saveError": "Could not update profile"
   },
   "errorCodes": {
     "PASSWORDS_DO_NOT_MATCH": "Passwords do not match"

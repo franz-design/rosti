@@ -1,10 +1,8 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useParams, useSearchParams } from 'react-router'
+import { useParams, useSearchParams } from 'react-router'
 import { storePendingInvitationId } from '@/features/auth/utils/pending-invitation'
-
-const APP_STORE_URL = import.meta.env.VITE_APP_STORE_URL ?? 'https://apps.apple.com'
-const PLAY_STORE_URL = import.meta.env.VITE_PLAY_STORE_URL ?? 'https://play.google.com/store'
+import { InviteStoreLinks } from './components/invite/invite-store-links'
 
 export default function InvitePage() {
   const { t } = useTranslation()
@@ -29,34 +27,16 @@ export default function InvitePage() {
     }
   }, [invitationId, email, club])
 
-  const deepLink = `rosti://invite?token=${invitationId ?? ''}&email=${encodeURIComponent(email ?? '')}`
-
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="max-w-md space-y-4 text-center">
-        <h1 className="text-2xl font-semibold">
+        <h1 className="text-2xl font-black">
           {t('invite.title', { club: club || t('invite.fallbackClub') })}
         </h1>
         <p className="text-muted-foreground">
           {email ? t('invite.descriptionWithEmail', { email }) : t('invite.description')}
         </p>
-        <div className="flex flex-col gap-2">
-          <a className="underline" href={APP_STORE_URL}>
-            {t('invite.appStore')}
-          </a>
-          <a className="underline" href={PLAY_STORE_URL}>
-            {t('invite.playStore')}
-          </a>
-          <a className="underline" href={deepLink}>
-            {t('invite.openApp')}
-          </a>
-          <Link
-            className="underline"
-            to={`/register?invitationId=${invitationId ?? ''}&email=${encodeURIComponent(email ?? '')}&club=${encodeURIComponent(club ?? '')}`}
-          >
-            {t('invite.continueDesktop')}
-          </Link>
-        </div>
+        <InviteStoreLinks invitationId={invitationId} email={email} club={club} />
       </div>
     </div>
   )

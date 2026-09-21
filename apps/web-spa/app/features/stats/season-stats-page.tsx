@@ -1,42 +1,38 @@
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router'
-import { useClub } from '@/features/clubs/club-context'
+import { useClub } from '@/features/clubs/hooks/club-context'
 import { rostiApi } from '@/lib/rosti-api'
+import { fetchSeasonQueryOptions } from '@/features/seasons/utils/seasons-queries'
+import { SeasonStatsHeader } from './components/season/season-stats-header'
+import { SeasonStatsTable } from './components/season/season-stats-table'
 
 export default function SeasonStatsPage() {
+  const { t } = useTranslation()
   const { seasonId } = useParams()
   const { activeClub } = useClub()
+  const organizationId = activeClub?.id
 
+  const { data: season } = useQuery({
+    ...fetchSeasonQueryOptions(organizationId ?? '', seasonId ?? ''),
+    enabled: !!organizationId && !!seasonId,
+  })
   const { data: stats = [], isLoading } = useQuery({
-    queryKey: ['season-stats', activeClub?.id, seasonId],
-    queryFn: () => rostiApi.seasonStats(activeClub!.id, seasonId!),
-    enabled: !!activeClub && !!seasonId,
+    queryKey: ['season-stats', organizationId, seasonId],
+    queryFn: () => rostiApi.seasonStats(organizationId!, seasonId!),
+    enabled: !!organizationId && !!seasonId,
   })
 
   return (
-    <div className="space-y-6 p-6">
-      <h1 className="text-2xl font-semibold">Season stats</h1>
-      {isLoading ? <p>Loading…</p> : null}
-      <table className="w-full text-sm border">
-        <thead>
-          <tr className="border-b bg-muted/40 text-left">
-            <th className="p-2">Player</th>
-            <th className="p-2">Goals</th>
-            <th className="p-2">Assists</th>
-            <th className="p-2">Matches</th>
-          </tr>
-        </thead>
-        <tbody>
-          {stats.map((s) => (
-            <tr key={s.userId} className="border-b">
-              <td className="p-2">{s.userName}</td>
-              <td className="p-2">{s.goals}</td>
-              <td className="p-2">{s.assists}</td>
-              <td className="p-2">{s.matchesPlayed}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="space-y-6">
+      <SeasonStatsHeader seasonName={season?.name} />
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">{t('seasonStats.loading')}</p>
+      ) : null}
+      {!isLoading && stats.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{t('seasonStats.empty')}</p>
+      ) : null}
+      {stats.length > 0 ? <SeasonStatsTable stats={stats} /> : null}
     </div>
   )
 }

@@ -1,11 +1,8 @@
 import { EntityManager } from '@mikro-orm/core'
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common'
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { Organization, User } from '../auth/auth.entity'
 import { OrganizationService } from '../auth/organization.service'
+import { ScheduledJobType } from '../notifications/contracts/notification.contract'
 import { NotificationService } from '../notifications/notification.service'
 import { Season } from '../seasons/season.entity'
 import {
@@ -219,6 +216,29 @@ export class MatchService {
     })
   }
 
+  async findViewerTeamsByMatchIds(input: {
+    userId: string
+    matchIds: string[]
+  }): Promise<Map<string, TeamSide>> {
+    const teams = new Map<string, TeamSide>()
+    if (input.matchIds.length === 0) return teams
+
+    const rows = await this.em.find(
+      MatchLineup,
+      {
+        match: { id: { $in: input.matchIds } },
+        user: { id: input.userId },
+      },
+      { fields: ['match', 'team'] },
+    )
+
+    for (const row of rows) {
+      teams.set(row.match.id, row.team)
+    }
+
+    return teams
+  }
+
   async get(organizationId: string, userId: string, matchId: string): Promise<Match> {
     await this.organizationService.requireMember(organizationId, userId)
     const match = await this.em.findOne(
@@ -243,6 +263,7 @@ export class MatchService {
     if (match.status === MatchStatus.Cancelled) {
       throw new BadRequestException('Cannot update a cancelled match')
     }
+    const previousStartsAt = match.startsAt
     if (data.title !== undefined) match.title = data.title
     if (data.startsAt !== undefined) match.startsAt = data.startsAt
     if (data.location !== undefined) match.location = data.location ?? undefined
@@ -253,6 +274,16 @@ export class MatchService {
       match.reminderOffsetsHours = data.reminderOffsetsHours ?? undefined
     }
     await this.em.flush()
+
+    const startsAtChanged = match.startsAt.getTime() !== previousStartsAt.getTime()
+    const hasScore = match.blueScore != null && match.redScore != null
+    if (startsAtChanged) {
+      await this.notificationService.cancelMatchJobs(match.id)
+      await this.notificationService.scheduleMatchReminders(match)
+    } else if (hasScore && (data.blueScore !== undefined || data.redScore !== undefined)) {
+      await this.notificationService.cancelMatchJobs(match.id, ScheduledJobType.ScoreReminder)
+    }
+
     return match
   }
 

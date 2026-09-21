@@ -1,23 +1,35 @@
-import { Button } from '@rosti/ui/components/primitives/button'
-import { Input } from '@rosti/ui/components/primitives/input'
+import { Tabs, TabsContent } from '@rosti/ui/components/primitives/tabs'
 import { toast } from '@rosti/ui/components/primitives/sonner'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@rosti/ui/components/primitives/tabs'
 import { cn } from '@rosti/ui/lib/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CalendarDays, Clock, MapPin, Send } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router'
-import { useClub } from '@/features/clubs/club-context'
+import { useClub } from '@/features/clubs/hooks/club-context'
 import { authClient } from '@/lib/auth-client'
-import { rostiApi, type Attendance, type Lineup, type MatchMessage } from '@/lib/rosti-api'
-import { LineupDialog } from './lineup-dialog'
+import { rostiApi } from '@/lib/rosti-api'
+import { AttendanceTab } from './components/match-detail/attendance/attendance-tab'
+import { ChatTab } from './components/match-detail/chat/chat-tab'
+import { LineupDialog } from './components/match-detail/lineup/lineup-dialog'
+import { MatchDetailHeader } from './components/match-detail/match-detail-header'
+import { MatchDetailTabsList } from './components/match-detail/match-detail-tabs-list'
+import type { PlayerStatDraft } from './components/match-detail/player-stat-draft'
+import { StatsTab } from './components/match-detail/stats/stats-tab'
+import { SummaryTab } from './components/match-detail/summary-tab'
+import { shouldPromptEnterScore, shouldShowMatchResult } from './utils/match-filters'
 
 type MatchTab = 'summary' | 'attendance' | 'chat' | 'stats'
 
-interface PlayerStatDraft {
-  goals: number
-  assists: number
+function playerStatsMatch(
+  left: Record<string, PlayerStatDraft>,
+  right: Record<string, PlayerStatDraft>,
+  userIds: string[],
+) {
+  return userIds.every(
+    (id) =>
+      (left[id]?.goals ?? 0) === (right[id]?.goals ?? 0) &&
+      (left[id]?.assists ?? 0) === (right[id]?.assists ?? 0),
+  )
 }
 
 export default function MatchDetailPage() {
@@ -31,6 +43,9 @@ export default function MatchDetailPage() {
   const [message, setMessage] = useState('')
   const [statDrafts, setStatDrafts] = useState<Record<string, PlayerStatDraft>>({})
   const [scoreDraft, setScoreDraft] = useState({ blue: 0, red: 0 })
+  const savingScore = useRef<{ blue: number; red: number } | null>(null)
+  const scoreSyncedForMatch = useRef<string | null>(null)
+  const pendingStatSave = useRef<Record<string, PlayerStatDraft> | null>(null)
   const [busyUserId, setBusyUserId] = useState<string | null>(null)
   const [isLineupOpen, setIsLineupOpen] = useState(false)
   const chatEndRef = useRef<HTMLDivElement>(null)
@@ -96,14 +111,48 @@ export default function MatchDetailPage() {
         assists: existing?.assists ?? 0,
       }
     }
-    setStatDrafts(next)
+    const userIds = presentPlayers.map((player) => player.userId)
+    setStatDrafts((current) => {
+      const pending = pendingStatSave.current
+      if (!pending) return next
+      if (playerStatsMatch(current, pending, userIds) && playerStatsMatch(next, pending, userIds)) {
+        pendingStatSave.current = null
+        return next
+      }
+      const merged = { ...next }
+      for (const id of userIds) {
+        if (current[id]) merged[id] = current[id]
+      }
+      return merged
+    })
   }, [presentPlayers, stats])
 
   useEffect(() => {
     if (!match) return
-    setScoreDraft({
-      blue: match.blueScore ?? 0,
-      red: match.redScore ?? 0,
+    const server = { blue: match.blueScore ?? 0, red: match.redScore ?? 0 }
+    if (scoreSyncedForMatch.current !== match.id) {
+      scoreSyncedForMatch.current = match.id
+      savingScore.current = null
+      setScoreDraft(server)
+      return
+    }
+    setScoreDraft((current) => {
+      if (current.blue === server.blue && current.red === server.red) {
+        savingScore.current = null
+        return current
+      }
+      const saving = savingScore.current
+      if (
+        saving &&
+        saving.blue === server.blue &&
+        saving.red === server.red &&
+        current.blue === saving.blue &&
+        current.red === saving.red
+      ) {
+        savingScore.current = null
+        return server
+      }
+      return current
     })
   }, [match?.id, match?.blueScore, match?.redScore])
 
@@ -180,16 +229,8 @@ export default function MatchDetailPage() {
   })
 
   const saveStats = useMutation({
-    mutationFn: () =>
-      rostiApi.upsertMatchStats(
-        orgId!,
-        matchId!,
-        presentPlayers.map((a) => ({
-          userId: a.userId,
-          goals: statDrafts[a.userId]?.goals ?? 0,
-          assists: statDrafts[a.userId]?.assists ?? 0,
-        })),
-      ),
+    mutationFn: (entries: Array<{ userId: string; goals: number; assists: number }>) =>
+      rostiApi.upsertMatchStats(orgId!, matchId!, entries),
     onSuccess: () => {
       toast.success(t('matches.detail.stats.saved'))
       invalidate()
@@ -198,11 +239,13 @@ export default function MatchDetailPage() {
   })
 
   const saveScore = useMutation({
-    mutationFn: () =>
-      rostiApi.updateMatch(orgId!, matchId!, {
-        blueScore: scoreDraft.blue,
-        redScore: scoreDraft.red,
-      }),
+    mutationFn: (score: { blue: number; red: number }) => {
+      savingScore.current = score
+      return rostiApi.updateMatch(orgId!, matchId!, {
+        blueScore: score.blue,
+        redScore: score.red,
+      })
+    },
     onSuccess: () => {
       toast.success(t('matches.detail.stats.scoreSaved'))
       invalidate()
@@ -228,281 +271,113 @@ export default function MatchDetailPage() {
   const canRsvp = match.status === 'scheduled'
   const isChat = tab === 'chat'
   const canManageComposition = isClubAdmin && match.status !== 'cancelled'
+  const showMatchResult = shouldShowMatchResult(match)
 
   return (
-    <div className={cn('flex flex-col', isChat && '-m-6 h-[calc(100dvh-var(--header-height))]')}>
+    <div
+      className={cn(
+        'flex flex-col',
+        isChat &&
+          '-m-6 h-dvh max-md:-mb-[calc(1.5rem+var(--bottom-nav-height))] max-md:h-[calc(100dvh-var(--bottom-nav-height))]',
+      )}
+    >
       <Tabs
         value={tab}
         onValueChange={(value) => setTab(value as MatchTab)}
         className={cn('w-full min-h-0 flex-col gap-0', isChat && 'flex-1')}
       >
         <div className={cn('shrink-0 space-y-4', isChat && 'border-b px-6 pt-6 pb-3')}>
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight">{match.title}</h1>
-              <p className="text-sm text-muted-foreground">
-                {t(`matches.detail.status.${match.status}`)}
-              </p>
-            </div>
-            {match.status === 'scheduled' ? (
-              <Button variant="destructive" onClick={() => cancel.mutate()}>
-                {t('matches.cancel')}
-              </Button>
-            ) : null}
-          </div>
-
-          <TabsList className="h-9 w-full justify-start gap-1 rounded-lg border border-border bg-muted p-1">
-            <TabsTrigger value="summary" className="px-3">
-              {t('matches.detail.tabs.summary')}
-            </TabsTrigger>
-            <TabsTrigger value="attendance" className="px-3">
-              {t('matches.detail.tabs.attendance')}
-            </TabsTrigger>
-            <TabsTrigger value="chat" className="px-3">
-              {t('matches.detail.tabs.chat')}
-            </TabsTrigger>
-            <TabsTrigger value="stats" className="px-3">
-              {t('matches.detail.tabs.stats')}
-            </TabsTrigger>
-          </TabsList>
+          <MatchDetailHeader match={match} onCancel={() => cancel.mutate()} />
+          <MatchDetailTabsList />
         </div>
 
         <TabsContent
           value="summary"
           className={cn('mt-6 space-y-6 outline-none', isChat && 'px-6')}
         >
-          <dl className="grid gap-4 sm:grid-cols-3">
-            <InfoItem
-              icon={<CalendarDays className="size-4" />}
-              label={t('matches.detail.summary.date')}
-              value={dateLabel}
-            />
-            <InfoItem
-              icon={<Clock className="size-4" />}
-              label={t('matches.detail.summary.time')}
-              value={timeLabel}
-            />
-            <InfoItem
-              icon={<MapPin className="size-4" />}
-              label={t('matches.detail.summary.location')}
-              value={match.location ?? t('matches.detail.noLocation')}
-            />
-          </dl>
-
-          {canRsvp ? (
-            <section className="space-y-3">
-              <p className="text-sm font-medium">{t('matches.detail.rsvp.question')}</p>
-              <RsvpButtons
-                status={myAttendance?.status}
-                disabled={rsvp.isPending}
-                onPresent={() => rsvp.mutate('present')}
-                onAbsent={() => rsvp.mutate('absent')}
-                presentLabel={t('matches.detail.rsvp.present')}
-                absentLabel={t('matches.detail.rsvp.absent')}
-              />
-            </section>
-          ) : null}
-
-          <AttendanceGroup
-            title={t('matches.detail.summary.presentPlayers')}
-            players={presentPlayers}
-            emptyLabel={t('matches.detail.summary.noPresent')}
+          <SummaryTab
+            match={match}
+            dateLabel={dateLabel}
+            timeLabel={timeLabel}
+            showMatchResult={showMatchResult}
+            canEnterScore={shouldPromptEnterScore(match, isClubAdmin)}
+            onEnterScore={() => setTab('stats')}
+            canRsvp={canRsvp}
+            myAttendance={myAttendance}
+            isRsvpPending={rsvp.isPending}
+            onPresent={() => rsvp.mutate('present')}
+            onAbsent={() => rsvp.mutate('absent')}
+            presentPlayers={presentPlayers}
+            statDrafts={statDrafts}
+            lineups={lineups}
+            canManageComposition={canManageComposition}
+            onEditLineup={() => setIsLineupOpen(true)}
           />
-
-          <section className="space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="text-base font-medium">{t('matches.detail.summary.lineup')}</h2>
-              {canManageComposition ? (
-                <Button size="sm" variant="outline" onClick={() => setIsLineupOpen(true)}>
-                  {t(
-                    lineups.length === 0
-                      ? 'matches.detail.lineupEditor.create'
-                      : 'matches.detail.lineupEditor.edit',
-                  )}
-                </Button>
-              ) : null}
-            </div>
-            <LineupSection
-              lineups={lineups}
-              blueLabel={t('matches.detail.summary.teamBlue')}
-              redLabel={t('matches.detail.summary.teamRed')}
-              emptyLabel={t('matches.detail.summary.noLineup')}
-            />
-          </section>
         </TabsContent>
 
         <TabsContent
           value="attendance"
           className={cn('mt-6 space-y-6 outline-none', isChat && 'px-6')}
         >
-          {canManageComposition ? (
-            <AttendanceManager
-              players={sortedAttendances}
-              busyUserId={busyUserId}
-              onSetStatus={(userId, status) => setAttendance.mutate({ userId, status })}
-              labels={{
-                hint: t('matches.detail.attendance.manageHint'),
-                present: t('matches.detail.attendance.markPresent'),
-                absent: t('matches.detail.attendance.markAbsent'),
-                pending: t('matches.detail.attendance.markPending'),
-                empty: t('matches.detail.attendance.empty'),
-              }}
-            />
-          ) : (
-            <>
-              <AttendanceGroup
-                title={t('matches.detail.attendance.present')}
-                players={attendanceGroups.present}
-                emptyLabel={t('matches.detail.attendance.empty')}
-              />
-              <AttendanceGroup
-                title={t('matches.detail.attendance.pending')}
-                players={attendanceGroups.pending}
-                emptyLabel={t('matches.detail.attendance.empty')}
-              />
-              <AttendanceGroup
-                title={t('matches.detail.attendance.absent')}
-                players={attendanceGroups.absent}
-                emptyLabel={t('matches.detail.attendance.empty')}
-              />
-            </>
-          )}
+          <AttendanceTab
+            canManage={canManageComposition}
+            sortedAttendances={sortedAttendances}
+            attendanceGroups={attendanceGroups}
+            busyUserId={busyUserId}
+            onSetStatus={(userId, status) => setAttendance.mutate({ userId, status })}
+          />
         </TabsContent>
 
         <TabsContent value="chat" className="flex min-h-0 flex-1 flex-col outline-none">
-          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-6 py-4">
-            {messages.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t('matches.detail.chat.empty')}</p>
-            ) : (
-              messages.map((msg) => (
-                <ChatBubble
-                  key={msg.id}
-                  message={msg}
-                  isMine={msg.authorId === session?.user?.id}
-                />
-              ))
-            )}
-            <div ref={chatEndRef} />
-          </div>
-          <form
-            className="flex shrink-0 gap-2 border-t bg-background p-3 px-6"
-            onSubmit={(event) => {
-              event.preventDefault()
-              if (!message.trim() || postMsg.isPending) return
-              postMsg.mutate()
-            }}
-          >
-            <Input
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={t('matches.detail.chat.placeholder')}
-              className="flex-1"
-              autoComplete="off"
-            />
-            <Button type="submit" disabled={!message.trim() || postMsg.isPending} size="icon">
-              <Send className="size-4" />
-              <span className="sr-only">{t('matches.detail.chat.send')}</span>
-            </Button>
-          </form>
+          <ChatTab
+            messages={messages}
+            currentUserId={session?.user?.id}
+            endRef={chatEndRef}
+            draft={message}
+            onDraftChange={setMessage}
+            onSubmit={() => postMsg.mutate()}
+            isPending={postMsg.isPending}
+          />
         </TabsContent>
 
         <TabsContent value="stats" className={cn('mt-6 space-y-6 outline-none', isChat && 'px-6')}>
-          <section className="space-y-3">
-            <h2 className="text-base font-medium">{t('matches.detail.stats.score')}</h2>
-            <div className="flex items-center justify-center gap-6 rounded-lg border px-6 py-8">
-              <ScoreSide
-                label={t('matches.detail.stats.teamBlue')}
-                labelClassName="text-team-blue"
-                value={scoreDraft.blue}
-                canEdit={canManageComposition}
-                onChange={(blue) => setScoreDraft((prev) => ({ ...prev, blue }))}
-              />
-              <span className="text-2xl text-muted-foreground">–</span>
-              <ScoreSide
-                label={t('matches.detail.stats.teamRed')}
-                labelClassName="text-primary"
-                value={scoreDraft.red}
-                canEdit={canManageComposition}
-                onChange={(red) => setScoreDraft((prev) => ({ ...prev, red }))}
-              />
-            </div>
-            {canManageComposition ? (
-              <Button onClick={() => saveScore.mutate()} disabled={saveScore.isPending}>
-                {t('matches.detail.stats.saveScore')}
-              </Button>
-            ) : null}
-            <p className="text-xs text-muted-foreground">{t('matches.detail.stats.hint')}</p>
-          </section>
-
-          {presentPlayers.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t('matches.detail.stats.noPlayers')}</p>
-          ) : (
-            <section className="space-y-3">
-              <div className="grid grid-cols-[1fr_5rem_5rem] gap-2 px-1 text-xs font-medium text-muted-foreground">
-                <span>{t('matches.detail.stats.player')}</span>
-                <span className="text-center">{t('matches.detail.stats.goals')}</span>
-                <span className="text-center">{t('matches.detail.stats.assists')}</span>
-              </div>
-              <ul className="space-y-2">
-                {presentPlayers.map((player) => (
-                  <li
-                    key={player.userId}
-                    className="grid grid-cols-[1fr_5rem_5rem] items-center gap-2"
-                  >
-                    <span className="truncate text-sm">{player.userName}</span>
-                    {canManageComposition ? (
-                      <>
-                        <Input
-                          type="number"
-                          min={0}
-                          className="text-center"
-                          value={statDrafts[player.userId]?.goals ?? 0}
-                          onChange={(e) =>
-                            setStatDrafts((prev) => ({
-                              ...prev,
-                              [player.userId]: {
-                                goals: Number(e.target.value) || 0,
-                                assists: prev[player.userId]?.assists ?? 0,
-                              },
-                            }))
-                          }
-                        />
-                        <Input
-                          type="number"
-                          min={0}
-                          className="text-center"
-                          value={statDrafts[player.userId]?.assists ?? 0}
-                          onChange={(e) =>
-                            setStatDrafts((prev) => ({
-                              ...prev,
-                              [player.userId]: {
-                                goals: prev[player.userId]?.goals ?? 0,
-                                assists: Number(e.target.value) || 0,
-                              },
-                            }))
-                          }
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-center text-sm tabular-nums">
-                          {statDrafts[player.userId]?.goals ?? 0}
-                        </span>
-                        <span className="text-center text-sm tabular-nums">
-                          {statDrafts[player.userId]?.assists ?? 0}
-                        </span>
-                      </>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              {canManageComposition ? (
-                <Button onClick={() => saveStats.mutate()} disabled={saveStats.isPending}>
-                  {t('matches.detail.stats.save')}
-                </Button>
-              ) : null}
-            </section>
-          )}
+          <StatsTab
+            score={scoreDraft}
+            onScoreChange={setScoreDraft}
+            onSaveScore={(next) => {
+              if (next.blue === (match.blueScore ?? 0) && next.red === (match.redScore ?? 0)) return
+              saveScore.mutate(next)
+            }}
+            players={presentPlayers}
+            drafts={statDrafts}
+            onStatChange={(userId, draft) =>
+              setStatDrafts((prev) => ({ ...prev, [userId]: draft }))
+            }
+            onSaveStats={(next) => {
+              const userIds = presentPlayers.map((player) => player.userId)
+              const server: Record<string, PlayerStatDraft> = {}
+              for (const player of presentPlayers) {
+                const existing = stats.find((item) => item.userId === player.userId)
+                server[player.userId] = {
+                  goals: existing?.goals ?? 0,
+                  assists: existing?.assists ?? 0,
+                }
+              }
+              if (playerStatsMatch(next, server, userIds)) {
+                pendingStatSave.current = null
+                return
+              }
+              pendingStatSave.current = next
+              saveStats.mutate(
+                presentPlayers.map((player) => ({
+                  userId: player.userId,
+                  goals: next[player.userId]?.goals ?? 0,
+                  assists: next[player.userId]?.assists ?? 0,
+                })),
+              )
+            }}
+            canManage={canManageComposition}
+          />
         </TabsContent>
       </Tabs>
       <LineupDialog
@@ -514,281 +389,6 @@ export default function MatchDetailPage() {
         isPending={saveLineup.isPending}
         onSave={(assignments) => saveLineup.mutate(assignments)}
       />
-    </div>
-  )
-}
-
-function RsvpButtons({
-  status,
-  disabled,
-  onPresent,
-  onAbsent,
-  presentLabel,
-  absentLabel,
-}: {
-  status?: Attendance['status']
-  disabled?: boolean
-  onPresent: () => void
-  onAbsent: () => void
-  presentLabel: string
-  absentLabel: string
-}) {
-  const hasAnswered = status === 'present' || status === 'absent'
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      <Button
-        type="button"
-        variant={status === 'present' ? 'default' : 'outline'}
-        className={cn(
-          'min-w-36',
-          hasAnswered && status !== 'present' && 'opacity-40 hover:opacity-70',
-        )}
-        disabled={disabled}
-        onClick={onPresent}
-      >
-        {presentLabel}
-      </Button>
-      <Button
-        type="button"
-        variant={status === 'absent' ? 'default' : 'outline'}
-        className={cn(
-          'min-w-36',
-          hasAnswered && status !== 'absent' && 'opacity-40 hover:opacity-70',
-        )}
-        disabled={disabled}
-        onClick={onAbsent}
-      >
-        {absentLabel}
-      </Button>
-    </div>
-  )
-}
-
-function InfoItem({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
-  return (
-    <div className="space-y-1 rounded-lg border p-3">
-      <dt className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-        {icon}
-        {label}
-      </dt>
-      <dd className="text-sm font-medium">{value}</dd>
-    </div>
-  )
-}
-
-function AttendanceGroup({
-  title,
-  players,
-  emptyLabel,
-}: {
-  title: string
-  players: Attendance[]
-  emptyLabel: string
-}) {
-  return (
-    <section className="space-y-2">
-      <h2 className="text-base font-medium">
-        {title} <span className="text-muted-foreground">({players.length})</span>
-      </h2>
-      {players.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{emptyLabel}</p>
-      ) : (
-        <ul className="divide-y rounded-lg border">
-          {players.map((player) => (
-            <li key={player.id} className="px-3 py-2 text-sm">
-              {player.userName}
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  )
-}
-
-function AttendanceManager({
-  players,
-  busyUserId,
-  onSetStatus,
-  labels,
-}: {
-  players: Attendance[]
-  busyUserId: string | null
-  onSetStatus: (userId: string, status: 'present' | 'absent' | 'pending') => void
-  labels: {
-    hint: string
-    present: string
-    absent: string
-    pending: string
-    empty: string
-  }
-}) {
-  if (players.length === 0) {
-    return <p className="text-sm text-muted-foreground">{labels.empty}</p>
-  }
-
-  return (
-    <section className="space-y-4">
-      <p className="text-sm text-muted-foreground">{labels.hint}</p>
-      <ul className="divide-y rounded-lg border">
-        {players.map((player) => {
-          const busy = busyUserId === player.userId
-          return (
-            <li
-              key={player.id}
-              className="flex flex-col gap-3 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{player.userName}</p>
-              </div>
-              <div className="flex flex-wrap gap-1 sm:justify-end">
-                <ToggleChip
-                  active={player.status === 'present'}
-                  disabled={busy}
-                  onClick={() => onSetStatus(player.userId, 'present')}
-                  label={labels.present}
-                />
-                <ToggleChip
-                  active={player.status === 'absent'}
-                  disabled={busy}
-                  onClick={() => onSetStatus(player.userId, 'absent')}
-                  label={labels.absent}
-                />
-                <ToggleChip
-                  active={player.status === 'pending'}
-                  disabled={busy}
-                  onClick={() => onSetStatus(player.userId, 'pending')}
-                  label={labels.pending}
-                />
-              </div>
-            </li>
-          )
-        })}
-      </ul>
-    </section>
-  )
-}
-
-function ToggleChip({
-  active,
-  disabled,
-  onClick,
-  label,
-}: {
-  active: boolean
-  disabled?: boolean
-  onClick: () => void
-  label: string
-}) {
-  return (
-    <Button
-      type="button"
-      size="sm"
-      variant={active ? 'default' : 'outline'}
-      disabled={disabled}
-      onClick={onClick}
-      className="h-7 px-2.5 text-xs"
-    >
-      {label}
-    </Button>
-  )
-}
-
-function LineupSection({
-  lineups,
-  title,
-  blueLabel,
-  redLabel,
-  emptyLabel,
-}: {
-  lineups: Lineup[]
-  title?: string
-  blueLabel: string
-  redLabel: string
-  emptyLabel: string
-}) {
-  const blue = lineups.filter((l) => l.team === 'blue')
-  const red = lineups.filter((l) => l.team === 'red')
-
-  if (lineups.length === 0) {
-    return (
-      <section className="space-y-2">
-        {title ? <h2 className="text-base font-medium">{title}</h2> : null}
-        <p className="text-sm text-muted-foreground">{emptyLabel}</p>
-      </section>
-    )
-  }
-
-  return (
-    <section className="space-y-3">
-      {title ? <h2 className="text-base font-medium">{title}</h2> : null}
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border p-3">
-          <h3 className="mb-2 text-sm font-medium text-team-blue">{blueLabel}</h3>
-          <ul className="space-y-1 text-sm">
-            {blue.map((l) => (
-              <li key={l.id}>{l.userName}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="rounded-lg border p-3">
-          <h3 className="mb-2 text-sm font-medium text-primary">{redLabel}</h3>
-          <ul className="space-y-1 text-sm">
-            {red.map((l) => (
-              <li key={l.id}>{l.userName}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function ScoreSide({
-  label,
-  labelClassName,
-  value,
-  canEdit,
-  onChange,
-}: {
-  label: string
-  labelClassName: string
-  value: number
-  canEdit: boolean
-  onChange: (value: number) => void
-}) {
-  return (
-    <div className="text-center">
-      <p className={cn('text-sm font-medium', labelClassName)}>{label}</p>
-      {canEdit ? (
-        <Input
-          type="number"
-          min={0}
-          className="mx-auto mt-1 w-20 py-2 text-center text-4xl font-semibold tabular-nums"
-          value={value}
-          onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
-        />
-      ) : (
-        <p className="text-4xl font-semibold tabular-nums">{value}</p>
-      )}
-    </div>
-  )
-}
-
-function ChatBubble({ message, isMine }: { message: MatchMessage; isMine: boolean }) {
-  return (
-    <div className={cn('flex flex-col gap-0.5', isMine ? 'items-end' : 'items-start')}>
-      {!isMine ? (
-        <span className="px-1 text-xs font-medium text-muted-foreground">{message.authorName}</span>
-      ) : null}
-      <div
-        className={cn(
-          'max-w-[85%] rounded-2xl px-3 py-2 text-sm',
-          isMine ? 'bg-primary text-primary-foreground' : 'bg-muted',
-        )}
-      >
-        {message.body}
-      </div>
     </div>
   )
 }

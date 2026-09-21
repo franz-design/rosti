@@ -1,14 +1,16 @@
 import { AppLoader } from '@rosti/ui/components/app'
-import { Button } from '@rosti/ui/components/primitives/button'
-import { Input } from '@rosti/ui/components/primitives/input'
 import { toast } from '@rosti/ui/components/primitives/sonner'
+import { Tabs, TabsContent } from '@rosti/ui/components/primitives/tabs'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router'
-import { ClubPlayersSection } from '@/features/clubs/club-players-section'
-import { useClub } from '@/features/clubs/club-context'
-import { EmailPillsInput } from '@/features/onboarding/email-pills-input'
+import { ClubPlayersSection } from './components/players/club-players-section'
+import { ClubSettingsTabsList } from './components/settings/club-settings-tabs'
+import { InviteMembersSection } from './components/settings/invite-members-section'
+import { PaymentLinkSection } from './components/settings/payment-link-section'
+import { SeasonsSettingsSection } from './components/settings/seasons-settings-section'
+import { useClub } from './hooks/club-context'
 import { authClient } from '@/lib/auth-client'
 import { rostiApi } from '@/lib/rosti-api'
 
@@ -19,6 +21,7 @@ export default function ClubSettingsPage() {
   const queryClient = useQueryClient()
   const [link, setLink] = useState('')
   const [emails, setEmails] = useState<string[]>([])
+  const [settingsTab, setSettingsTab] = useState('players')
 
   const { data } = useQuery({
     queryKey: ['payment-link', activeClub?.id],
@@ -64,43 +67,41 @@ export default function ClubSettingsPage() {
   if (!isClubAdmin) return <Navigate to="/dashboard" replace />
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 p-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">{t('clubSettings.title')}</h1>
+        <h1 className="text-2xl font-black">{t('clubSettings.title')}</h1>
         <p className="text-muted-foreground">{activeClub.name}</p>
       </div>
 
-      <section className="space-y-2">
-        <h2 className="text-lg font-medium">{t('clubSettings.invite.title')}</h2>
-        <p className="text-sm text-muted-foreground">{t('clubSettings.invite.hint')}</p>
-        <EmailPillsInput
-          emails={emails}
-          onChange={setEmails}
-          placeholder={t('clubSettings.invite.placeholder')}
-        />
-        <Button
-          disabled={invite.isPending || emails.length === 0}
-          onClick={() => invite.mutate()}
-        >
-          {t('clubSettings.invite.send')}
-        </Button>
-      </section>
+      <Tabs value={settingsTab} onValueChange={(value) => setSettingsTab(value)} className="gap-4">
+        <ClubSettingsTabsList />
 
-      <ClubPlayersSection
-        organizationId={activeClub.id}
-        currentUserId={session?.user?.id}
-      />
+        <TabsContent value="players" className="outline-none">
+          <ClubPlayersSection organizationId={activeClub.id} currentUserId={session?.user?.id} />
+        </TabsContent>
 
-      <section className="space-y-2">
-        <h2 className="text-lg font-medium">{t('clubSettings.paymentLink.title')}</h2>
-        <p className="text-sm text-muted-foreground">{t('clubSettings.paymentLink.hint')}</p>
-        <Input
-          value={link}
-          onChange={(e) => setLink(e.target.value)}
-          placeholder={data?.paymentLink ?? 'https://…'}
-        />
-        <Button onClick={() => save.mutate()}>{t('clubSettings.paymentLink.save')}</Button>
-      </section>
+        <TabsContent value="invite" className="outline-none">
+          <InviteMembersSection
+            emails={emails}
+            onEmailsChange={setEmails}
+            onSubmit={() => invite.mutate()}
+            isPending={invite.isPending}
+          />
+        </TabsContent>
+
+        <TabsContent value="seasons" className="outline-none">
+          <SeasonsSettingsSection />
+        </TabsContent>
+
+        <TabsContent value="payment" className="outline-none">
+          <PaymentLinkSection
+            value={link}
+            placeholder={data?.paymentLink ?? undefined}
+            onChange={setLink}
+            onSave={() => save.mutate()}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

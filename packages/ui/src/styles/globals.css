@@ -25,6 +25,7 @@
 
 :root {
   --header-height: 3rem;
+  --bottom-nav-height: calc(3.5rem + env(safe-area-inset-bottom, 0px));
   --radius: 0.625rem;
 
   /* Rösti yellow — primary fill token (NEVER use as text color on white) */

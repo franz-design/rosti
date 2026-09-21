@@ -10,14 +10,14 @@ SaaS multi-club session manager.
 ## Core concepts
 
 - **Club** = Better Auth Organization (`owner` immutable, `admin`, `member`)
-- **Season** — stats window
+- **Season** — stats window. A club has one active season at a time. Admins create, rename, and close seasons from the seasons page. Home stats and new matches follow the active season.
 - **Match / MatchSeries** — single or recurring sessions with capacity
 - **Attendance** — present / absent / pending
 - **Lineup** — blue / red
 - **Score** — set by club admins on the match; independent of player stats
-- **Stats** — goals & assists per match (indicative only), aggregated per season
+- **Stats** — goals & assists per match (indicative only), aggregated per season. The home page shows club highlights for the active season (matches played, top scorer, most wins, most losses, most frequent teammates) plus the signed-in player's own totals.
 - **Chat** — per-match messages with `@uuid` mentions
-- **Notifications** — email + push preferences + scheduled RSVP reminders
+- **Notifications** — email + push preferences, scheduled RSVP reminders, and a score reminder to club admins after a match ends
 - **Session fees** — split pitch + extras; mark paid; personal payment link
 
 ## Clients

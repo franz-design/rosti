@@ -85,7 +85,7 @@ Reset + seed
 pnpm db:fresh:seed # Same but run seeders afterwards
 ```
 
-Development seed credentials (after `db:fresh:seed` or `db:migrate:seed`):
+Development seed credentials (after `db:fresh:seed` or `db:migrate:seed`). The seed also creates an active season and past weekly matches with random scores and lineups:
 
 | Account | Email | Password |
 |---------|-------|----------|

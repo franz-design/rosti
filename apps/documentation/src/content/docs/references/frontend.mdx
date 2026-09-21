@@ -18,16 +18,21 @@ If not specified otherwise, follow the following guidelines:
 - Use kebab-case for file names.
 - Use features folder to add route components or scoped components. Look at other features in the repo. It shoud look like this:
   - features/
-    - common/ for common files, hooks, etc.
-      - hooks/
-      - utils/
-      - atoms/
-    - featureName/
-      - components/
-        - feature-component.tsx
-        - another-component.tsx
-      - hooks/ for hooks scoped to this feature
-      - utils/ for utils scoped to this feature
+  - common/ for common files, hooks, etc.
+    - hooks/
+    - utils/
+    - atoms/
+  - featureName/
+    - feature-page.tsx (route pages only at the feature root)
+    - another-page.tsx
+    - components/
+      - feature-component.tsx
+      - another-component.tsx
+      - page-section/ for components used by one page
+        - nested-group/ for a tight UI group (chat, lineup, forms, …)
+    - hooks/ for hooks scoped to this feature
+    - utils/ for utils scoped to this feature
+- A feature folder's direct children should be page files, then `components/`, and optionally `hooks/` and `utils/`. Split page UI into dedicated components instead of keeping large local functions in the page file.
 - Use app folder to had global components that are used in multiple features.
 - Use utils folder to had utility functions.
 - Use components from @rosti/ui in ./packages/ui.

@@ -3605,7 +3605,8 @@
           "collation": null,
           "enumItems": [
             "match_invite",
-            "rsvp_reminder"
+            "rsvp_reminder",
+            "score_reminder"
           ],
           "mappedType": "enum"
         },
@@ -3659,8 +3660,8 @@
         },
         {
           "name": "scheduled_job_type_check",
-          "expression": "\"type\" in ('match_invite', 'rsvp_reminder')",
-          "definition": "check (\"type\" in ('match_invite', 'rsvp_reminder'))",
+          "expression": "\"type\" in ('match_invite', 'rsvp_reminder', 'score_reminder')",
+          "definition": "check (\"type\" in ('match_invite', 'rsvp_reminder', 'score_reminder'))",
           "columnName": "type"
         }
       ],

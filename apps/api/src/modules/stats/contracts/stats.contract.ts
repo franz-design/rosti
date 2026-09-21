@@ -40,3 +40,66 @@ export const seasonPlayerStatSchema = z
 
 export type SeasonPlayerStatDto = z.infer<typeof seasonPlayerStatSchema>
 export const seasonPlayerStatsSchema = z.array(seasonPlayerStatSchema)
+
+export const playerRefSchema = z
+  .object({
+    userId: z.string().uuid(),
+    userName: z.string(),
+  })
+  .meta({ title: 'PlayerRefSchema' })
+
+export type PlayerRefDto = z.infer<typeof playerRefSchema>
+
+export const playerHighlightSchema = z
+  .object({
+    userId: z.string().uuid(),
+    userName: z.string(),
+    value: z.number().int().nonnegative(),
+  })
+  .meta({ title: 'PlayerHighlightSchema' })
+
+export type PlayerHighlightDto = z.infer<typeof playerHighlightSchema>
+
+export const playedTogetherSchema = z
+  .object({
+    playerA: playerRefSchema,
+    playerB: playerRefSchema,
+    matchesTogether: z.number().int().nonnegative(),
+  })
+  .meta({ title: 'PlayedTogetherSchema' })
+
+export type PlayedTogetherDto = z.infer<typeof playedTogetherSchema>
+
+export const clubHomeStatsSchema = z
+  .object({
+    matchesPlayed: z.number().int().nonnegative(),
+    topScorer: playerHighlightSchema.nullable(),
+    mostWins: playerHighlightSchema.nullable(),
+    mostLosses: playerHighlightSchema.nullable(),
+    mostPlayedTogether: playedTogetherSchema.nullable(),
+  })
+  .meta({ title: 'ClubHomeStatsSchema' })
+
+export const personalHomeStatsSchema = z
+  .object({
+    matchesPlayed: z.number().int().nonnegative(),
+    goals: z.number().int().nonnegative(),
+    wins: z.number().int().nonnegative(),
+    losses: z.number().int().nonnegative(),
+  })
+  .meta({ title: 'PersonalHomeStatsSchema' })
+
+export const seasonHomeStatsSchema = z
+  .object({
+    season: z
+      .object({
+        id: z.string().uuid(),
+        name: z.string(),
+      })
+      .nullable(),
+    club: clubHomeStatsSchema,
+    me: personalHomeStatsSchema,
+  })
+  .meta({ title: 'SeasonHomeStatsSchema' })
+
+export type SeasonHomeStatsDto = z.infer<typeof seasonHomeStatsSchema>

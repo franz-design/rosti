@@ -1,0 +1,89 @@
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandSeparator,
+  CommandShortcut,
+} from '@rosti/ui/components/primitives/command'
+import { CalendarRange, LayoutDashboard, Moon, Sun, User } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router'
+import useTheme from '@/hooks/useTheme'
+
+interface CommandPaletteProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const [theme, setTheme] = useTheme()
+
+  const handleNavigate = (to: string) => {
+    onOpenChange(false)
+    navigate(to)
+  }
+
+  const handleToggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark')
+    onOpenChange(false)
+  }
+
+  return (
+    <CommandDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={t('commandPalette.title')}
+      description={t('commandPalette.description')}
+    >
+      <Command>
+        <CommandInput placeholder={t('commandPalette.placeholder')} />
+        <CommandEmpty>{t('commandPalette.noResults')}</CommandEmpty>
+
+        <CommandGroup heading={t('commandPalette.groups.navigate')}>
+          <CommandItem
+            onSelect={() => handleNavigate('/dashboard')}
+            keywords={['dashboard', 'home', 'overview']}
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            <span>{t('commandPalette.items.dashboard')}</span>
+            <CommandShortcut>D</CommandShortcut>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => handleNavigate('/seasons')}
+            keywords={['season', 'saison', 'stats']}
+          >
+            <CalendarRange className="h-4 w-4" />
+            <span>{t('commandPalette.items.seasons')}</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => handleNavigate('/dashboard/profile')}
+            keywords={['profile', 'account', 'user', 'settings']}
+          >
+            <User className="h-4 w-4" />
+            <span>{t('commandPalette.items.profile')}</span>
+            <CommandShortcut>P</CommandShortcut>
+          </CommandItem>
+        </CommandGroup>
+
+        <CommandSeparator />
+
+        <CommandGroup heading={t('commandPalette.groups.preferences')}>
+          <CommandItem onSelect={handleToggleTheme} keywords={['theme', 'dark', 'light', 'mode']}>
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            <span>
+              {theme === 'dark'
+                ? t('commandPalette.items.lightMode')
+                : t('commandPalette.items.darkMode')}
+            </span>
+            <CommandShortcut>T</CommandShortcut>
+          </CommandItem>
+        </CommandGroup>
+      </Command>
+    </CommandDialog>
+  )
+}

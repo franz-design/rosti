@@ -2,10 +2,21 @@ import { EntityManager } from '@mikro-orm/core'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { User } from '../auth/auth.entity'
 import { OrganizationService } from '../auth/organization.service'
-import { MatchStatus } from '../matches/contracts/match.contract'
+import { AttendanceStatus, MatchStatus } from '../matches/contracts/match.contract'
+import { MatchAttendance } from '../matches/match-attendance.entity'
+import { MatchLineup } from '../matches/match-lineup.entity'
 import { Match } from '../matches/match.entity'
-import { UpsertMatchStatsInput } from './contracts/stats.contract'
+import { SeasonStatus } from '../seasons/contracts/season.contract'
+import { Season } from '../seasons/season.entity'
+import { SeasonHomeStatsDto, UpsertMatchStatsInput } from './contracts/stats.contract'
 import { MatchStat } from './match-stat.entity'
+import {
+  computeSeasonHomeStats,
+  createEmptyHomeStats,
+  type HomeStatsGoalRow,
+  type HomeStatsLineupRow,
+  type HomeStatsPlayerRow,
+} from './season-home-stats'
 
 @Injectable()
 export class StatsService {
@@ -102,5 +113,77 @@ export class StatsService {
       map.set(s.user.id, current)
     }
     return Array.from(map.values()).sort((a, b) => b.goals - a.goals)
+  }
+
+  /**
+   * Club and personal highlights for the latest active season.
+   */
+  async getHomeStats(organizationId: string, userId: string): Promise<SeasonHomeStatsDto> {
+    await this.organizationService.requireMember(organizationId, userId)
+
+    const season = await this.em.findOne(
+      Season,
+      { organization: { id: organizationId }, status: SeasonStatus.Active },
+      { orderBy: { startsAt: 'DESC' } },
+    )
+    if (!season) return createEmptyHomeStats(null)
+
+    const seasonRef = { id: season.id, name: season.name }
+    const matches = await this.em.find(Match, {
+      organization: { id: organizationId },
+      season: { id: season.id },
+      status: MatchStatus.Played,
+    })
+    if (matches.length === 0) return createEmptyHomeStats(seasonRef)
+
+    const matchIds = matches.map((match) => match.id)
+    const [attendances, lineups, stats] = await Promise.all([
+      this.em.find(
+        MatchAttendance,
+        { match: { id: { $in: matchIds } }, status: AttendanceStatus.Present },
+        { populate: ['user', 'match'] },
+      ),
+      this.em.find(MatchLineup, { match: { id: { $in: matchIds } } }, { populate: ['user', 'match'] }),
+      this.em.find(MatchStat, { match: { id: { $in: matchIds } } }, { populate: ['user', 'match'] }),
+    ])
+
+    return computeSeasonHomeStats({
+      season: seasonRef,
+      viewerUserId: userId,
+      matches: matches.map((match) => ({
+        id: match.id,
+        blueScore: match.blueScore,
+        redScore: match.redScore,
+      })),
+      attendances: attendances.map(toPlayerRow),
+      lineups: lineups.map(toLineupRow),
+      goals: stats.map(toGoalRow),
+    })
+  }
+}
+
+function toPlayerRow(row: MatchAttendance): HomeStatsPlayerRow {
+  return {
+    matchId: row.match.id,
+    userId: row.user.id,
+    userName: row.user.name,
+  }
+}
+
+function toLineupRow(row: MatchLineup): HomeStatsLineupRow {
+  return {
+    matchId: row.match.id,
+    userId: row.user.id,
+    userName: row.user.name,
+    team: row.team,
+  }
+}
+
+function toGoalRow(row: MatchStat): HomeStatsGoalRow {
+  return {
+    matchId: row.match.id,
+    userId: row.user.id,
+    userName: row.user.name,
+    goals: row.goals,
   }
 }

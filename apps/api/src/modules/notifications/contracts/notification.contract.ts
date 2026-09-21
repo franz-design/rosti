@@ -9,6 +9,7 @@ export enum DevicePlatform {
 export enum ScheduledJobType {
   MatchInvite = 'match_invite',
   RsvpReminder = 'rsvp_reminder',
+  ScoreReminder = 'score_reminder',
 }
 
 export enum ScheduledJobStatus {

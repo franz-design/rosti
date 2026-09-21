@@ -25,6 +25,7 @@ import {
   UpdateMatchInput,
   updateMatchSchema,
 } from './contracts/match.contract'
+import { Match } from './match.entity'
 import { MatchMapper } from './match.mapper'
 import { MatchService } from './match.service'
 
@@ -43,8 +44,7 @@ export class MatchController {
     @TypedBody(createMatchSchema) body: CreateMatchInput,
   ): Promise<MatchDto[]> {
     const matches = await this.matchService.create(organizationId, session.user.id, body)
-    const presentCounts = await this.matchService.countPresentByMatchIds(matches.map((m) => m.id))
-    return this.matchMapper.toDtos(matches, presentCounts)
+    return this.mapMatches(matches, session.user.id)
   }
 
   @TypedRoute.Get('', matchesSchema)
@@ -54,8 +54,7 @@ export class MatchController {
     @Query('seasonId') seasonId?: string,
   ): Promise<MatchDto[]> {
     const matches = await this.matchService.list(organizationId, session.user.id, seasonId)
-    const presentCounts = await this.matchService.countPresentByMatchIds(matches.map((m) => m.id))
-    return this.matchMapper.toDtos(matches, presentCounts)
+    return this.mapMatches(matches, session.user.id)
   }
 
   @TypedRoute.Get(':matchId', matchSchema)
@@ -65,8 +64,7 @@ export class MatchController {
     @TypedParam('matchId', z.string().uuid()) matchId: string,
   ): Promise<MatchDto> {
     const match = await this.matchService.get(organizationId, session.user.id, matchId)
-    const presentCount = await this.matchService.countPresent(match.id)
-    return this.matchMapper.toDto(match, presentCount)
+    return this.mapMatch(match, session.user.id)
   }
 
   @TypedRoute.Patch(':matchId', matchSchema)
@@ -77,8 +75,7 @@ export class MatchController {
     @TypedBody(updateMatchSchema) body: UpdateMatchInput,
   ): Promise<MatchDto> {
     const match = await this.matchService.update(organizationId, session.user.id, matchId, body)
-    const presentCount = await this.matchService.countPresent(match.id)
-    return this.matchMapper.toDto(match, presentCount)
+    return this.mapMatch(match, session.user.id)
   }
 
   @TypedRoute.Post(':matchId/cancel', matchSchema)
@@ -89,8 +86,7 @@ export class MatchController {
     @TypedBody(cancelMatchSchema) body: CancelMatchInput,
   ): Promise<MatchDto> {
     const match = await this.matchService.cancel(organizationId, session.user.id, matchId, body)
-    const presentCount = await this.matchService.countPresent(match.id)
-    return this.matchMapper.toDto(match, presentCount)
+    return this.mapMatch(match, session.user.id)
   }
 
   @TypedRoute.Post(':matchId/played', matchSchema)
@@ -100,8 +96,7 @@ export class MatchController {
     @TypedParam('matchId', z.string().uuid()) matchId: string,
   ): Promise<MatchDto> {
     const match = await this.matchService.markPlayed(organizationId, session.user.id, matchId)
-    const presentCount = await this.matchService.countPresent(match.id)
-    return this.matchMapper.toDto(match, presentCount)
+    return this.mapMatch(match, session.user.id)
   }
 
   @TypedRoute.Get(':matchId/attendances', attendancesSchema)
@@ -185,5 +180,25 @@ export class MatchController {
       body.team,
     )
     return rows.map((r) => this.matchMapper.toLineupDto(r))
+  }
+
+  private async mapMatch(match: Match, userId: string): Promise<MatchDto> {
+    const [presentCount, viewerTeams] = await Promise.all([
+      this.matchService.countPresent(match.id),
+      this.matchService.findViewerTeamsByMatchIds({ userId, matchIds: [match.id] }),
+    ])
+    return this.matchMapper.toDto(match, {
+      presentCount,
+      viewerTeam: viewerTeams.get(match.id),
+    })
+  }
+
+  private async mapMatches(matches: Match[], userId: string): Promise<MatchDto[]> {
+    const matchIds = matches.map((match) => match.id)
+    const [presentCounts, viewerTeams] = await Promise.all([
+      this.matchService.countPresentByMatchIds(matchIds),
+      this.matchService.findViewerTeamsByMatchIds({ userId, matchIds }),
+    ])
+    return this.matchMapper.toDtos(matches, { presentCounts, viewerTeams })
   }
 }

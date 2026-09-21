@@ -1,65 +1,81 @@
-import { Avatar, AvatarFallback } from '@rosti/ui/components/primitives/avatar'
+import { toast } from '@rosti/ui/components/primitives/sonner'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { z } from 'zod'
 import { authClient } from '@/lib/auth-client'
+import { ProfileDetailsForm } from './components/profile-details-form'
+import { ProfileHeader } from './components/profile-header'
+import { ProfileIdentity } from './components/profile-identity'
+import {
+  getNameParts,
+  getProfileDisplayName,
+  getProfileInitials,
+  type ProfileNameParts,
+  type ProfileUser,
+} from './utils/get-name-parts'
 
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="bg-background p-5">
-      <dt className="mb-1 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
-        {label}
-      </dt>
-      <dd className="text-sm font-medium text-foreground break-words">{value}</dd>
-    </div>
-  )
-}
+const profileDetailsSchema = z.object({
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+})
 
 export default function ProfilePage() {
   const { t } = useTranslation()
-  const { data: sessionData } = authClient.useSession()
-  const user = sessionData?.user
+  const { data: sessionData, refetch } = authClient.useSession()
+  const user = sessionData?.user as ProfileUser | undefined
 
-  const name = user?.name ?? user?.email ?? t('common.user')
-  const initials = name
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
+  const form = useForm<ProfileNameParts>({
+    resolver: zodResolver(profileDetailsSchema),
+    defaultValues: getNameParts(user),
+  })
+
+  useEffect(() => {
+    if (form.formState.isDirty) return
+    form.reset(getNameParts(user))
+  }, [form, user?.firstName, user?.lastName, user?.name])
+
+  const { mutate: saveProfile, isPending } = useMutation({
+    mutationFn: async (data: ProfileNameParts) => {
+      const name = `${data.firstName} ${data.lastName}`.trim()
+      const response = await authClient.updateUser({
+        name,
+        // @ts-expect-error additional fields inferred at runtime
+        firstName: data.firstName,
+        lastName: data.lastName,
+      })
+
+      if (response.error) {
+        throw new Error(response.error.message ?? t('profile.saveError'))
+      }
+
+      return response.data
+    },
+    onSuccess: async (_result, data) => {
+      form.reset(data)
+      await refetch()
+      toast.success(t('profile.saved'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('profile.saveError'))
+    },
+  })
+
+  const displayName = getProfileDisplayName(user, t('common.user'))
+  const initials = getProfileInitials(displayName)
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="border-b border-border pb-6">
-        <p className="mb-1 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
-          {t('profile.eyebrow')}
-        </p>
-        <h1 className="font-display text-3xl font-black tracking-tight text-foreground">
-          {t('profile.title')}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t('profile.description')}</p>
-      </div>
-
-      {/* Identity */}
-      <div className="flex items-center gap-4">
-        <Avatar size="lg" className="size-16">
-          <AvatarFallback className="text-lg font-bold">{initials}</AvatarFallback>
-        </Avatar>
-        <div className="min-w-0">
-          <p className="truncate text-lg font-bold text-foreground">{name}</p>
-          <p className="truncate text-sm text-muted-foreground">{user?.email}</p>
-        </div>
-      </div>
-
-      {/* Details */}
-      <dl className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2">
-        <Field label={t('profile.name')} value={user?.name ?? '—'} />
-        <Field label={t('profile.email')} value={user?.email ?? '—'} />
-        <Field
-          label={t('profile.emailVerified')}
-          value={user?.emailVerified ? t('profile.verified') : t('profile.unverified')}
-        />
-        <Field label={t('profile.userId')} value={user?.id ?? '—'} />
-      </dl>
+      <ProfileHeader />
+      <ProfileIdentity displayName={displayName} initials={initials} email={user?.email} />
+      <ProfileDetailsForm
+        form={form}
+        email={user?.email}
+        isPending={isPending}
+        onSubmit={(data) => saveProfile(data)}
+      />
     </div>
   )
 }

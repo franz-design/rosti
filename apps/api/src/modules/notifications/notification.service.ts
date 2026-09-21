@@ -3,7 +3,7 @@ import { CreateRequestContext } from '@mikro-orm/decorators/legacy'
 import { Injectable, Logger } from '@nestjs/common'
 import { Member, User } from '../auth/auth.entity'
 import { EmailService } from '../email/email.service'
-import { AttendanceStatus } from '../matches/contracts/match.contract'
+import { AttendanceStatus, MatchStatus } from '../matches/contracts/match.contract'
 import { MatchAttendance } from '../matches/match-attendance.entity'
 import { Match } from '../matches/match.entity'
 import {
@@ -14,6 +14,12 @@ import {
 import { DeviceToken } from './device-token.entity'
 import { NotificationPreference } from './notification-preference.entity'
 import { ScheduledJob } from './scheduled-job.entity'
+import {
+  canRemindScore,
+  CLUB_ADMIN_ROLES,
+  computeScoreReminderRunAt,
+  SCORE_REMINDER_DELAY_MS,
+} from './score-reminder'
 
 @Injectable()
 export class NotificationService {
@@ -76,15 +82,15 @@ export class NotificationService {
   }
 
   async scheduleMatchReminders(match: Match): Promise<void> {
-    const offsets = match.reminderOffsetsHours?.length
-      ? match.reminderOffsetsHours
-      : [120, 48]
+    const offsets = match.reminderOffsetsHours?.length ? match.reminderOffsetsHours : [120, 48]
 
     // Initial invite ~5 days before if not already closer
     const inviteOffset = Math.max(...offsets, 120)
     const inviteAt = new Date(match.startsAt.getTime() - inviteOffset * 60 * 60 * 1000)
     if (inviteAt > new Date()) {
-      await this.enqueue(match, ScheduledJobType.MatchInvite, inviteAt, { offsetHours: inviteOffset })
+      await this.enqueue(match, ScheduledJobType.MatchInvite, inviteAt, {
+        offsetHours: inviteOffset,
+      })
     }
 
     for (const hours of offsets) {
@@ -92,6 +98,17 @@ export class NotificationService {
       if (runAt <= new Date()) continue
       await this.enqueue(match, ScheduledJobType.RsvpReminder, runAt, { offsetHours: hours })
     }
+
+    await this.scheduleScoreReminder(match)
+  }
+
+  private async scheduleScoreReminder(match: Match): Promise<void> {
+    if (!canRemindScore(match)) return
+    await this.enqueue(
+      match,
+      ScheduledJobType.ScoreReminder,
+      computeScoreReminderRunAt(match.startsAt),
+    )
   }
 
   private async enqueue(
@@ -110,10 +127,11 @@ export class NotificationService {
     await this.em.flush()
   }
 
-  async cancelMatchJobs(matchId: string): Promise<void> {
+  async cancelMatchJobs(matchId: string, type?: ScheduledJobType): Promise<void> {
     const jobs = await this.em.find(ScheduledJob, {
       match: { id: matchId },
       status: ScheduledJobStatus.Pending,
+      ...(type ? { type } : {}),
     })
     for (const job of jobs) job.status = ScheduledJobStatus.Cancelled
     await this.em.flush()
@@ -182,6 +200,7 @@ export class NotificationService {
 
   @CreateRequestContext()
   async processDueJobs(): Promise<number> {
+    await this.ensureScoreReminders()
     const now = new Date()
     const jobs = await this.em.find(
       ScheduledJob,
@@ -194,6 +213,8 @@ export class NotificationService {
           await this.notifyNewMatch(job.match)
         } else if (job.type === ScheduledJobType.RsvpReminder) {
           await this.sendRsvpReminders(job.match)
+        } else if (job.type === ScheduledJobType.ScoreReminder) {
+          await this.sendScoreReminders(job.match)
         }
         job.status = ScheduledJobStatus.Done
       } catch (err) {
@@ -203,6 +224,53 @@ export class NotificationService {
     }
     await this.em.flush()
     return jobs.length
+  }
+
+  private async ensureScoreReminders(): Promise<void> {
+    const now = new Date()
+    const latestKickoff = new Date(now.getTime() - SCORE_REMINDER_DELAY_MS)
+    const earliestKickoff = new Date(latestKickoff.getTime() - 6 * 60 * 60 * 1000)
+
+    const matches = await this.em.find(
+      Match,
+      {
+        status: { $ne: MatchStatus.Cancelled },
+        startsAt: { $gt: earliestKickoff, $lte: latestKickoff },
+      },
+      { populate: ['organization'], limit: 50 },
+    )
+
+    for (const match of matches) {
+      if (!canRemindScore(match)) continue
+      const existing = await this.em.count(ScheduledJob, {
+        match: { id: match.id },
+        type: ScheduledJobType.ScoreReminder,
+      })
+      if (existing > 0) continue
+      await this.enqueue(match, ScheduledJobType.ScoreReminder, now)
+    }
+  }
+
+  private async sendScoreReminders(match: Match): Promise<void> {
+    if (!canRemindScore(match)) return
+
+    const admins = await this.em.find(
+      Member,
+      {
+        organization: { id: match.organization.id },
+        role: { $in: [...CLUB_ADMIN_ROLES] },
+      },
+      { populate: ['user'] },
+    )
+    for (const member of admins) {
+      const prefs = await this.getOrCreatePreferences(member.user.id)
+      await this.deliver(
+        member.user,
+        prefs,
+        `Enter the score: ${match.title}`,
+        `The match "${match.title}" has ended. Please enter the score in Rösti.`,
+      )
+    }
   }
 
   private async sendRsvpReminders(match: Match): Promise<void> {

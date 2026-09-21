@@ -1,12 +1,17 @@
-import { Button } from '@rosti/ui/components/primitives/button'
 import { useQuery } from '@tanstack/react-query'
-import { MapPin } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Link, Navigate } from 'react-router'
-import MatchCard from '@/features/matches/match-card'
-import { getLastMatch, getNextMatch } from '@/features/matches/match-filters'
+import { Navigate } from 'react-router'
+import { HomeActions } from './components/home/home-actions'
+import { HomeHeader } from './components/home/home-header'
+import { HomeMatchSection } from './components/home/home-match-section'
+import { useClub } from './hooks/club-context'
+import {
+  getLastMatch,
+  getNextMatch,
+  shouldPromptEnterScore,
+} from '@/features/matches/utils/match-filters'
+import HomeStatsSection from '@/features/stats/components/home/home-stats-section'
 import { rostiApi } from '@/lib/rosti-api'
-import { useClub } from './club-context'
 
 export default function ClubsPage() {
   const { t, i18n } = useTranslation()
@@ -31,61 +36,35 @@ export default function ClubsPage() {
   const dateLocale = i18n.language?.startsWith('en') ? 'en-GB' : 'fr-FR'
 
   return (
-    <div className="space-y-8">
-      <div>
-        <p className="text-sm text-muted-foreground">{t('home.eyebrow')}</p>
-        <h1 className="text-3xl font-semibold tracking-tight">
-          {activeClub?.name ?? t('home.fallbackClub')}
-        </h1>
-        {activeClub?.venue ? (
-          <p className="mt-2 flex items-center gap-2 text-muted-foreground">
-            <MapPin className="size-4 shrink-0" />
-            {activeClub.venue}
-          </p>
-        ) : null}
-      </div>
+    <div className="min-w-0 space-y-8">
+      <HomeHeader
+        clubName={activeClub?.name ?? t('home.fallbackClub')}
+        venue={activeClub?.venue}
+      />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="space-y-3">
-          <h2 className="text-lg font-medium">{t('home.lastMatch')}</h2>
-          {isMatchesLoading ? (
-            <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
-          ) : lastMatch ? (
-            <MatchCard match={lastMatch} dateLocale={dateLocale} variant="past" />
-          ) : (
-            <div className="rounded-xl border border-dashed p-6 text-center">
-              <p className="text-muted-foreground">{t('home.noPast')}</p>
-            </div>
-          )}
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-lg font-medium">{t('home.nextMatch')}</h2>
-          {isMatchesLoading ? (
-            <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
-          ) : nextMatch ? (
-            <MatchCard match={nextMatch} dateLocale={dateLocale} variant="upcoming" />
-          ) : (
-            <div className="rounded-xl border border-dashed p-6 text-center space-y-3">
-              <p className="text-muted-foreground">{t('home.noUpcoming')}</p>
-              <Button variant="outline" render={<Link to="/matches" />}>
-                {t('home.goToMatches')}
-              </Button>
-            </div>
-          )}
-        </section>
+        <HomeMatchSection
+          title={t('home.lastMatch')}
+          isLoading={isMatchesLoading}
+          match={lastMatch}
+          dateLocale={dateLocale}
+          variant="past"
+          emptyLabel={t('home.noPast')}
+          promptEnterScore={lastMatch ? shouldPromptEnterScore(lastMatch, isClubAdmin) : undefined}
+        />
+        <HomeMatchSection
+          title={t('home.nextMatch')}
+          isLoading={isMatchesLoading}
+          match={nextMatch}
+          dateLocale={dateLocale}
+          variant="upcoming"
+          emptyLabel={t('home.noUpcoming')}
+          showGoToMatches
+        />
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <Button variant="outline" render={<Link to="/matches" />}>
-          {t('home.allMatches')}
-        </Button>
-        {isClubAdmin ? (
-          <Button variant="outline" render={<Link to="/club-settings" />}>
-            {t('nav.clubSettings')}
-          </Button>
-        ) : null}
-      </div>
+      <HomeStatsSection />
+      <HomeActions isClubAdmin={isClubAdmin} />
     </div>
   )
 }
