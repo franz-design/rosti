@@ -36,9 +36,11 @@ client.setConfig({
 
 ```typescript
 // Usage example
-import { postControllerCreatePost } from '@rosti/openapi-generator'
+import { seasonControllerListSeasons } from '@rosti/openapi-generator'
 
-const posts = await postControllerCreatePost()
+const seasons = await seasonControllerListSeasons({
+  path: { organizationId: '...' },
+})
 ```
 
 ## Requirements

@@ -5,783 +5,431 @@ export type ClientOptions = {
 };
 
 /**
- * UseCase1SingleGenerationRequest
- *
- * Single generation; trace is finalized with name/output so Langfuse shows them
+ * UpdateNotificationPreferenceSchema
  */
-export type UseCase1SingleGenerationRequest = {
-    prompt: string;
-    model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-    options?: AiGenerateOptions;
+export type UpdateNotificationPreferenceSchema = {
+    emailEnabled?: boolean;
+    pushEnabled?: boolean;
+    notifyNewMatch?: boolean;
+    notifyRsvpReminder?: boolean;
+    notifyMatchCancelled?: boolean;
+    chatMentionsOnly?: boolean;
+    notifyChatMention?: boolean;
+    notifyAllChatMessages?: boolean;
 };
 
 /**
- * UseCase2GroupedCallsRequest
- *
- * Multiple LLM calls in one request; one trace in Langfuse, finalized at end
+ * RegisterDeviceSchema
  */
-export type UseCase2GroupedCallsRequest = {
-    /**
-     * Prompts for each step (same trace)
-     */
-    prompts: Array<string>;
-    model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
+export type RegisterDeviceSchema = {
+    token: string;
+    platform: 'ios' | 'android' | 'web';
 };
 
 /**
- * UseCase3LogicalUnitsRequest
- *
- * Multiple workflows; each workflow gets its own Langfuse trace (split per unit)
+ * CreateMatchMessageSchema
  */
-export type UseCase3LogicalUnitsRequest = {
-    /**
-     * One prompt per logical workflow; each gets its own trace
-     */
-    workflowPrompts: Array<string>;
-    model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
+export type CreateMatchMessageSchema = {
+    body: string;
+    mentionedUserIds?: Array<string>;
 };
 
 /**
- * UseCase4ChatSessionRequest
- *
- * Simple generateText with sessionId for grouping traces across requests
+ * UpdateClubSchema
  */
-export type UseCase4ChatSessionRequest = {
-    prompt: string;
-    /**
-     * Session ID to group traces in Langfuse (e.g. conversation or thread)
-     */
-    sessionId: string;
-    model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
+export type UpdateClubSchema = {
+    name?: string;
+    venue?: string | null;
+    sportType?: 'football' | 'futsal' | 'basketball' | 'volleyball' | 'tennis' | 'padel' | 'badminton' | 'other' | null;
+    defaultMaxCapacity?: number | null;
 };
 
 /**
- * GenerateTextRequest
- *
- * Request for simple text generation with a single prompt
+ * UpdateMemberRoleSchema
  */
-export type GenerateTextRequest = {
-    prompt: string;
-    model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-    options?: AiGenerateOptions;
+export type UpdateMemberRoleSchema = {
+    role: 'admin' | 'member';
 };
 
 /**
- * GenerateObjectRequest
- *
- * Request for structured object generation with a predefined schema type
+ * CreateMatchSchema
  */
-export type GenerateObjectRequest = {
-    prompt: string;
-    schemaType: 'userProfile' | 'task' | 'product' | 'recipe';
-    model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-    options?: AiGenerateOptions;
-};
-
-/**
- * ChatRequest
- *
- * Request for multi-turn AI conversation with message history. schemaType can be used to request structured output.
- */
-export type ChatRequest = {
-    messages: Array<ChatMessageWithSchemaType>;
-    model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-    options?: AiGenerateOptions;
-    schemaType?: ChatSchemaType;
-};
-
-/**
- * StreamTextRequest
- *
- * Request for streaming text generation with a single prompt
- */
-export type StreamTextRequest = {
-    prompt: string;
-    model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-    options?: AiGenerateOptions;
-};
-
-/**
- * StreamObjectRequest
- *
- * Request for streaming structured object generation
- */
-export type StreamObjectRequest = {
-    prompt: string;
-    schemaType: 'userProfile' | 'task' | 'product' | 'recipe';
-    model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-    options?: AiGenerateOptions;
-};
-
-/**
- * StreamChatRequest
- *
- * Request for streaming multi-turn AI conversation
- */
-export type StreamChatRequest = {
-    messages: Array<ChatMessageWithSchemaType>;
-    model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-    options?: AiGenerateOptions;
-};
-
-/**
- * CreateCommentSchema
- *
- * Schema for creating a comment
- */
-export type CreateCommentSchema = {
-    content: string;
-    parentId?: string;
-};
-
-/**
- * CreatePostSchema
- *
- * Schema for creating/updating a post
- */
-export type CreatePostSchema = {
+export type CreateMatchSchema = {
+    seasonId: string;
     title: string;
-    content: Array<PostContentSchema>;
-    coverImage?: string;
-    tags?: Array<string>;
-};
-
-/**
- * UpdatePostSchema
- *
- * Schema for updating a post
- */
-export type UpdatePostSchema = {
-    title?: string;
-    content?: Array<PostContentSchema>;
-    coverImage?: string;
-    tags?: Array<string>;
-};
-
-/**
- * GenerateTextResponse
- *
- * Response from text generation
- */
-export type GenerateTextResponse = {
-    usage?: TokenUsage;
-    finishReason?: string;
-    toolCalls?: Array<ToolCall>;
-    toolResults?: Array<ToolResult>;
-    result: string;
-};
-
-/**
- * TokenUsage
- *
- * Token usage information for an AI generation
- */
-export type TokenUsage = {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-};
-
-/**
- * ToolCall
- *
- * A tool call made by the AI
- */
-export type ToolCall = {
-    toolCallId: string;
-    toolName: string;
-    args: {
-        [key: string]: unknown;
+    startsAt: string;
+    location?: string;
+    maxCapacity: number;
+    reminderOffsetsHours?: Array<number>;
+    recurrence?: {
+        frequency: 'weekly' | 'monthly' | 'monthly_nth_weekday' | 'custom';
+        rrule?: string;
+        endsAt?: string;
+        occurrenceCount?: number;
     };
 };
 
 /**
- * ToolResult
- *
- * The result of a tool call
+ * UpdateMatchSchema
  */
-export type ToolResult = {
-    toolCallId: string;
-    toolName: string;
-    result: unknown;
+export type UpdateMatchSchema = {
+    title?: string;
+    startsAt?: string;
+    location?: string | null;
+    maxCapacity?: number;
+    blueScore?: number | null;
+    redScore?: number | null;
+    reminderOffsetsHours?: Array<number> | null;
 };
 
 /**
- * UseCase2GroupedCallsResponse
- *
- * Combined results from grouped LLM calls
+ * CancelMatchSchema
  */
-export type UseCase2GroupedCallsResponse = {
-    traceName: string;
-    results: Array<string>;
-    usage?: TokenUsage;
+export type CancelMatchSchema = {
+    reason?: string;
 };
 
 /**
- * UseCase3LogicalUnitsResponse
- *
- * One result per workflow (each in its own trace)
+ * RespondAttendanceSchema
  */
-export type UseCase3LogicalUnitsResponse = {
-    workflows: Array<{
-        index: number;
-        result: string;
-        usage?: TokenUsage;
+export type RespondAttendanceSchema = {
+    status: 'present' | 'absent';
+};
+
+/**
+ * SetAttendanceSchema
+ */
+export type SetAttendanceSchema = {
+    status: 'present' | 'absent' | 'pending';
+};
+
+/**
+ * SetLineupSchema
+ */
+export type SetLineupSchema = {
+    assignments: Array<{
+        userId: string;
+        team: 'blue' | 'red';
     }>;
 };
 
 /**
- * GenerateObjectResponse
- *
- * Response from structured object generation
+ * SetPlayerTeamSchema
  */
-export type GenerateObjectResponse = {
-    usage?: TokenUsage;
-    finishReason?: string;
-    toolCalls?: Array<ToolCall>;
-    toolResults?: Array<ToolResult>;
-    result: unknown;
+export type SetPlayerTeamSchema = {
+    team: 'blue' | 'red' | null;
 };
 
 /**
- * ChatResponse
- *
- * Response from AI chat conversation
+ * UpsertMatchCostSchema
  */
-export type ChatResponse = {
-    usage?: TokenUsage;
-    finishReason?: string;
-    toolCalls?: Array<ToolCall>;
-    toolResults?: Array<ToolResult>;
-    result: string;
-    messages: Array<ChatMessageWithSchemaType>;
+export type UpsertMatchCostSchema = {
+    pitchCostCents: number;
+    extrasCostCents: number;
 };
 
 /**
- * ChatMessageWithSchemaType
- *
- * A message with optional schemaType metadata for identifying structured output
+ * UpdateFeeStatusSchema
  */
-export type ChatMessageWithSchemaType = {
-    role: 'user' | 'assistant' | 'system' | 'tool';
-    content: string;
-    metadata?: {
-        isConsideredSystemMessage?: boolean;
-        /**
-         * TokenUsage
-         *
-         * Total token usage for the message, including tools calls and reasoning steps
-         */
-        usage?: {
-            promptTokens: number;
-            completionTokens: number;
-            totalTokens: number;
-        };
-        finishReason?: string;
-        /**
-         * ISO 8601 timestamp when the message was created
-         */
-        timestamp?: Date;
-        /**
-         * Tool calls made to generate the message
-         */
-        toolCalls?: Array<{
-            toolCallId: string;
-            toolName: string;
-            args: {
-                [key: string]: unknown;
-            };
-        }>;
-        /**
-         * Reasoning text for the message
-         */
-        reasonning?: string;
-        /**
-         * ChatSchemaType
-         *
-         * Predefined schema types for testing structured output
-         */
-        schemaType?: 'userProfile' | 'task' | 'product' | 'recipe' | 'none';
-    };
+export type UpdateFeeStatusSchema = {
+    status: 'owed' | 'paid' | 'waived';
 };
 
 /**
- * ChatSchemaType
- *
- * Predefined schema types for testing structured output
+ * ClubPaymentLinkSchema
  */
-export const ChatSchemaType = {
-    USER_PROFILE: 'userProfile',
-    TASK: 'task',
-    PRODUCT: 'product',
-    RECIPE: 'recipe',
-    NONE: 'none'
-} as const;
+export type ClubPaymentLinkSchema = {
+    paymentLink?: string | null;
+};
 
 /**
- * ChatSchemaType
- *
- * Predefined schema types for testing structured output
+ * CreateSeasonSchema
  */
-export type ChatSchemaType = typeof ChatSchemaType[keyof typeof ChatSchemaType];
+export type CreateSeasonSchema = {
+    name: string;
+    startsAt: string;
+    endsAt?: string;
+};
 
 /**
- * CommentSchema
- *
- * Schema for a comment
+ * UpdateSeasonSchema
  */
-export type CommentSchema = {
+export type UpdateSeasonSchema = {
+    name?: string;
+    startsAt?: string;
+    endsAt?: string | null;
+    status?: 'active' | 'closed';
+};
+
+/**
+ * UpsertMatchStatsSchema
+ */
+export type UpsertMatchStatsSchema = {
+    stats: Array<{
+        userId: string;
+        goals: number;
+        assists: number;
+    }>;
+};
+
+/**
+ * NotificationPreferenceSchema
+ */
+export type NotificationPreferenceSchema = {
     id: string;
-    content: string;
-    authorName: string | null;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+    notifyNewMatch: boolean;
+    notifyRsvpReminder: boolean;
+    notifyMatchCancelled: boolean;
+    chatMentionsOnly: boolean;
+    notifyChatMention: boolean;
+    notifyAllChatMessages: boolean;
+};
+
+/**
+ * MatchMessageSchema
+ */
+export type MatchMessageSchema = {
+    id: string;
+    matchId: string;
+    authorId: string;
+    authorName: string;
+    body: string;
+    mentionedUserIds: Array<string>;
     createdAt: string;
-    user: {
+};
+
+export type GetDefault = Array<SeasonSchema>;
+
+/**
+ * ClubSchema
+ */
+export type ClubSchema = {
+    id: string;
+    name: string;
+    slug?: string | null;
+    logo?: string | null;
+    paymentLink?: string | null;
+    venue?: string | null;
+    sportType?: 'football' | 'futsal' | 'basketball' | 'volleyball' | 'tennis' | 'padel' | 'badminton' | 'other' | null;
+    defaultMaxCapacity?: number | null;
+    createdAt: string;
+};
+
+/**
+ * ClubMemberSchema
+ */
+export type ClubMemberSchema = {
+    id: string;
+    userId: string;
+    name: string;
+    email: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    phone?: string | null;
+    role: 'owner' | 'admin' | 'member';
+    createdAt: string;
+};
+
+export type GetOrganizationIdMembers = Array<ClubMemberSchema>;
+
+/**
+ * MatchSchema
+ */
+export type MatchSchema = {
+    id: string;
+    organizationId: string;
+    seasonId: string;
+    seriesId?: string | null;
+    title: string;
+    startsAt: string;
+    location?: string | null;
+    maxCapacity: number;
+    status: 'scheduled' | 'cancelled' | 'played';
+    blueScore?: number | null;
+    redScore?: number | null;
+    reminderOffsetsHours?: Array<number> | null;
+    presentCount?: number;
+    viewerTeam?: 'blue' | 'red' | null;
+    cancellationReason?: string | null;
+    createdAt: string;
+};
+
+export type PostDefault = Array<MatchSchema>;
+
+/**
+ * AttendanceSchema
+ */
+export type AttendanceSchema = {
+    id: string;
+    matchId: string;
+    userId: string;
+    userName: string;
+    status: 'present' | 'absent' | 'pending';
+    respondedAt?: string | null;
+};
+
+export type GetMatchIdAttendances = Array<AttendanceSchema>;
+
+/**
+ * LineupSchema
+ */
+export type LineupSchema = {
+    id: string;
+    matchId: string;
+    userId: string;
+    userName: string;
+    team: 'blue' | 'red';
+};
+
+export type GetMatchIdLineups = Array<LineupSchema>;
+
+export type PutMatchIdLineups = Array<LineupSchema>;
+
+export type PutMatchIdLineupsUserId = Array<LineupSchema>;
+
+/**
+ * MatchCostSchema
+ */
+export type MatchCostSchema = {
+    id: string;
+    matchId: string;
+    pitchCostCents: number;
+    extrasCostCents: number;
+    perPlayerCents?: number;
+    presentCount?: number;
+};
+
+/**
+ * SessionFeeSchema
+ */
+export type SessionFeeSchema = {
+    id: string;
+    matchId: string;
+    userId: string;
+    userName: string;
+    amountCents: number;
+    status: 'owed' | 'paid' | 'waived';
+    paidAt?: string | null;
+};
+
+export type GetMatchesMatchIdFees = Array<SessionFeeSchema>;
+
+/**
+ * SeasonSchema
+ */
+export type SeasonSchema = {
+    id: string;
+    organizationId: string;
+    name: string;
+    startsAt: string;
+    endsAt?: string | null;
+    status: 'active' | 'closed';
+    createdAt: string;
+};
+
+/**
+ * MatchStatSchema
+ */
+export type MatchStatSchema = {
+    id: string;
+    matchId: string;
+    userId: string;
+    userName: string;
+    goals: number;
+    assists: number;
+};
+
+export type PutMatchesMatchIdStats = Array<MatchStatSchema>;
+
+export type GetMatchesMatchIdStats = Array<MatchStatSchema>;
+
+/**
+ * SeasonPlayerStatSchema
+ */
+export type SeasonPlayerStatSchema = {
+    userId: string;
+    userName: string;
+    goals: number;
+    assists: number;
+    matchesPlayed: number;
+};
+
+export type GetSeasonsSeasonIdStats = Array<SeasonPlayerStatSchema>;
+
+/**
+ * SeasonHomeStatsSchema
+ */
+export type SeasonHomeStatsSchema = {
+    season: {
         id: string;
         name: string;
     } | null;
-    parentId: string | null;
-    replyIds?: Array<string>;
-    replyCount?: number;
+    club: ClubHomeStatsSchema;
+    me: PersonalHomeStatsSchema;
 };
 
 /**
- * CommentsSchema
- *
- * Schema for a paginated list of comments
+ * ClubHomeStatsSchema
  */
-export type CommentsSchema = {
-    data: Array<CommentSchema>;
-    meta: {
-        offset: number;
-        pageSize: number;
-        itemCount: number;
-        hasMore: boolean;
-    };
-};
-
-/**
- * UserPostSchema
- *
- * Schema for a user's post
- */
-export type UserPostSchema = {
-    id: string;
-    slug?: string | null;
-    title: string;
-    content: Array<PostContentSchema>;
-    versions: Array<PostVersionSchema>;
-    publishedAt?: string | null;
-    type: 'published' | 'draft';
-    commentCount?: number;
-    coverImage?: string;
-    tags: Array<TagSchema>;
-};
-
-/**
- * PostContentSchema
- *
- * Schema for content items (text, image, video)
- */
-export type PostContentSchema = {
-    type: 'text';
-    data: string;
-} | {
-    type: 'image';
-    data: string;
-} | {
-    type: 'video';
-    data: string;
-};
-
-/**
- * PostVersionSchema
- *
- * Schema for a post version
- */
-export type PostVersionSchema = {
-    id: string;
-    title: string;
-    createdAt: string;
-};
-
-/**
- * TagSchema
- *
- * A tag attached to a post
- */
-export type TagSchema = {
-    id: string;
-    name: string;
-    slug: string;
-};
-
-/**
- * UserPostsSchema
- *
- * Schema for a list of user's posts
- */
-export type UserPostsSchema = {
-    data: Array<{
-        id: string;
-        slug?: string | null;
-        title: string;
-        versions: Array<PostVersionSchema>;
-        publishedAt?: string | null;
-        type: 'published' | 'draft';
-        commentCount?: number;
-        coverImage?: string;
-        tags: Array<TagSchema>;
-        contentPreview: PostContentSchema;
-    }>;
-    meta: {
-        offset: number;
-        pageSize: number;
-        itemCount: number;
-        hasMore: boolean;
-    };
-};
-
-/**
- * PublicPostSchema
- *
- * A public post
- */
-export type PublicPostSchema = {
-    title: string;
-    author: {
-        name: string;
-    };
-    content: Array<PostContentSchema>;
-    publishedAt: string;
-    slug?: string;
-    commentCount?: number;
-    coverImage?: string;
-    likesCount: number;
-    tags: Array<TagSchema>;
-};
-
-/**
- * PublicPostsSchema
- *
- * A list of public posts
- */
-export type PublicPostsSchema = {
-    data: Array<{
-        title: string;
-        author: {
-            name: string;
-        };
-        publishedAt: string;
-        slug?: string;
-        commentCount?: number;
-        coverImage?: string;
-        likesCount: number;
-        tags: Array<TagSchema>;
-        contentPreview: PostContentSchema;
-    }>;
-    meta: {
-        offset: number;
-        pageSize: number;
-        itemCount: number;
-        hasMore: boolean;
-    };
-};
-
-/**
- * PublicAuthorPostsSchema
- *
- * A list of posts from a specific author
- */
-export type PublicAuthorPostsSchema = {
-    data: Array<{
-        title: string;
-        author: {
-            name: string;
-        };
-        publishedAt: string;
-        slug?: string;
-        commentCount?: number;
-        coverImage?: string;
-        likesCount: number;
-        tags: Array<TagSchema>;
-        contentPreview: PostContentSchema;
-    }>;
-    meta: {
-        offset: number;
-        pageSize: number;
-        itemCount: number;
-        hasMore: boolean;
-    };
-};
-
-/**
- * AiCoreMessage
- *
- * A message in the conversation history following Vercel AI SDK patterns
- */
-export type AiCoreMessage = {
-    role: 'user' | 'assistant' | 'system' | 'tool';
-    content: string;
-    metadata?: {
-        isConsideredSystemMessage?: boolean;
-        usage?: TokenUsage;
-        finishReason?: string;
+export type ClubHomeStatsSchema = {
+    matchesPlayed: number;
+    topScorer: {
+        userId: string;
+        userName: string;
+        value: number;
+    } | null;
+    mostWins: {
+        userId: string;
+        userName: string;
+        value: number;
+    } | null;
+    mostLosses: {
+        userId: string;
+        userName: string;
+        value: number;
+    } | null;
+    mostPlayedTogether: {
         /**
-         * ISO 8601 timestamp when the message was created
+         * PlayerRefSchema
          */
-        timestamp?: Date;
-        /**
-         * Tool calls made to generate the message
-         */
-        toolCalls?: Array<ToolCall>;
-        /**
-         * Reasoning text for the message
-         */
-        reasonning?: string;
-    };
-};
-
-/**
- * AiStreamEvent
- *
- * SSE event for AI text streaming with tool support
- */
-export type AiStreamEvent = {
-    type: 'chunk';
-    text: string;
-} | {
-    type: 'tool-call';
-    toolCallId: string;
-    toolName: string;
-    args: {
-        [key: string]: unknown;
-    };
-} | {
-    type: 'tool-result';
-    toolCallId: string;
-    toolName: string;
-    result: unknown;
-} | {
-    type: 'done';
-    fullText: string;
-    /**
-     * AiStreamUsage
-     *
-     * Token usage information for the stream
-     */
-    usage?: {
-        promptTokens: number;
-        completionTokens: number;
-        totalTokens: number;
-    };
-    finishReason?: string;
-} | {
-    type: 'error';
-    message: string;
-};
-
-/**
- * Task
- *
- * A task
- */
-export type Task = {
-    title: string;
-    description: string;
-    priority: 'low' | 'medium' | 'high';
-    dueDate?: string;
-    tags?: Array<string>;
-};
-
-/**
- * Product
- *
- * A product
- */
-export type Product = {
-    name: string;
-    price: number;
-    description: string;
-    category: string;
-    inStock: boolean;
-    features?: Array<string>;
-};
-
-/**
- * Recipe
- *
- * A recipe
- */
-export type Recipe = {
-    name: string;
-    description: string;
-    prepTime: string;
-    cookTime: string;
-    servings: number;
-    difficulty: 'easy' | 'medium' | 'hard';
-    ingredients: Array<{
-        name: string;
-        quantity: string;
-    }>;
-    instructions: Array<string>;
-    tips?: Array<string>;
-};
-
-/**
- * UserProfile
- *
- * A user profile
- */
-export type UserProfile = {
-    name: string;
-    age: number;
-    email: string;
-    bio?: string;
-    skills?: Array<string>;
-};
-
-/**
- * AiGenerateOptions
- *
- * Options for an AI generation
- */
-export type AiGenerateOptions = {
-    temperature?: number;
-    maxTokens?: number;
-    topP?: number;
-    frequencyPenalty?: number;
-    presencePenalty?: number;
-    maxSteps?: number;
-    stopWhen?: number;
-    telemetry?: {
-        /**
-         * Trace strategy. Use "inherit" to keep the active OTEL trace, or "split" to create a new (Langfuse) trace for this LLM call.
-         */
-        traceMode?: 'inherit' | 'split';
-        /**
-         * Optional explicit (Langfuse) trace ID for split mode. Reuse the same value to group multiple LLM calls in one (Langfuse) trace.
-         */
-        traceId?: string;
-        /**
-         * Display name used as root span name for the Langfuse trace. This does not control grouping.
-         */
-        traceName?: string;
-        /**
-         * Name for the LLM span. This is forwarded to Vercel telemetry as functionId.
-         */
-        spanName?: string;
-        /**
-         * Optional Langfuse session identifier to group related (Langfuse) traces (e.g. chat thread or job run).
-         */
-        sessionId?: string;
-        /**
-         * Telemetry metadata attached to (Langfuse) trace/span.
-         */
-        metadata?: {
-            [key: string]: unknown;
+        playerA: {
+            userId: string;
+            userName: string;
         };
         /**
-         * The original prompt that was used to generate the response. (Use prompt.toJSON())
+         * PlayerRefSchema
          */
-        langfuseOriginalPrompt?: string;
-    };
-    metadata?: {
-        [key: string]: unknown;
-    };
+        playerB: {
+            userId: string;
+            userName: string;
+        };
+        matchesTogether: number;
+    } | null;
 };
 
 /**
- * PaginationQuerySchema
- *
- * Schema for pagination query
+ * PersonalHomeStatsSchema
  */
-export type PaginationQuerySchema = {
-    /**
-     * Starting position of the query
-     */
-    offset: number;
-    /**
-     * Number of items to return
-     */
-    pageSize: number;
+export type PersonalHomeStatsSchema = {
+    matchesPlayed: number;
+    goals: number;
+    wins: number;
+    losses: number;
 };
 
-/**
- * SortingQueryStringSchema
- *
- * Schema for sorting items
- */
-export type SortingQueryStringSchema = string;
+export type ChatControllerOrganizationId = string;
 
-/**
- * FilterQueryStringSchema
- *
- * Filtering query string, in the format of "property:rule[:value];property:rule[:value];..."
- * <br> Available rules: eq, neq, gt, gte, lt, lte, like, nlike, in, nin, isnull, isnotnull
- * <br> Available properties: title, tag
- */
-export type FilterQueryStringSchema = string;
+export type ChatControllerMatchId = string;
 
-export type CommentsControllerPostSlug = string;
+export type MatchControllerOrganizationId = string;
 
-export type CommentsControllerGetCommentsFilterItem = {
-    property: 'content';
-    rule: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'like' | 'nlike' | 'in' | 'nin' | 'isnull' | 'isnotnull';
-    value?: string;
-};
+export type PaymentControllerOrganizationId = string;
 
-export type CommentsControllerGetCommentsFilterArray = Array<CommentsControllerGetCommentsFilterItem>;
+export type SeasonControllerOrganizationId = string;
 
-export type CommentsControllerGetCommentsSortItem = {
-    property: 'createdAt' | 'authorName';
-    direction: 'asc' | 'desc';
-};
-
-export type CommentsControllerGetCommentsSortArray = Array<CommentsControllerGetCommentsSortItem>;
-
-export type CommentsControllerGetCommentRepliesSortItem = {
-    property: 'createdAt' | 'authorName';
-    direction: 'asc' | 'desc';
-};
-
-export type CommentsControllerGetCommentRepliesSortArray = Array<CommentsControllerGetCommentRepliesSortItem>;
-
-export type PostControllerGetUserPostsFilterItem = {
-    property: 'title' | 'tag';
-    rule: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'like' | 'nlike' | 'in' | 'nin' | 'isnull' | 'isnotnull';
-    value?: string;
-};
-
-export type PostControllerGetUserPostsFilterArray = Array<PostControllerGetUserPostsFilterItem>;
-
-export type PostControllerGetUserPostsSortItem = {
-    property: 'title' | 'createdAt';
-    direction: 'asc' | 'desc';
-};
-
-export type PostControllerGetUserPostsSortArray = Array<PostControllerGetUserPostsSortItem>;
-
-export type PublicPostControllerGetPostsFilterItem = {
-    property: 'title' | 'tag';
-    rule: 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'like' | 'nlike' | 'in' | 'nin' | 'isnull' | 'isnotnull';
-    value?: string;
-};
-
-export type PublicPostControllerGetPostsFilterArray = Array<PublicPostControllerGetPostsFilterItem>;
-
-export type PublicPostControllerGetPostsSortItem = {
-    property: 'title' | 'createdAt';
-    direction: 'asc' | 'desc';
-};
-
-export type PublicPostControllerGetPostsSortArray = Array<PublicPostControllerGetPostsSortItem>;
-
-export type PublicAuthorControllerGetAuthorPostsSortItem = {
-    property: 'title' | 'createdAt';
-    direction: 'asc' | 'desc';
-};
-
-export type PublicAuthorControllerGetAuthorPostsSortArray = Array<PublicAuthorControllerGetAuthorPostsSortItem>;
+export type StatsControllerOrganizationId = string;
 
 export type AppControllerGetHelloData = {
     body?: never;
@@ -794,1099 +442,795 @@ export type AppControllerGetHelloResponses = {
     200: unknown;
 };
 
-export type CommentsControllerGetCommentsData = {
-    body?: never;
-    path: {
-        postSlug: string;
-    };
-    query: {
-        /**
-         * Filtering query string, in the format of "property:rule[:value];property:rule[:value];..."
-         * <br> Available rules: eq, neq, gt, gte, lt, lte, like, nlike, in, nin, isnull, isnotnull
-         * <br> Available properties: content
-         */
-        filter?: CommentsControllerGetCommentsFilterArray;
-        /**
-         * Schema for sorting items
-         */
-        sort?: CommentsControllerGetCommentsSortArray;
-        /**
-         * Starting position of the query
-         */
-        offset: number;
-        /**
-         * Number of items to return
-         */
-        pageSize: number;
-    };
-    url: '/api/posts/{postSlug}/comments';
-};
-
-export type CommentsControllerGetCommentsResponses = {
-    /**
-     * Schema for a paginated list of comments
-     */
-    200: CommentsSchema;
-};
-
-export type CommentsControllerGetCommentsResponse = CommentsControllerGetCommentsResponses[keyof CommentsControllerGetCommentsResponses];
-
-export type CommentsControllerCreateCommentData = {
-    /**
-     * CreateCommentSchema
-     *
-     * Schema for creating a comment
-     */
-    body: {
-        content: string;
-        parentId?: string;
-    };
-    path: {
-        postSlug: string;
-    };
-    query?: never;
-    url: '/api/posts/{postSlug}/comments';
-};
-
-export type CommentsControllerCreateCommentResponses = {
-    /**
-     * Schema for a comment
-     */
-    200: CommentSchema;
-};
-
-export type CommentsControllerCreateCommentResponse = CommentsControllerCreateCommentResponses[keyof CommentsControllerCreateCommentResponses];
-
-export type CommentsControllerGetCommentCountData = {
-    body?: never;
-    path: {
-        postSlug: string;
-    };
-    query?: never;
-    url: '/api/posts/{postSlug}/comments/count';
-};
-
-export type CommentsControllerGetCommentCountResponses = {
-    200: unknown;
-};
-
-export type CommentsControllerGetCommentRepliesData = {
-    body?: never;
-    path: {
-        commentId: string;
-        postSlug: string;
-    };
-    query: {
-        /**
-         * Schema for sorting items
-         */
-        sort?: CommentsControllerGetCommentRepliesSortArray;
-        /**
-         * Starting position of the query
-         */
-        offset: number;
-        /**
-         * Number of items to return
-         */
-        pageSize: number;
-    };
-    url: '/api/posts/{postSlug}/comments/{commentId}/replies';
-};
-
-export type CommentsControllerGetCommentRepliesResponses = {
-    /**
-     * Schema for a paginated list of comments
-     */
-    200: CommentsSchema;
-};
-
-export type CommentsControllerGetCommentRepliesResponse = CommentsControllerGetCommentRepliesResponses[keyof CommentsControllerGetCommentRepliesResponses];
-
-export type CommentsControllerDeleteCommentData = {
-    body?: never;
-    path: {
-        commentId: string;
-        postSlug: string;
-    };
-    query?: never;
-    url: '/api/posts/{postSlug}/comments/{commentId}';
-};
-
-export type CommentsControllerDeleteCommentResponses = {
-    200: unknown;
-};
-
-export type PostControllerGetUserPostsData = {
+export type ClubControllerListMineData = {
     body?: never;
     path?: never;
-    query: {
-        /**
-         * Filtering query string, in the format of "property:rule[:value];property:rule[:value];..."
-         * <br> Available rules: eq, neq, gt, gte, lt, lte, like, nlike, in, nin, isnull, isnotnull
-         * <br> Available properties: title, tag
-         */
-        filter?: PostControllerGetUserPostsFilterArray;
-        /**
-         * Schema for sorting items
-         */
-        sort?: PostControllerGetUserPostsSortArray;
-        /**
-         * Starting position of the query
-         */
-        offset: number;
-        /**
-         * Number of items to return
-         */
-        pageSize: number;
-    };
-    url: '/api/admin/posts';
+    query?: never;
+    url: '/api/clubs';
 };
 
-export type PostControllerGetUserPostsResponses = {
+export type ClubControllerListMineResponses = {
     /**
-     * Schema for a list of user's posts
+     * Successful response
      */
-    200: UserPostsSchema;
+    200: GetDefault;
 };
 
-export type PostControllerGetUserPostsResponse = PostControllerGetUserPostsResponses[keyof PostControllerGetUserPostsResponses];
+export type ClubControllerListMineResponse = ClubControllerListMineResponses[keyof ClubControllerListMineResponses];
 
-export type PostControllerCreatePostData = {
+export type ClubControllerGetOneData = {
+    body?: never;
+    path: {
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}';
+};
+
+export type ClubControllerGetOneResponses = {
     /**
-     * CreatePostSchema
-     *
-     * Schema for creating/updating a post
+     * Successful response
+     */
+    200: ClubSchema;
+};
+
+export type ClubControllerGetOneResponse = ClubControllerGetOneResponses[keyof ClubControllerGetOneResponses];
+
+export type ClubControllerUpdateData = {
+    /**
+     * UpdateClubSchema
      */
     body: {
+        name?: string;
+        venue?: string | null;
+        sportType?: 'football' | 'futsal' | 'basketball' | 'volleyball' | 'tennis' | 'padel' | 'badminton' | 'other' | null;
+        defaultMaxCapacity?: number | null;
+    };
+    path: {
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}';
+};
+
+export type ClubControllerUpdateResponses = {
+    /**
+     * Successful response
+     */
+    200: ClubSchema;
+};
+
+export type ClubControllerUpdateResponse = ClubControllerUpdateResponses[keyof ClubControllerUpdateResponses];
+
+export type ClubControllerListMembersData = {
+    body?: never;
+    path: {
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/members';
+};
+
+export type ClubControllerListMembersResponses = {
+    /**
+     * Successful response
+     */
+    200: GetOrganizationIdMembers;
+};
+
+export type ClubControllerListMembersResponse = ClubControllerListMembersResponses[keyof ClubControllerListMembersResponses];
+
+export type ClubControllerUpdateRoleData = {
+    /**
+     * UpdateMemberRoleSchema
+     */
+    body: {
+        role: 'admin' | 'member';
+    };
+    path: {
+        memberId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/members/{memberId}/role';
+};
+
+export type ClubControllerUpdateRoleResponses = {
+    /**
+     * Successful response
+     */
+    200: ClubMemberSchema;
+};
+
+export type ClubControllerUpdateRoleResponse = ClubControllerUpdateRoleResponses[keyof ClubControllerUpdateRoleResponses];
+
+export type SeasonControllerListData = {
+    body?: never;
+    path: {
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/seasons';
+};
+
+export type SeasonControllerListResponses = {
+    /**
+     * Successful response
+     */
+    200: GetDefault;
+};
+
+export type SeasonControllerListResponse = SeasonControllerListResponses[keyof SeasonControllerListResponses];
+
+export type SeasonControllerCreateData = {
+    /**
+     * CreateSeasonSchema
+     */
+    body: {
+        name: string;
+        startsAt: string;
+        endsAt?: string;
+    };
+    path: {
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/seasons';
+};
+
+export type SeasonControllerCreateResponses = {
+    /**
+     * Successful response
+     */
+    200: SeasonSchema;
+};
+
+export type SeasonControllerCreateResponse = SeasonControllerCreateResponses[keyof SeasonControllerCreateResponses];
+
+export type SeasonControllerGetData = {
+    body?: never;
+    path: {
+        seasonId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/seasons/{seasonId}';
+};
+
+export type SeasonControllerGetResponses = {
+    /**
+     * Successful response
+     */
+    200: SeasonSchema;
+};
+
+export type SeasonControllerGetResponse = SeasonControllerGetResponses[keyof SeasonControllerGetResponses];
+
+export type SeasonControllerUpdateData = {
+    /**
+     * UpdateSeasonSchema
+     */
+    body: {
+        name?: string;
+        startsAt?: string;
+        endsAt?: string | null;
+        status?: 'active' | 'closed';
+    };
+    path: {
+        seasonId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/seasons/{seasonId}';
+};
+
+export type SeasonControllerUpdateResponses = {
+    /**
+     * Successful response
+     */
+    200: SeasonSchema;
+};
+
+export type SeasonControllerUpdateResponse = SeasonControllerUpdateResponses[keyof SeasonControllerUpdateResponses];
+
+export type MatchControllerListData = {
+    body?: never;
+    path: {
+        organizationId: string;
+    };
+    query: {
+        seasonId: string;
+    };
+    url: '/api/clubs/{organizationId}/matches';
+};
+
+export type MatchControllerListResponses = {
+    /**
+     * Successful response
+     */
+    200: GetDefault;
+};
+
+export type MatchControllerListResponse = MatchControllerListResponses[keyof MatchControllerListResponses];
+
+export type MatchControllerCreateData = {
+    /**
+     * CreateMatchSchema
+     */
+    body: {
+        seasonId: string;
         title: string;
-        /**
-         * PostContentSchema
-         *
-         * Schema for content items (text, image, video)
-         */
-        content: Array<{
-            type: 'text';
-            data: string;
-        } | {
-            type: 'image';
-            data: string;
-        } | {
-            type: 'video';
-            data: string;
-        }>;
-        coverImage?: string;
-        tags?: Array<string>;
+        startsAt: string;
+        location?: string;
+        maxCapacity: number;
+        reminderOffsetsHours?: Array<number>;
+        recurrence?: {
+            frequency: 'weekly' | 'monthly' | 'monthly_nth_weekday' | 'custom';
+            rrule?: string;
+            endsAt?: string;
+            occurrenceCount?: number;
+        };
     };
-    path?: never;
+    path: {
+        organizationId: string;
+    };
     query?: never;
-    url: '/api/admin/posts';
+    url: '/api/clubs/{organizationId}/matches';
 };
 
-export type PostControllerCreatePostResponses = {
+export type MatchControllerCreateResponses = {
     /**
-     * Schema for a user's post
+     * Successful response
      */
-    200: UserPostSchema;
+    200: PostDefault;
 };
 
-export type PostControllerCreatePostResponse = PostControllerCreatePostResponses[keyof PostControllerCreatePostResponses];
+export type MatchControllerCreateResponse = MatchControllerCreateResponses[keyof MatchControllerCreateResponses];
 
-export type PostControllerGetUserPostData = {
+export type MatchControllerGetData = {
     body?: never;
     path: {
-        id: string;
+        matchId: string;
+        organizationId: string;
     };
     query?: never;
-    url: '/api/admin/posts/{id}';
+    url: '/api/clubs/{organizationId}/matches/{matchId}';
 };
 
-export type PostControllerGetUserPostResponses = {
+export type MatchControllerGetResponses = {
     /**
-     * Schema for a user's post
+     * Successful response
      */
-    200: UserPostSchema;
+    200: MatchSchema;
 };
 
-export type PostControllerGetUserPostResponse = PostControllerGetUserPostResponses[keyof PostControllerGetUserPostResponses];
+export type MatchControllerGetResponse = MatchControllerGetResponses[keyof MatchControllerGetResponses];
 
-export type PostControllerUpdatePostData = {
+export type MatchControllerUpdateData = {
     /**
-     * UpdatePostSchema
-     *
-     * Schema for updating a post
+     * UpdateMatchSchema
      */
     body: {
         title?: string;
-        /**
-         * PostContentSchema
-         *
-         * Schema for content items (text, image, video)
-         */
-        content?: Array<{
-            type: 'text';
-            data: string;
-        } | {
-            type: 'image';
-            data: string;
-        } | {
-            type: 'video';
-            data: string;
+        startsAt?: string;
+        location?: string | null;
+        maxCapacity?: number;
+        blueScore?: number | null;
+        redScore?: number | null;
+        reminderOffsetsHours?: Array<number> | null;
+    };
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}';
+};
+
+export type MatchControllerUpdateResponses = {
+    /**
+     * Successful response
+     */
+    200: MatchSchema;
+};
+
+export type MatchControllerUpdateResponse = MatchControllerUpdateResponses[keyof MatchControllerUpdateResponses];
+
+export type MatchControllerCancelData = {
+    /**
+     * CancelMatchSchema
+     */
+    body: {
+        reason?: string;
+    };
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/cancel';
+};
+
+export type MatchControllerCancelResponses = {
+    /**
+     * Successful response
+     */
+    200: MatchSchema;
+};
+
+export type MatchControllerCancelResponse = MatchControllerCancelResponses[keyof MatchControllerCancelResponses];
+
+export type MatchControllerMarkPlayedData = {
+    body?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/played';
+};
+
+export type MatchControllerMarkPlayedResponses = {
+    /**
+     * Successful response
+     */
+    200: MatchSchema;
+};
+
+export type MatchControllerMarkPlayedResponse = MatchControllerMarkPlayedResponses[keyof MatchControllerMarkPlayedResponses];
+
+export type MatchControllerListAttendancesData = {
+    body?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/attendances';
+};
+
+export type MatchControllerListAttendancesResponses = {
+    /**
+     * Successful response
+     */
+    200: GetMatchIdAttendances;
+};
+
+export type MatchControllerListAttendancesResponse = MatchControllerListAttendancesResponses[keyof MatchControllerListAttendancesResponses];
+
+export type MatchControllerRespondData = {
+    /**
+     * RespondAttendanceSchema
+     */
+    body: {
+        status: 'present' | 'absent';
+    };
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/attendances/me';
+};
+
+export type MatchControllerRespondResponses = {
+    /**
+     * Successful response
+     */
+    200: AttendanceSchema;
+};
+
+export type MatchControllerRespondResponse = MatchControllerRespondResponses[keyof MatchControllerRespondResponses];
+
+export type MatchControllerSetAttendanceData = {
+    /**
+     * SetAttendanceSchema
+     */
+    body: {
+        status: 'present' | 'absent' | 'pending';
+    };
+    path: {
+        userId: string;
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/attendances/{userId}';
+};
+
+export type MatchControllerSetAttendanceResponses = {
+    /**
+     * Successful response
+     */
+    200: AttendanceSchema;
+};
+
+export type MatchControllerSetAttendanceResponse = MatchControllerSetAttendanceResponses[keyof MatchControllerSetAttendanceResponses];
+
+export type MatchControllerListLineupsData = {
+    body?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/lineups';
+};
+
+export type MatchControllerListLineupsResponses = {
+    /**
+     * Successful response
+     */
+    200: GetMatchIdLineups;
+};
+
+export type MatchControllerListLineupsResponse = MatchControllerListLineupsResponses[keyof MatchControllerListLineupsResponses];
+
+export type MatchControllerSetLineupData = {
+    /**
+     * SetLineupSchema
+     */
+    body: {
+        assignments: Array<{
+            userId: string;
+            team: 'blue' | 'red';
         }>;
-        coverImage?: string;
-        tags?: Array<string>;
     };
     path: {
-        id: string;
+        matchId: string;
+        organizationId: string;
     };
     query?: never;
-    url: '/api/admin/posts/{id}';
+    url: '/api/clubs/{organizationId}/matches/{matchId}/lineups';
 };
 
-export type PostControllerUpdatePostResponses = {
+export type MatchControllerSetLineupResponses = {
     /**
-     * Schema for a user's post
+     * Successful response
      */
-    200: UserPostSchema;
+    200: PutMatchIdLineups;
 };
 
-export type PostControllerUpdatePostResponse = PostControllerUpdatePostResponses[keyof PostControllerUpdatePostResponses];
+export type MatchControllerSetLineupResponse = MatchControllerSetLineupResponses[keyof MatchControllerSetLineupResponses];
 
-export type PostControllerPublishPostData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/api/admin/posts/{id}/publish';
-};
-
-export type PostControllerPublishPostResponses = {
-    200: unknown;
-};
-
-export type PostControllerUnpublishPostData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/api/admin/posts/{id}/unpublish';
-};
-
-export type PostControllerUnpublishPostResponses = {
-    200: unknown;
-};
-
-export type PublicPostControllerGetRandomPostData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/public/posts/random';
-};
-
-export type PublicPostControllerGetRandomPostResponses = {
+export type MatchControllerSetPlayerTeamData = {
     /**
-     * A public post
-     */
-    200: PublicPostSchema;
-};
-
-export type PublicPostControllerGetRandomPostResponse = PublicPostControllerGetRandomPostResponses[keyof PublicPostControllerGetRandomPostResponses];
-
-export type PublicPostControllerGetPostData = {
-    body?: never;
-    path: {
-        slug: string;
-    };
-    query?: never;
-    url: '/api/public/posts/{slug}';
-};
-
-export type PublicPostControllerGetPostResponses = {
-    /**
-     * A public post
-     */
-    200: PublicPostSchema;
-};
-
-export type PublicPostControllerGetPostResponse = PublicPostControllerGetPostResponses[keyof PublicPostControllerGetPostResponses];
-
-export type PublicPostControllerGetPostsData = {
-    body?: never;
-    path?: never;
-    query: {
-        /**
-         * Filtering query string, in the format of "property:rule[:value];property:rule[:value];..."
-         * <br> Available rules: eq, neq, gt, gte, lt, lte, like, nlike, in, nin, isnull, isnotnull
-         * <br> Available properties: title, tag
-         */
-        filter?: PublicPostControllerGetPostsFilterArray;
-        /**
-         * Schema for sorting items
-         */
-        sort?: PublicPostControllerGetPostsSortArray;
-        /**
-         * Starting position of the query
-         */
-        offset: number;
-        /**
-         * Number of items to return
-         */
-        pageSize: number;
-    };
-    url: '/api/public/posts';
-};
-
-export type PublicPostControllerGetPostsResponses = {
-    /**
-     * A list of public posts
-     */
-    200: PublicPostsSchema;
-};
-
-export type PublicPostControllerGetPostsResponse = PublicPostControllerGetPostsResponses[keyof PublicPostControllerGetPostsResponses];
-
-export type PublicPostControllerLikePostData = {
-    body?: never;
-    path: {
-        slug: string;
-    };
-    query?: never;
-    url: '/api/public/posts/{slug}/like';
-};
-
-export type PublicPostControllerLikePostResponses = {
-    /**
-     * A public post
-     */
-    200: PublicPostSchema;
-};
-
-export type PublicPostControllerLikePostResponse = PublicPostControllerLikePostResponses[keyof PublicPostControllerLikePostResponses];
-
-export type PublicAuthorControllerGetAuthorPostsData = {
-    body?: never;
-    path: {
-        slug: string;
-    };
-    query: {
-        /**
-         * Schema for sorting items
-         */
-        sort?: PublicAuthorControllerGetAuthorPostsSortArray;
-        /**
-         * Starting position of the query
-         */
-        offset: number;
-        /**
-         * Number of items to return
-         */
-        pageSize: number;
-    };
-    url: '/api/public/authors/{slug}/posts';
-};
-
-export type PublicAuthorControllerGetAuthorPostsResponses = {
-    /**
-     * A list of posts from a specific author
-     */
-    200: PublicAuthorPostsSchema;
-};
-
-export type PublicAuthorControllerGetAuthorPostsResponse = PublicAuthorControllerGetAuthorPostsResponses[keyof PublicAuthorControllerGetAuthorPostsResponses];
-
-export type AiExampleControllerGenerateTextData = {
-    /**
-     * GenerateTextRequest
-     *
-     * Request for simple text generation with a single prompt
+     * SetPlayerTeamSchema
      */
     body: {
-        prompt: string;
-        model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-        /**
-         * AiGenerateOptions
-         *
-         * Options for an AI generation
-         */
-        options?: {
-            temperature?: number;
-            maxTokens?: number;
-            topP?: number;
-            frequencyPenalty?: number;
-            presencePenalty?: number;
-            maxSteps?: number;
-            stopWhen?: number;
-            telemetry?: {
-                /**
-                 * Trace strategy. Use "inherit" to keep the active OTEL trace, or "split" to create a new (Langfuse) trace for this LLM call.
-                 */
-                traceMode?: 'inherit' | 'split';
-                /**
-                 * Optional explicit (Langfuse) trace ID for split mode. Reuse the same value to group multiple LLM calls in one (Langfuse) trace.
-                 */
-                traceId?: string;
-                /**
-                 * Display name used as root span name for the Langfuse trace. This does not control grouping.
-                 */
-                traceName?: string;
-                /**
-                 * Name for the LLM span. This is forwarded to Vercel telemetry as functionId.
-                 */
-                spanName?: string;
-                /**
-                 * Optional Langfuse session identifier to group related (Langfuse) traces (e.g. chat thread or job run).
-                 */
-                sessionId?: string;
-                /**
-                 * Telemetry metadata attached to (Langfuse) trace/span.
-                 */
-                metadata?: {
-                    [key: string]: unknown;
-                };
-                /**
-                 * The original prompt that was used to generate the response. (Use prompt.toJSON())
-                 */
-                langfuseOriginalPrompt?: string;
-            };
-            metadata?: {
-                [key: string]: unknown;
-            };
-        };
+        team: 'blue' | 'red' | null;
     };
+    path: {
+        userId: string;
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/lineups/{userId}';
+};
+
+export type MatchControllerSetPlayerTeamResponses = {
+    /**
+     * Successful response
+     */
+    200: PutMatchIdLineupsUserId;
+};
+
+export type MatchControllerSetPlayerTeamResponse = MatchControllerSetPlayerTeamResponses[keyof MatchControllerSetPlayerTeamResponses];
+
+export type NotificationControllerGetPreferencesData = {
+    body?: never;
     path?: never;
     query?: never;
-    url: '/api/ai/generate-text';
+    url: '/api/notifications/preferences';
 };
 
-export type AiExampleControllerGenerateTextResponses = {
+export type NotificationControllerGetPreferencesResponses = {
     /**
-     * Response from text generation
+     * Successful response
      */
-    200: GenerateTextResponse;
+    200: NotificationPreferenceSchema;
 };
 
-export type AiExampleControllerGenerateTextResponse = AiExampleControllerGenerateTextResponses[keyof AiExampleControllerGenerateTextResponses];
+export type NotificationControllerGetPreferencesResponse = NotificationControllerGetPreferencesResponses[keyof NotificationControllerGetPreferencesResponses];
 
-export type AiExampleControllerGenerateObjectData = {
+export type NotificationControllerUpdatePreferencesData = {
     /**
-     * GenerateObjectRequest
-     *
-     * Request for structured object generation with a predefined schema type
+     * UpdateNotificationPreferenceSchema
      */
     body: {
-        prompt: string;
-        schemaType: 'userProfile' | 'task' | 'product' | 'recipe';
-        model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-        /**
-         * AiGenerateOptions
-         *
-         * Options for an AI generation
-         */
-        options?: {
-            temperature?: number;
-            maxTokens?: number;
-            topP?: number;
-            frequencyPenalty?: number;
-            presencePenalty?: number;
-            maxSteps?: number;
-            stopWhen?: number;
-            telemetry?: {
-                /**
-                 * Trace strategy. Use "inherit" to keep the active OTEL trace, or "split" to create a new (Langfuse) trace for this LLM call.
-                 */
-                traceMode?: 'inherit' | 'split';
-                /**
-                 * Optional explicit (Langfuse) trace ID for split mode. Reuse the same value to group multiple LLM calls in one (Langfuse) trace.
-                 */
-                traceId?: string;
-                /**
-                 * Display name used as root span name for the Langfuse trace. This does not control grouping.
-                 */
-                traceName?: string;
-                /**
-                 * Name for the LLM span. This is forwarded to Vercel telemetry as functionId.
-                 */
-                spanName?: string;
-                /**
-                 * Optional Langfuse session identifier to group related (Langfuse) traces (e.g. chat thread or job run).
-                 */
-                sessionId?: string;
-                /**
-                 * Telemetry metadata attached to (Langfuse) trace/span.
-                 */
-                metadata?: {
-                    [key: string]: unknown;
-                };
-                /**
-                 * The original prompt that was used to generate the response. (Use prompt.toJSON())
-                 */
-                langfuseOriginalPrompt?: string;
-            };
-            metadata?: {
-                [key: string]: unknown;
-            };
-        };
+        emailEnabled?: boolean;
+        pushEnabled?: boolean;
+        notifyNewMatch?: boolean;
+        notifyRsvpReminder?: boolean;
+        notifyMatchCancelled?: boolean;
+        chatMentionsOnly?: boolean;
+        notifyChatMention?: boolean;
+        notifyAllChatMessages?: boolean;
     };
     path?: never;
     query?: never;
-    url: '/api/ai/generate-object';
+    url: '/api/notifications/preferences';
 };
 
-export type AiExampleControllerGenerateObjectResponses = {
+export type NotificationControllerUpdatePreferencesResponses = {
     /**
-     * Response from structured object generation
+     * Successful response
      */
-    200: GenerateObjectResponse;
+    200: NotificationPreferenceSchema;
 };
 
-export type AiExampleControllerGenerateObjectResponse = AiExampleControllerGenerateObjectResponses[keyof AiExampleControllerGenerateObjectResponses];
+export type NotificationControllerUpdatePreferencesResponse = NotificationControllerUpdatePreferencesResponses[keyof NotificationControllerUpdatePreferencesResponses];
 
-export type AiExampleControllerChatData = {
+export type NotificationControllerRegisterDeviceData = {
     /**
-     * ChatRequest
-     *
-     * Request for multi-turn AI conversation with message history. schemaType can be used to request structured output.
+     * RegisterDeviceSchema
      */
     body: {
-        messages: Array<{
-            role: 'user' | 'assistant' | 'system' | 'tool';
-            content: string;
-            metadata?: {
-                isConsideredSystemMessage?: boolean;
-                /**
-                 * TokenUsage
-                 *
-                 * Total token usage for the message, including tools calls and reasoning steps
-                 */
-                usage?: {
-                    promptTokens: number;
-                    completionTokens: number;
-                    totalTokens: number;
-                };
-                finishReason?: string;
-                /**
-                 * ISO 8601 timestamp when the message was created
-                 */
-                timestamp?: Date;
-                /**
-                 * Tool calls made to generate the message
-                 */
-                toolCalls?: Array<{
-                    toolCallId: string;
-                    toolName: string;
-                    args: {
-                        [key: string]: unknown;
-                    };
-                }>;
-                /**
-                 * Reasoning text for the message
-                 */
-                reasonning?: string;
-                /**
-                 * ChatSchemaType
-                 *
-                 * Predefined schema types for testing structured output
-                 */
-                schemaType?: 'userProfile' | 'task' | 'product' | 'recipe' | 'none';
-            };
-        }>;
-        model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-        /**
-         * AiGenerateOptions
-         *
-         * Options for an AI generation
-         */
-        options?: {
-            temperature?: number;
-            maxTokens?: number;
-            topP?: number;
-            frequencyPenalty?: number;
-            presencePenalty?: number;
-            maxSteps?: number;
-            stopWhen?: number;
-            telemetry?: {
-                /**
-                 * Trace strategy. Use "inherit" to keep the active OTEL trace, or "split" to create a new (Langfuse) trace for this LLM call.
-                 */
-                traceMode?: 'inherit' | 'split';
-                /**
-                 * Optional explicit (Langfuse) trace ID for split mode. Reuse the same value to group multiple LLM calls in one (Langfuse) trace.
-                 */
-                traceId?: string;
-                /**
-                 * Display name used as root span name for the Langfuse trace. This does not control grouping.
-                 */
-                traceName?: string;
-                /**
-                 * Name for the LLM span. This is forwarded to Vercel telemetry as functionId.
-                 */
-                spanName?: string;
-                /**
-                 * Optional Langfuse session identifier to group related (Langfuse) traces (e.g. chat thread or job run).
-                 */
-                sessionId?: string;
-                /**
-                 * Telemetry metadata attached to (Langfuse) trace/span.
-                 */
-                metadata?: {
-                    [key: string]: unknown;
-                };
-                /**
-                 * The original prompt that was used to generate the response. (Use prompt.toJSON())
-                 */
-                langfuseOriginalPrompt?: string;
-            };
-            metadata?: {
-                [key: string]: unknown;
-            };
-        };
-        /**
-         * ChatSchemaType
-         *
-         * Predefined schema types for testing structured output
-         */
-        schemaType?: 'userProfile' | 'task' | 'product' | 'recipe' | 'none';
+        token: string;
+        platform: 'ios' | 'android' | 'web';
     };
     path?: never;
     query?: never;
-    url: '/api/ai/chat';
+    url: '/api/notifications/devices';
 };
 
-export type AiExampleControllerChatResponses = {
-    /**
-     * Response from AI chat conversation
-     */
-    200: ChatResponse;
-};
-
-export type AiExampleControllerChatResponse = AiExampleControllerChatResponses[keyof AiExampleControllerChatResponses];
-
-export type AiExampleControllerStreamTextData = {
-    /**
-     * StreamTextRequest
-     *
-     * Request for streaming text generation with a single prompt
-     */
-    body: {
-        prompt: string;
-        model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-        /**
-         * AiGenerateOptions
-         *
-         * Options for an AI generation
-         */
-        options?: {
-            temperature?: number;
-            maxTokens?: number;
-            topP?: number;
-            frequencyPenalty?: number;
-            presencePenalty?: number;
-            maxSteps?: number;
-            stopWhen?: number;
-            telemetry?: {
-                /**
-                 * Trace strategy. Use "inherit" to keep the active OTEL trace, or "split" to create a new (Langfuse) trace for this LLM call.
-                 */
-                traceMode?: 'inherit' | 'split';
-                /**
-                 * Optional explicit (Langfuse) trace ID for split mode. Reuse the same value to group multiple LLM calls in one (Langfuse) trace.
-                 */
-                traceId?: string;
-                /**
-                 * Display name used as root span name for the Langfuse trace. This does not control grouping.
-                 */
-                traceName?: string;
-                /**
-                 * Name for the LLM span. This is forwarded to Vercel telemetry as functionId.
-                 */
-                spanName?: string;
-                /**
-                 * Optional Langfuse session identifier to group related (Langfuse) traces (e.g. chat thread or job run).
-                 */
-                sessionId?: string;
-                /**
-                 * Telemetry metadata attached to (Langfuse) trace/span.
-                 */
-                metadata?: {
-                    [key: string]: unknown;
-                };
-                /**
-                 * The original prompt that was used to generate the response. (Use prompt.toJSON())
-                 */
-                langfuseOriginalPrompt?: string;
-            };
-            metadata?: {
-                [key: string]: unknown;
-            };
-        };
-    };
-    path?: never;
-    query?: never;
-    url: '/api/ai/stream-text';
-};
-
-export type AiExampleControllerStreamTextResponses = {
+export type NotificationControllerRegisterDeviceResponses = {
     201: unknown;
 };
 
-export type AiExampleControllerStreamObjectData = {
-    /**
-     * StreamObjectRequest
-     *
-     * Request for streaming structured object generation
-     */
-    body: {
-        prompt: string;
-        schemaType: 'userProfile' | 'task' | 'product' | 'recipe';
-        model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-        /**
-         * AiGenerateOptions
-         *
-         * Options for an AI generation
-         */
-        options?: {
-            temperature?: number;
-            maxTokens?: number;
-            topP?: number;
-            frequencyPenalty?: number;
-            presencePenalty?: number;
-            maxSteps?: number;
-            stopWhen?: number;
-            telemetry?: {
-                /**
-                 * Trace strategy. Use "inherit" to keep the active OTEL trace, or "split" to create a new (Langfuse) trace for this LLM call.
-                 */
-                traceMode?: 'inherit' | 'split';
-                /**
-                 * Optional explicit (Langfuse) trace ID for split mode. Reuse the same value to group multiple LLM calls in one (Langfuse) trace.
-                 */
-                traceId?: string;
-                /**
-                 * Display name used as root span name for the Langfuse trace. This does not control grouping.
-                 */
-                traceName?: string;
-                /**
-                 * Name for the LLM span. This is forwarded to Vercel telemetry as functionId.
-                 */
-                spanName?: string;
-                /**
-                 * Optional Langfuse session identifier to group related (Langfuse) traces (e.g. chat thread or job run).
-                 */
-                sessionId?: string;
-                /**
-                 * Telemetry metadata attached to (Langfuse) trace/span.
-                 */
-                metadata?: {
-                    [key: string]: unknown;
-                };
-                /**
-                 * The original prompt that was used to generate the response. (Use prompt.toJSON())
-                 */
-                langfuseOriginalPrompt?: string;
-            };
-            metadata?: {
-                [key: string]: unknown;
-            };
-        };
+export type StatsControllerListMatchData = {
+    body?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
     };
-    path?: never;
     query?: never;
-    url: '/api/ai/stream-object';
+    url: '/api/clubs/{organizationId}/matches/{matchId}/stats';
 };
 
-export type AiExampleControllerStreamObjectResponses = {
-    201: unknown;
-};
-
-export type AiExampleControllerStreamChatData = {
+export type StatsControllerListMatchResponses = {
     /**
-     * StreamChatRequest
-     *
-     * Request for streaming multi-turn AI conversation
+     * Successful response
+     */
+    200: GetMatchesMatchIdStats;
+};
+
+export type StatsControllerListMatchResponse = StatsControllerListMatchResponses[keyof StatsControllerListMatchResponses];
+
+export type StatsControllerUpsertData = {
+    /**
+     * UpsertMatchStatsSchema
      */
     body: {
-        messages: Array<{
-            role: 'user' | 'assistant' | 'system' | 'tool';
-            content: string;
-            metadata?: {
-                isConsideredSystemMessage?: boolean;
-                /**
-                 * TokenUsage
-                 *
-                 * Total token usage for the message, including tools calls and reasoning steps
-                 */
-                usage?: {
-                    promptTokens: number;
-                    completionTokens: number;
-                    totalTokens: number;
-                };
-                finishReason?: string;
-                /**
-                 * ISO 8601 timestamp when the message was created
-                 */
-                timestamp?: Date;
-                /**
-                 * Tool calls made to generate the message
-                 */
-                toolCalls?: Array<{
-                    toolCallId: string;
-                    toolName: string;
-                    args: {
-                        [key: string]: unknown;
-                    };
-                }>;
-                /**
-                 * Reasoning text for the message
-                 */
-                reasonning?: string;
-                /**
-                 * ChatSchemaType
-                 *
-                 * Predefined schema types for testing structured output
-                 */
-                schemaType?: 'userProfile' | 'task' | 'product' | 'recipe' | 'none';
-            };
+        stats: Array<{
+            userId: string;
+            goals: number;
+            assists: number;
         }>;
-        model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-        /**
-         * AiGenerateOptions
-         *
-         * Options for an AI generation
-         */
-        options?: {
-            temperature?: number;
-            maxTokens?: number;
-            topP?: number;
-            frequencyPenalty?: number;
-            presencePenalty?: number;
-            maxSteps?: number;
-            stopWhen?: number;
-            telemetry?: {
-                /**
-                 * Trace strategy. Use "inherit" to keep the active OTEL trace, or "split" to create a new (Langfuse) trace for this LLM call.
-                 */
-                traceMode?: 'inherit' | 'split';
-                /**
-                 * Optional explicit (Langfuse) trace ID for split mode. Reuse the same value to group multiple LLM calls in one (Langfuse) trace.
-                 */
-                traceId?: string;
-                /**
-                 * Display name used as root span name for the Langfuse trace. This does not control grouping.
-                 */
-                traceName?: string;
-                /**
-                 * Name for the LLM span. This is forwarded to Vercel telemetry as functionId.
-                 */
-                spanName?: string;
-                /**
-                 * Optional Langfuse session identifier to group related (Langfuse) traces (e.g. chat thread or job run).
-                 */
-                sessionId?: string;
-                /**
-                 * Telemetry metadata attached to (Langfuse) trace/span.
-                 */
-                metadata?: {
-                    [key: string]: unknown;
-                };
-                /**
-                 * The original prompt that was used to generate the response. (Use prompt.toJSON())
-                 */
-                langfuseOriginalPrompt?: string;
-            };
-            metadata?: {
-                [key: string]: unknown;
-            };
-        };
     };
-    path?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
     query?: never;
-    url: '/api/ai/stream-chat';
+    url: '/api/clubs/{organizationId}/matches/{matchId}/stats';
 };
 
-export type AiExampleControllerStreamChatResponses = {
-    201: unknown;
-};
-
-export type AiExampleUseCasesControllerUseCase1SingleGenerationData = {
+export type StatsControllerUpsertResponses = {
     /**
-     * UseCase1SingleGenerationRequest
-     *
-     * Single generation; trace is finalized with name/output so Langfuse shows them
+     * Successful response
+     */
+    200: PutMatchesMatchIdStats;
+};
+
+export type StatsControllerUpsertResponse = StatsControllerUpsertResponses[keyof StatsControllerUpsertResponses];
+
+export type StatsControllerSeasonStatsData = {
+    body?: never;
+    path: {
+        seasonId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/seasons/{seasonId}/stats';
+};
+
+export type StatsControllerSeasonStatsResponses = {
+    /**
+     * Successful response
+     */
+    200: GetSeasonsSeasonIdStats;
+};
+
+export type StatsControllerSeasonStatsResponse = StatsControllerSeasonStatsResponses[keyof StatsControllerSeasonStatsResponses];
+
+export type StatsControllerHomeStatsData = {
+    body?: never;
+    path: {
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/home-stats';
+};
+
+export type StatsControllerHomeStatsResponses = {
+    /**
+     * Successful response
+     */
+    200: SeasonHomeStatsSchema;
+};
+
+export type StatsControllerHomeStatsResponse = StatsControllerHomeStatsResponses[keyof StatsControllerHomeStatsResponses];
+
+export type ChatControllerListData = {
+    body?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/messages';
+};
+
+export type ChatControllerListResponses = {
+    /**
+     * Successful response
+     */
+    200: GetDefault;
+};
+
+export type ChatControllerListResponse = ChatControllerListResponses[keyof ChatControllerListResponses];
+
+export type ChatControllerPostData = {
+    /**
+     * CreateMatchMessageSchema
      */
     body: {
-        prompt: string;
-        model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
-        /**
-         * AiGenerateOptions
-         *
-         * Options for an AI generation
-         */
-        options?: {
-            temperature?: number;
-            maxTokens?: number;
-            topP?: number;
-            frequencyPenalty?: number;
-            presencePenalty?: number;
-            maxSteps?: number;
-            stopWhen?: number;
-            telemetry?: {
-                /**
-                 * Trace strategy. Use "inherit" to keep the active OTEL trace, or "split" to create a new (Langfuse) trace for this LLM call.
-                 */
-                traceMode?: 'inherit' | 'split';
-                /**
-                 * Optional explicit (Langfuse) trace ID for split mode. Reuse the same value to group multiple LLM calls in one (Langfuse) trace.
-                 */
-                traceId?: string;
-                /**
-                 * Display name used as root span name for the Langfuse trace. This does not control grouping.
-                 */
-                traceName?: string;
-                /**
-                 * Name for the LLM span. This is forwarded to Vercel telemetry as functionId.
-                 */
-                spanName?: string;
-                /**
-                 * Optional Langfuse session identifier to group related (Langfuse) traces (e.g. chat thread or job run).
-                 */
-                sessionId?: string;
-                /**
-                 * Telemetry metadata attached to (Langfuse) trace/span.
-                 */
-                metadata?: {
-                    [key: string]: unknown;
-                };
-                /**
-                 * The original prompt that was used to generate the response. (Use prompt.toJSON())
-                 */
-                langfuseOriginalPrompt?: string;
-            };
-            metadata?: {
-                [key: string]: unknown;
-            };
-        };
+        body: string;
+        mentionedUserIds?: Array<string>;
     };
-    path?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
     query?: never;
-    url: '/api/ai/examples/use-case-1-single-generation';
+    url: '/api/clubs/{organizationId}/matches/{matchId}/messages';
 };
 
-export type AiExampleUseCasesControllerUseCase1SingleGenerationResponses = {
+export type ChatControllerPostResponses = {
     /**
-     * Response from text generation
+     * Successful response
      */
-    200: GenerateTextResponse;
+    200: MatchMessageSchema;
 };
 
-export type AiExampleUseCasesControllerUseCase1SingleGenerationResponse = AiExampleUseCasesControllerUseCase1SingleGenerationResponses[keyof AiExampleUseCasesControllerUseCase1SingleGenerationResponses];
+export type ChatControllerPostResponse = ChatControllerPostResponses[keyof ChatControllerPostResponses];
 
-export type AiExampleUseCasesControllerUseCase2GroupedCallsData = {
+export type PaymentControllerGetCostData = {
+    body?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/cost';
+};
+
+export type PaymentControllerGetCostResponses = {
     /**
-     * UseCase2GroupedCallsRequest
-     *
-     * Multiple LLM calls in one request; one trace in Langfuse, finalized at end
+     * Successful response
+     */
+    200: MatchCostSchema;
+};
+
+export type PaymentControllerGetCostResponse = PaymentControllerGetCostResponses[keyof PaymentControllerGetCostResponses];
+
+export type PaymentControllerUpsertCostData = {
+    /**
+     * UpsertMatchCostSchema
      */
     body: {
-        /**
-         * Prompts for each step (same trace)
-         */
-        prompts: Array<string>;
-        model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
+        pitchCostCents: number;
+        extrasCostCents: number;
     };
-    path?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
     query?: never;
-    url: '/api/ai/examples/use-case-2-grouped-calls';
+    url: '/api/clubs/{organizationId}/matches/{matchId}/cost';
 };
 
-export type AiExampleUseCasesControllerUseCase2GroupedCallsResponses = {
+export type PaymentControllerUpsertCostResponses = {
     /**
-     * Combined results from grouped LLM calls
+     * Successful response
      */
-    200: UseCase2GroupedCallsResponse;
+    200: MatchCostSchema;
 };
 
-export type AiExampleUseCasesControllerUseCase2GroupedCallsResponse = AiExampleUseCasesControllerUseCase2GroupedCallsResponses[keyof AiExampleUseCasesControllerUseCase2GroupedCallsResponses];
+export type PaymentControllerUpsertCostResponse = PaymentControllerUpsertCostResponses[keyof PaymentControllerUpsertCostResponses];
 
-export type AiExampleUseCasesControllerUseCase3LogicalUnitsData = {
+export type PaymentControllerListFeesData = {
+    body?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/fees';
+};
+
+export type PaymentControllerListFeesResponses = {
     /**
-     * UseCase3LogicalUnitsRequest
-     *
-     * Multiple workflows; each workflow gets its own Langfuse trace (split per unit)
+     * Successful response
+     */
+    200: GetMatchesMatchIdFees;
+};
+
+export type PaymentControllerListFeesResponse = PaymentControllerListFeesResponses[keyof PaymentControllerListFeesResponses];
+
+export type PaymentControllerUpdateFeeData = {
+    /**
+     * UpdateFeeStatusSchema
      */
     body: {
-        /**
-         * One prompt per logical workflow; each gets its own trace
-         */
-        workflowPrompts: Array<string>;
-        model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
+        status: 'owed' | 'paid' | 'waived';
     };
-    path?: never;
+    path: {
+        feeId: string;
+        organizationId: string;
+    };
     query?: never;
-    url: '/api/ai/examples/use-case-3-logical-units';
+    url: '/api/clubs/{organizationId}/fees/{feeId}';
 };
 
-export type AiExampleUseCasesControllerUseCase3LogicalUnitsResponses = {
+export type PaymentControllerUpdateFeeResponses = {
     /**
-     * One result per workflow (each in its own trace)
+     * Successful response
      */
-    200: UseCase3LogicalUnitsResponse;
+    200: SessionFeeSchema;
 };
 
-export type AiExampleUseCasesControllerUseCase3LogicalUnitsResponse = AiExampleUseCasesControllerUseCase3LogicalUnitsResponses[keyof AiExampleUseCasesControllerUseCase3LogicalUnitsResponses];
+export type PaymentControllerUpdateFeeResponse = PaymentControllerUpdateFeeResponses[keyof PaymentControllerUpdateFeeResponses];
 
-export type AiExampleUseCasesControllerUseCase4ChatSessionData = {
+export type PaymentControllerGetPaymentLinkData = {
+    body?: never;
+    path: {
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/payment-link';
+};
+
+export type PaymentControllerGetPaymentLinkResponses = {
     /**
-     * UseCase4ChatSessionRequest
-     *
-     * Simple generateText with sessionId for grouping traces across requests
+     * Successful response
+     */
+    200: ClubPaymentLinkSchema;
+};
+
+export type PaymentControllerGetPaymentLinkResponse = PaymentControllerGetPaymentLinkResponses[keyof PaymentControllerGetPaymentLinkResponses];
+
+export type PaymentControllerSetPaymentLinkData = {
+    /**
+     * ClubPaymentLinkSchema
      */
     body: {
-        prompt: string;
-        /**
-         * Session ID to group traces in Langfuse (e.g. conversation or thread)
-         */
-        sessionId: string;
-        model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
+        paymentLink?: string | null;
     };
-    path?: never;
-    query?: never;
-    url: '/api/ai/examples/use-case-4-chat-session';
-};
-
-export type AiExampleUseCasesControllerUseCase4ChatSessionResponses = {
-    /**
-     * Response from text generation
-     */
-    200: GenerateTextResponse;
-};
-
-export type AiExampleUseCasesControllerUseCase4ChatSessionResponse = AiExampleUseCasesControllerUseCase4ChatSessionResponses[keyof AiExampleUseCasesControllerUseCase4ChatSessionResponses];
-
-export type AiExampleUseCasesControllerUseCase5ChatSessionWithTurnsMergedData = {
-    /**
-     * UseCase4ChatSessionRequest
-     *
-     * Simple generateText with sessionId for grouping traces across requests
-     */
-    body: {
-        prompt: string;
-        /**
-         * Session ID to group traces in Langfuse (e.g. conversation or thread)
-         */
-        sessionId: string;
-        model?: 'OPENAI_GPT_5_NANO' | 'GOOGLE_GEMINI_3_FLASH' | 'CLAUDE_HAIKU_3_5' | 'CLAUDE_OPUS_4_5' | 'MISTRAL_SMALL';
+    path: {
+        organizationId: string;
     };
-    path?: never;
     query?: never;
-    url: '/api/ai/examples/use-case-5-chat-session-with-turns-merged';
+    url: '/api/clubs/{organizationId}/payment-link';
 };
 
-export type AiExampleUseCasesControllerUseCase5ChatSessionWithTurnsMergedResponses = {
+export type PaymentControllerSetPaymentLinkResponses = {
     /**
-     * Response from text generation
+     * Successful response
      */
-    200: GenerateTextResponse;
+    200: ClubPaymentLinkSchema;
 };
 
-export type AiExampleUseCasesControllerUseCase5ChatSessionWithTurnsMergedResponse = AiExampleUseCasesControllerUseCase5ChatSessionWithTurnsMergedResponses[keyof AiExampleUseCasesControllerUseCase5ChatSessionWithTurnsMergedResponses];
+export type PaymentControllerSetPaymentLinkResponse = PaymentControllerSetPaymentLinkResponses[keyof PaymentControllerSetPaymentLinkResponses];

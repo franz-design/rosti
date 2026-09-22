@@ -3,882 +3,578 @@
 import { z } from 'zod';
 
 /**
- * UseCase2GroupedCallsRequest
- *
- * Multiple LLM calls in one request; one trace in Langfuse, finalized at end
+ * UpdateNotificationPreferenceSchema
  */
-export const zUseCase2GroupedCallsRequest = z.object({
-    prompts: z.array(z.string().min(1)).min(1).max(5),
-    model: z.optional(z.enum([
-        'OPENAI_GPT_5_NANO',
-        'GOOGLE_GEMINI_3_FLASH',
-        'CLAUDE_HAIKU_3_5',
-        'CLAUDE_OPUS_4_5',
-        'MISTRAL_SMALL'
+export const zUpdateNotificationPreferenceSchema = z.object({
+    emailEnabled: z.optional(z.boolean()),
+    pushEnabled: z.optional(z.boolean()),
+    notifyNewMatch: z.optional(z.boolean()),
+    notifyRsvpReminder: z.optional(z.boolean()),
+    notifyMatchCancelled: z.optional(z.boolean()),
+    chatMentionsOnly: z.optional(z.boolean()),
+    notifyChatMention: z.optional(z.boolean()),
+    notifyAllChatMessages: z.optional(z.boolean())
+});
+
+/**
+ * RegisterDeviceSchema
+ */
+export const zRegisterDeviceSchema = z.object({
+    token: z.string().min(1),
+    platform: z.enum([
+        'ios',
+        'android',
+        'web'
+    ])
+});
+
+/**
+ * CreateMatchMessageSchema
+ */
+export const zCreateMatchMessageSchema = z.object({
+    body: z.string().min(1).max(4000),
+    mentionedUserIds: z.optional(z.array(z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)))
+});
+
+/**
+ * UpdateClubSchema
+ */
+export const zUpdateClubSchema = z.object({
+    name: z.optional(z.string().min(1)),
+    venue: z.optional(z.union([
+        z.string().min(1),
+        z.null()
+    ])),
+    sportType: z.optional(z.union([
+        z.enum([
+            'football',
+            'futsal',
+            'basketball',
+            'volleyball',
+            'tennis',
+            'padel',
+            'badminton',
+            'other'
+        ]),
+        z.null()
+    ])),
+    defaultMaxCapacity: z.optional(z.union([
+        z.int().gt(0).lte(9007199254740991),
+        z.null()
     ]))
 });
 
 /**
- * UseCase3LogicalUnitsRequest
- *
- * Multiple workflows; each workflow gets its own Langfuse trace (split per unit)
+ * UpdateMemberRoleSchema
  */
-export const zUseCase3LogicalUnitsRequest = z.object({
-    workflowPrompts: z.array(z.string().min(1)).min(1).max(5),
-    model: z.optional(z.enum([
-        'OPENAI_GPT_5_NANO',
-        'GOOGLE_GEMINI_3_FLASH',
-        'CLAUDE_HAIKU_3_5',
-        'CLAUDE_OPUS_4_5',
-        'MISTRAL_SMALL'
-    ]))
+export const zUpdateMemberRoleSchema = z.object({
+    role: z.enum(['admin', 'member'])
 });
 
 /**
- * UseCase4ChatSessionRequest
- *
- * Simple generateText with sessionId for grouping traces across requests
+ * CreateMatchSchema
  */
-export const zUseCase4ChatSessionRequest = z.object({
-    prompt: z.string().min(1),
-    sessionId: z.string().min(1),
-    model: z.optional(z.enum([
-        'OPENAI_GPT_5_NANO',
-        'GOOGLE_GEMINI_3_FLASH',
-        'CLAUDE_HAIKU_3_5',
-        'CLAUDE_OPUS_4_5',
-        'MISTRAL_SMALL'
-    ]))
-});
-
-/**
- * CreateCommentSchema
- *
- * Schema for creating a comment
- */
-export const zCreateCommentSchema = z.object({
-    content: z.string().min(1).max(1000),
-    parentId: z.optional(z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/))
-});
-
-/**
- * TokenUsage
- *
- * Token usage information for an AI generation
- */
-export const zTokenUsage = z.object({
-    promptTokens: z.number(),
-    completionTokens: z.number(),
-    totalTokens: z.number()
-});
-
-/**
- * ToolCall
- *
- * A tool call made by the AI
- */
-export const zToolCall = z.object({
-    toolCallId: z.string(),
-    toolName: z.string(),
-    args: z.record(z.string(), z.unknown())
-});
-
-/**
- * ToolResult
- *
- * The result of a tool call
- */
-export const zToolResult = z.object({
-    toolCallId: z.string(),
-    toolName: z.string(),
-    result: z.unknown()
-});
-
-/**
- * GenerateTextResponse
- *
- * Response from text generation
- */
-export const zGenerateTextResponse = z.object({
-    usage: z.optional(zTokenUsage),
-    finishReason: z.optional(z.string()),
-    toolCalls: z.optional(z.array(zToolCall)),
-    toolResults: z.optional(z.array(zToolResult)),
-    result: z.string()
-});
-
-/**
- * UseCase2GroupedCallsResponse
- *
- * Combined results from grouped LLM calls
- */
-export const zUseCase2GroupedCallsResponse = z.object({
-    traceName: z.string(),
-    results: z.array(z.string()),
-    usage: z.optional(zTokenUsage)
-});
-
-/**
- * UseCase3LogicalUnitsResponse
- *
- * One result per workflow (each in its own trace)
- */
-export const zUseCase3LogicalUnitsResponse = z.object({
-    workflows: z.array(z.object({
-        index: z.number(),
-        result: z.string(),
-        usage: z.optional(zTokenUsage)
+export const zCreateMatchSchema = z.object({
+    seasonId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    title: z.string().min(1),
+    startsAt: z.string(),
+    location: z.optional(z.string()),
+    maxCapacity: z.int().gt(0).lte(9007199254740991),
+    reminderOffsetsHours: z.optional(z.array(z.int().gt(0).lte(9007199254740991))),
+    recurrence: z.optional(z.object({
+        frequency: z.enum([
+            'weekly',
+            'monthly',
+            'monthly_nth_weekday',
+            'custom'
+        ]),
+        rrule: z.optional(z.string()),
+        endsAt: z.optional(z.string()),
+        occurrenceCount: z.optional(z.int().gt(0).lte(52))
     }))
 });
 
 /**
- * GenerateObjectResponse
- *
- * Response from structured object generation
+ * UpdateMatchSchema
  */
-export const zGenerateObjectResponse = z.object({
-    usage: z.optional(zTokenUsage),
-    finishReason: z.optional(z.string()),
-    toolCalls: z.optional(z.array(zToolCall)),
-    toolResults: z.optional(z.array(zToolResult)),
-    result: z.unknown()
-});
-
-/**
- * ChatMessageWithSchemaType
- *
- * A message with optional schemaType metadata for identifying structured output
- */
-export const zChatMessageWithSchemaType = z.object({
-    role: z.enum([
-        'user',
-        'assistant',
-        'system',
-        'tool'
-    ]),
-    content: z.string(),
-    metadata: z.optional(z.object({
-        isConsideredSystemMessage: z.optional(z.boolean()),
-        usage: z.optional(z.object({
-            promptTokens: z.number(),
-            completionTokens: z.number(),
-            totalTokens: z.number()
-        })),
-        finishReason: z.optional(z.string()),
-        timestamp: z.optional(z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)),
-        toolCalls: z.optional(z.array(z.object({
-            toolCallId: z.string(),
-            toolName: z.string(),
-            args: z.record(z.string(), z.unknown())
-        }))),
-        reasonning: z.optional(z.string()),
-        schemaType: z.optional(z.enum([
-            'userProfile',
-            'task',
-            'product',
-            'recipe',
-            'none'
-        ]))
-    }))
-});
-
-/**
- * ChatResponse
- *
- * Response from AI chat conversation
- */
-export const zChatResponse = z.object({
-    usage: z.optional(zTokenUsage),
-    finishReason: z.optional(z.string()),
-    toolCalls: z.optional(z.array(zToolCall)),
-    toolResults: z.optional(z.array(zToolResult)),
-    result: z.string(),
-    messages: z.array(zChatMessageWithSchemaType)
-});
-
-/**
- * ChatSchemaType
- *
- * Predefined schema types for testing structured output
- */
-export const zChatSchemaType = z.enum([
-    'userProfile',
-    'task',
-    'product',
-    'recipe',
-    'none'
-]);
-
-/**
- * CommentSchema
- *
- * Schema for a comment
- */
-export const zCommentSchema = z.object({
-    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-    content: z.string(),
-    authorName: z.union([
+export const zUpdateMatchSchema = z.object({
+    title: z.optional(z.string().min(1)),
+    startsAt: z.optional(z.string()),
+    location: z.optional(z.union([
         z.string(),
         z.null()
+    ])),
+    maxCapacity: z.optional(z.int().gt(0).lte(9007199254740991)),
+    blueScore: z.optional(z.union([
+        z.int().gte(0).lte(9007199254740991),
+        z.null()
+    ])),
+    redScore: z.optional(z.union([
+        z.int().gte(0).lte(9007199254740991),
+        z.null()
+    ])),
+    reminderOffsetsHours: z.optional(z.union([
+        z.array(z.int().gt(0).lte(9007199254740991)),
+        z.null()
+    ]))
+});
+
+/**
+ * CancelMatchSchema
+ */
+export const zCancelMatchSchema = z.object({
+    reason: z.optional(z.string())
+});
+
+/**
+ * RespondAttendanceSchema
+ */
+export const zRespondAttendanceSchema = z.object({
+    status: z.enum(['present', 'absent'])
+});
+
+/**
+ * SetAttendanceSchema
+ */
+export const zSetAttendanceSchema = z.object({
+    status: z.enum([
+        'present',
+        'absent',
+        'pending'
+    ])
+});
+
+/**
+ * SetLineupSchema
+ */
+export const zSetLineupSchema = z.object({
+    assignments: z.array(z.object({
+        userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        team: z.enum(['blue', 'red'])
+    }))
+});
+
+/**
+ * SetPlayerTeamSchema
+ */
+export const zSetPlayerTeamSchema = z.object({
+    team: z.union([
+        z.enum(['blue', 'red']),
+        z.null()
+    ])
+});
+
+/**
+ * UpsertMatchCostSchema
+ */
+export const zUpsertMatchCostSchema = z.object({
+    pitchCostCents: z.int().gte(0).lte(9007199254740991),
+    extrasCostCents: z.int().gte(0).lte(9007199254740991).default(0)
+});
+
+/**
+ * UpdateFeeStatusSchema
+ */
+export const zUpdateFeeStatusSchema = z.object({
+    status: z.enum([
+        'owed',
+        'paid',
+        'waived'
+    ])
+});
+
+/**
+ * ClubPaymentLinkSchema
+ */
+export const zClubPaymentLinkSchema = z.object({
+    paymentLink: z.optional(z.union([
+        z.url(),
+        z.null()
+    ]))
+});
+
+/**
+ * CreateSeasonSchema
+ */
+export const zCreateSeasonSchema = z.object({
+    name: z.string().min(1),
+    startsAt: z.string(),
+    endsAt: z.optional(z.string())
+});
+
+/**
+ * UpdateSeasonSchema
+ */
+export const zUpdateSeasonSchema = z.object({
+    name: z.optional(z.string().min(1)),
+    startsAt: z.optional(z.string()),
+    endsAt: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    status: z.optional(z.enum(['active', 'closed']))
+});
+
+/**
+ * UpsertMatchStatsSchema
+ */
+export const zUpsertMatchStatsSchema = z.object({
+    stats: z.array(z.object({
+        userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        goals: z.int().gte(0).lte(9007199254740991),
+        assists: z.int().gte(0).lte(9007199254740991)
+    }))
+});
+
+/**
+ * NotificationPreferenceSchema
+ */
+export const zNotificationPreferenceSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    emailEnabled: z.boolean(),
+    pushEnabled: z.boolean(),
+    notifyNewMatch: z.boolean(),
+    notifyRsvpReminder: z.boolean(),
+    notifyMatchCancelled: z.boolean(),
+    chatMentionsOnly: z.boolean(),
+    notifyChatMention: z.boolean(),
+    notifyAllChatMessages: z.boolean()
+});
+
+/**
+ * MatchMessageSchema
+ */
+export const zMatchMessageSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    authorId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    authorName: z.string(),
+    body: z.string(),
+    mentionedUserIds: z.array(z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)),
+    createdAt: z.string()
+});
+
+/**
+ * ClubSchema
+ */
+export const zClubSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    name: z.string(),
+    slug: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    logo: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    paymentLink: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    venue: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    sportType: z.optional(z.union([
+        z.enum([
+            'football',
+            'futsal',
+            'basketball',
+            'volleyball',
+            'tennis',
+            'padel',
+            'badminton',
+            'other'
+        ]),
+        z.null()
+    ])),
+    defaultMaxCapacity: z.optional(z.union([
+        z.int().gt(0).lte(9007199254740991),
+        z.null()
+    ])),
+    createdAt: z.string()
+});
+
+/**
+ * ClubMemberSchema
+ */
+export const zClubMemberSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    name: z.string(),
+    email: z.email().regex(/^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/),
+    firstName: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    lastName: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    phone: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    role: z.enum([
+        'owner',
+        'admin',
+        'member'
     ]),
-    createdAt: z.string(),
-    user: z.union([
+    createdAt: z.string()
+});
+
+export const zGetOrganizationIdMembers = z.array(zClubMemberSchema);
+
+/**
+ * MatchSchema
+ */
+export const zMatchSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    seasonId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    seriesId: z.optional(z.union([
+        z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        z.null()
+    ])),
+    title: z.string(),
+    startsAt: z.string(),
+    location: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    maxCapacity: z.int().gt(0).lte(9007199254740991),
+    status: z.enum([
+        'scheduled',
+        'cancelled',
+        'played'
+    ]),
+    blueScore: z.optional(z.union([
+        z.int().gte(0).lte(9007199254740991),
+        z.null()
+    ])),
+    redScore: z.optional(z.union([
+        z.int().gte(0).lte(9007199254740991),
+        z.null()
+    ])),
+    reminderOffsetsHours: z.optional(z.union([
+        z.array(z.int().gt(0).lte(9007199254740991)),
+        z.null()
+    ])),
+    presentCount: z.optional(z.int().gte(-9007199254740991).lte(9007199254740991)),
+    viewerTeam: z.optional(z.union([
+        z.enum(['blue', 'red']),
+        z.null()
+    ])),
+    cancellationReason: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    createdAt: z.string()
+});
+
+export const zPostDefault = z.array(zMatchSchema);
+
+/**
+ * AttendanceSchema
+ */
+export const zAttendanceSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userName: z.string(),
+    status: z.enum([
+        'present',
+        'absent',
+        'pending'
+    ]),
+    respondedAt: z.optional(z.union([
+        z.string(),
+        z.null()
+    ]))
+});
+
+export const zGetMatchIdAttendances = z.array(zAttendanceSchema);
+
+/**
+ * LineupSchema
+ */
+export const zLineupSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userName: z.string(),
+    team: z.enum(['blue', 'red'])
+});
+
+export const zGetMatchIdLineups = z.array(zLineupSchema);
+
+export const zPutMatchIdLineups = z.array(zLineupSchema);
+
+export const zPutMatchIdLineupsUserId = z.array(zLineupSchema);
+
+/**
+ * MatchCostSchema
+ */
+export const zMatchCostSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    pitchCostCents: z.int().gte(0).lte(9007199254740991),
+    extrasCostCents: z.int().gte(0).lte(9007199254740991),
+    perPlayerCents: z.optional(z.int().gte(0).lte(9007199254740991)),
+    presentCount: z.optional(z.int().gte(-9007199254740991).lte(9007199254740991))
+});
+
+/**
+ * SessionFeeSchema
+ */
+export const zSessionFeeSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userName: z.string(),
+    amountCents: z.int().gte(-9007199254740991).lte(9007199254740991),
+    status: z.enum([
+        'owed',
+        'paid',
+        'waived'
+    ]),
+    paidAt: z.optional(z.union([
+        z.string(),
+        z.null()
+    ]))
+});
+
+export const zGetMatchesMatchIdFees = z.array(zSessionFeeSchema);
+
+/**
+ * SeasonSchema
+ */
+export const zSeasonSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    name: z.string(),
+    startsAt: z.string(),
+    endsAt: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    status: z.enum(['active', 'closed']),
+    createdAt: z.string()
+});
+
+export const zGetDefault = z.array(zSeasonSchema);
+
+/**
+ * MatchStatSchema
+ */
+export const zMatchStatSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userName: z.string(),
+    goals: z.int().gte(0).lte(9007199254740991),
+    assists: z.int().gte(0).lte(9007199254740991)
+});
+
+export const zPutMatchesMatchIdStats = z.array(zMatchStatSchema);
+
+export const zGetMatchesMatchIdStats = z.array(zMatchStatSchema);
+
+/**
+ * SeasonPlayerStatSchema
+ */
+export const zSeasonPlayerStatSchema = z.object({
+    userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userName: z.string(),
+    goals: z.int().gte(-9007199254740991).lte(9007199254740991),
+    assists: z.int().gte(-9007199254740991).lte(9007199254740991),
+    matchesPlayed: z.int().gte(-9007199254740991).lte(9007199254740991)
+});
+
+export const zGetSeasonsSeasonIdStats = z.array(zSeasonPlayerStatSchema);
+
+/**
+ * ClubHomeStatsSchema
+ */
+export const zClubHomeStatsSchema = z.object({
+    matchesPlayed: z.int().gte(0).lte(9007199254740991),
+    topScorer: z.union([
+        z.object({
+            userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+            userName: z.string(),
+            value: z.int().gte(0).lte(9007199254740991)
+        }),
+        z.null()
+    ]),
+    mostWins: z.union([
+        z.object({
+            userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+            userName: z.string(),
+            value: z.int().gte(0).lte(9007199254740991)
+        }),
+        z.null()
+    ]),
+    mostLosses: z.union([
+        z.object({
+            userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+            userName: z.string(),
+            value: z.int().gte(0).lte(9007199254740991)
+        }),
+        z.null()
+    ]),
+    mostPlayedTogether: z.union([
+        z.object({
+            playerA: z.object({
+                userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+                userName: z.string()
+            }),
+            playerB: z.object({
+                userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+                userName: z.string()
+            }),
+            matchesTogether: z.int().gte(0).lte(9007199254740991)
+        }),
+        z.null()
+    ])
+});
+
+/**
+ * PersonalHomeStatsSchema
+ */
+export const zPersonalHomeStatsSchema = z.object({
+    matchesPlayed: z.int().gte(0).lte(9007199254740991),
+    goals: z.int().gte(0).lte(9007199254740991),
+    wins: z.int().gte(0).lte(9007199254740991),
+    losses: z.int().gte(0).lte(9007199254740991)
+});
+
+/**
+ * SeasonHomeStatsSchema
+ */
+export const zSeasonHomeStatsSchema = z.object({
+    season: z.union([
         z.object({
             id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
             name: z.string()
         }),
         z.null()
     ]),
-    parentId: z.union([
-        z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-        z.null()
-    ]),
-    replyIds: z.optional(z.array(z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/))),
-    replyCount: z.optional(z.number())
+    club: zClubHomeStatsSchema,
+    me: zPersonalHomeStatsSchema
 });
 
-/**
- * CommentsSchema
- *
- * Schema for a paginated list of comments
- */
-export const zCommentsSchema = z.object({
-    data: z.array(zCommentSchema),
-    meta: z.object({
-        offset: z.number(),
-        pageSize: z.number(),
-        itemCount: z.number(),
-        hasMore: z.boolean()
-    })
-});
+export const zChatControllerOrganizationId = z.string();
 
-/**
- * PostContentSchema
- *
- * Schema for content items (text, image, video)
- */
-export const zPostContentSchema = z.union([
-    z.object({
-        type: z.literal('text'),
-        data: z.string()
-    }),
-    z.object({
-        type: z.literal('image'),
-        data: z.string()
-    }),
-    z.object({
-        type: z.literal('video'),
-        data: z.string()
-    })
-]);
+export const zChatControllerMatchId = z.string();
 
-/**
- * CreatePostSchema
- *
- * Schema for creating/updating a post
- */
-export const zCreatePostSchema = z.object({
-    title: z.string().min(1),
-    content: z.array(zPostContentSchema),
-    coverImage: z.optional(z.url()),
-    tags: z.optional(z.array(z.string()))
-});
+export const zMatchControllerOrganizationId = z.string();
 
-/**
- * UpdatePostSchema
- *
- * Schema for updating a post
- */
-export const zUpdatePostSchema = z.object({
-    title: z.optional(z.string().min(1)),
-    content: z.optional(z.array(zPostContentSchema)),
-    coverImage: z.optional(z.url()),
-    tags: z.optional(z.array(z.string()))
-});
+export const zPaymentControllerOrganizationId = z.string();
 
-/**
- * PostVersionSchema
- *
- * Schema for a post version
- */
-export const zPostVersionSchema = z.object({
-    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-    title: z.string(),
-    createdAt: z.string()
-});
+export const zSeasonControllerOrganizationId = z.string();
 
-/**
- * TagSchema
- *
- * A tag attached to a post
- */
-export const zTagSchema = z.object({
-    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-    name: z.string(),
-    slug: z.string()
-});
-
-/**
- * UserPostSchema
- *
- * Schema for a user's post
- */
-export const zUserPostSchema = z.object({
-    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-    slug: z.optional(z.union([
-        z.string(),
-        z.null()
-    ])),
-    title: z.string(),
-    content: z.array(zPostContentSchema),
-    versions: z.array(zPostVersionSchema),
-    publishedAt: z.optional(z.union([
-        z.string(),
-        z.null()
-    ])),
-    type: z.enum(['published', 'draft']),
-    commentCount: z.optional(z.number()),
-    coverImage: z.optional(z.url()),
-    tags: z.array(zTagSchema)
-});
-
-/**
- * UserPostsSchema
- *
- * Schema for a list of user's posts
- */
-export const zUserPostsSchema = z.object({
-    data: z.array(z.object({
-        id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-        slug: z.optional(z.union([
-            z.string(),
-            z.null()
-        ])),
-        title: z.string(),
-        versions: z.array(zPostVersionSchema),
-        publishedAt: z.optional(z.union([
-            z.string(),
-            z.null()
-        ])),
-        type: z.enum(['published', 'draft']),
-        commentCount: z.optional(z.number()),
-        coverImage: z.optional(z.url()),
-        tags: z.array(zTagSchema),
-        contentPreview: zPostContentSchema
-    })),
-    meta: z.object({
-        offset: z.number(),
-        pageSize: z.number(),
-        itemCount: z.number(),
-        hasMore: z.boolean()
-    })
-});
-
-/**
- * PublicPostSchema
- *
- * A public post
- */
-export const zPublicPostSchema = z.object({
-    title: z.string(),
-    author: z.object({
-        name: z.string()
-    }),
-    content: z.array(zPostContentSchema),
-    publishedAt: z.string(),
-    slug: z.optional(z.string()),
-    commentCount: z.optional(z.number()),
-    coverImage: z.optional(z.url()),
-    likesCount: z.number(),
-    tags: z.array(zTagSchema)
-});
-
-/**
- * PublicPostsSchema
- *
- * A list of public posts
- */
-export const zPublicPostsSchema = z.object({
-    data: z.array(z.object({
-        title: z.string(),
-        author: z.object({
-            name: z.string()
-        }),
-        publishedAt: z.string(),
-        slug: z.optional(z.string()),
-        commentCount: z.optional(z.number()),
-        coverImage: z.optional(z.url()),
-        likesCount: z.number(),
-        tags: z.array(zTagSchema),
-        contentPreview: zPostContentSchema
-    })),
-    meta: z.object({
-        offset: z.number(),
-        pageSize: z.number(),
-        itemCount: z.number(),
-        hasMore: z.boolean()
-    })
-});
-
-/**
- * PublicAuthorPostsSchema
- *
- * A list of posts from a specific author
- */
-export const zPublicAuthorPostsSchema = z.object({
-    data: z.array(z.object({
-        title: z.string(),
-        author: z.object({
-            name: z.string()
-        }),
-        publishedAt: z.string(),
-        slug: z.optional(z.string()),
-        commentCount: z.optional(z.number()),
-        coverImage: z.optional(z.url()),
-        likesCount: z.number(),
-        tags: z.array(zTagSchema),
-        contentPreview: zPostContentSchema
-    })),
-    meta: z.object({
-        offset: z.number(),
-        pageSize: z.number(),
-        itemCount: z.number(),
-        hasMore: z.boolean()
-    })
-});
-
-/**
- * AiCoreMessage
- *
- * A message in the conversation history following Vercel AI SDK patterns
- */
-export const zAiCoreMessage = z.object({
-    role: z.enum([
-        'user',
-        'assistant',
-        'system',
-        'tool'
-    ]),
-    content: z.string(),
-    metadata: z.optional(z.object({
-        isConsideredSystemMessage: z.optional(z.boolean()),
-        usage: z.optional(zTokenUsage),
-        finishReason: z.optional(z.string()),
-        timestamp: z.optional(z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)),
-        toolCalls: z.optional(z.array(zToolCall)),
-        reasonning: z.optional(z.string())
-    }))
-});
-
-/**
- * AiStreamEvent
- *
- * SSE event for AI text streaming with tool support
- */
-export const zAiStreamEvent = z.union([
-    z.object({
-        type: z.literal('chunk'),
-        text: z.string()
-    }),
-    z.object({
-        type: z.literal('tool-call'),
-        toolCallId: z.string(),
-        toolName: z.string(),
-        args: z.record(z.string(), z.unknown())
-    }),
-    z.object({
-        type: z.literal('tool-result'),
-        toolCallId: z.string(),
-        toolName: z.string(),
-        result: z.unknown()
-    }),
-    z.object({
-        type: z.literal('done'),
-        fullText: z.string(),
-        usage: z.optional(z.object({
-            promptTokens: z.number(),
-            completionTokens: z.number(),
-            totalTokens: z.number()
-        })),
-        finishReason: z.optional(z.string())
-    }),
-    z.object({
-        type: z.literal('error'),
-        message: z.string()
-    })
-]);
-
-/**
- * Task
- *
- * A task
- */
-export const zTask = z.object({
-    title: z.string(),
-    description: z.string(),
-    priority: z.enum([
-        'low',
-        'medium',
-        'high'
-    ]),
-    dueDate: z.optional(z.string()),
-    tags: z.optional(z.array(z.string()))
-});
-
-/**
- * Product
- *
- * A product
- */
-export const zProduct = z.object({
-    name: z.string(),
-    price: z.number(),
-    description: z.string(),
-    category: z.string(),
-    inStock: z.boolean(),
-    features: z.optional(z.array(z.string()))
-});
-
-/**
- * Recipe
- *
- * A recipe
- */
-export const zRecipe = z.object({
-    name: z.string(),
-    description: z.string(),
-    prepTime: z.string(),
-    cookTime: z.string(),
-    servings: z.number(),
-    difficulty: z.enum([
-        'easy',
-        'medium',
-        'hard'
-    ]),
-    ingredients: z.array(z.object({
-        name: z.string(),
-        quantity: z.string()
-    })),
-    instructions: z.array(z.string()),
-    tips: z.optional(z.array(z.string()))
-});
-
-/**
- * UserProfile
- *
- * A user profile
- */
-export const zUserProfile = z.object({
-    name: z.string(),
-    age: z.number(),
-    email: z.email().regex(/^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/),
-    bio: z.optional(z.string()),
-    skills: z.optional(z.array(z.string()))
-});
-
-/**
- * AiGenerateOptions
- *
- * Options for an AI generation
- */
-export const zAiGenerateOptions = z.object({
-    temperature: z.optional(z.number().gte(0).lte(2)),
-    maxTokens: z.optional(z.number().gt(0)),
-    topP: z.optional(z.number().gte(0).lte(1)),
-    frequencyPenalty: z.optional(z.number().gte(-2).lte(2)),
-    presencePenalty: z.optional(z.number().gte(-2).lte(2)),
-    maxSteps: z.optional(z.number().gt(0)),
-    stopWhen: z.optional(z.number().gt(0)),
-    telemetry: z.optional(z.object({
-        traceMode: z.optional(z.enum(['inherit', 'split'])),
-        traceId: z.optional(z.string()),
-        traceName: z.optional(z.string()),
-        spanName: z.optional(z.string()),
-        sessionId: z.optional(z.string()),
-        metadata: z.optional(z.record(z.string(), z.unknown())),
-        langfuseOriginalPrompt: z.optional(z.string())
-    })),
-    metadata: z.optional(z.record(z.string(), z.unknown()))
-});
-
-/**
- * UseCase1SingleGenerationRequest
- *
- * Single generation; trace is finalized with name/output so Langfuse shows them
- */
-export const zUseCase1SingleGenerationRequest = z.object({
-    prompt: z.string().min(1),
-    model: z.optional(z.enum([
-        'OPENAI_GPT_5_NANO',
-        'GOOGLE_GEMINI_3_FLASH',
-        'CLAUDE_HAIKU_3_5',
-        'CLAUDE_OPUS_4_5',
-        'MISTRAL_SMALL'
-    ])),
-    options: z.optional(zAiGenerateOptions)
-});
-
-/**
- * GenerateTextRequest
- *
- * Request for simple text generation with a single prompt
- */
-export const zGenerateTextRequest = z.object({
-    prompt: z.string().min(1),
-    model: z.optional(z.enum([
-        'OPENAI_GPT_5_NANO',
-        'GOOGLE_GEMINI_3_FLASH',
-        'CLAUDE_HAIKU_3_5',
-        'CLAUDE_OPUS_4_5',
-        'MISTRAL_SMALL'
-    ])),
-    options: z.optional(zAiGenerateOptions)
-});
-
-/**
- * GenerateObjectRequest
- *
- * Request for structured object generation with a predefined schema type
- */
-export const zGenerateObjectRequest = z.object({
-    prompt: z.string().min(1),
-    schemaType: z.enum([
-        'userProfile',
-        'task',
-        'product',
-        'recipe'
-    ]),
-    model: z.optional(z.enum([
-        'OPENAI_GPT_5_NANO',
-        'GOOGLE_GEMINI_3_FLASH',
-        'CLAUDE_HAIKU_3_5',
-        'CLAUDE_OPUS_4_5',
-        'MISTRAL_SMALL'
-    ])),
-    options: z.optional(zAiGenerateOptions)
-});
-
-/**
- * ChatRequest
- *
- * Request for multi-turn AI conversation with message history. schemaType can be used to request structured output.
- */
-export const zChatRequest = z.object({
-    messages: z.array(zChatMessageWithSchemaType).min(1),
-    model: z.optional(z.enum([
-        'OPENAI_GPT_5_NANO',
-        'GOOGLE_GEMINI_3_FLASH',
-        'CLAUDE_HAIKU_3_5',
-        'CLAUDE_OPUS_4_5',
-        'MISTRAL_SMALL'
-    ])),
-    options: z.optional(zAiGenerateOptions),
-    schemaType: z.optional(zChatSchemaType)
-});
-
-/**
- * StreamTextRequest
- *
- * Request for streaming text generation with a single prompt
- */
-export const zStreamTextRequest = z.object({
-    prompt: z.string().min(1),
-    model: z.optional(z.enum([
-        'OPENAI_GPT_5_NANO',
-        'GOOGLE_GEMINI_3_FLASH',
-        'CLAUDE_HAIKU_3_5',
-        'CLAUDE_OPUS_4_5',
-        'MISTRAL_SMALL'
-    ])),
-    options: z.optional(zAiGenerateOptions)
-});
-
-/**
- * StreamObjectRequest
- *
- * Request for streaming structured object generation
- */
-export const zStreamObjectRequest = z.object({
-    prompt: z.string().min(1),
-    schemaType: z.enum([
-        'userProfile',
-        'task',
-        'product',
-        'recipe'
-    ]),
-    model: z.optional(z.enum([
-        'OPENAI_GPT_5_NANO',
-        'GOOGLE_GEMINI_3_FLASH',
-        'CLAUDE_HAIKU_3_5',
-        'CLAUDE_OPUS_4_5',
-        'MISTRAL_SMALL'
-    ])),
-    options: z.optional(zAiGenerateOptions)
-});
-
-/**
- * StreamChatRequest
- *
- * Request for streaming multi-turn AI conversation
- */
-export const zStreamChatRequest = z.object({
-    messages: z.array(zChatMessageWithSchemaType).min(1),
-    model: z.optional(z.enum([
-        'OPENAI_GPT_5_NANO',
-        'GOOGLE_GEMINI_3_FLASH',
-        'CLAUDE_HAIKU_3_5',
-        'CLAUDE_OPUS_4_5',
-        'MISTRAL_SMALL'
-    ])),
-    options: z.optional(zAiGenerateOptions)
-});
-
-/**
- * PaginationQuerySchema
- *
- * Schema for pagination query
- */
-export const zPaginationQuerySchema = z.object({
-    offset: z.int().gte(0).lte(9007199254740991).default(0),
-    pageSize: z.int().gte(1).lte(100).default(20)
-});
-
-/**
- * SortingQueryStringSchema
- *
- * Schema for sorting items
- */
-export const zSortingQueryStringSchema = z.string();
-
-/**
- * FilterQueryStringSchema
- *
- * Filtering query string, in the format of "property:rule[:value];property:rule[:value];..."
- * <br> Available rules: eq, neq, gt, gte, lt, lte, like, nlike, in, nin, isnull, isnotnull
- * <br> Available properties: title, tag
- */
-export const zFilterQueryStringSchema = z.string();
-
-export const zCommentsControllerPostSlug = z.string();
-
-export const zCommentsControllerGetCommentsFilterItem = z.object({
-    property: z.literal('content'),
-    rule: z.enum([
-        'eq',
-        'neq',
-        'gt',
-        'gte',
-        'lt',
-        'lte',
-        'like',
-        'nlike',
-        'in',
-        'nin',
-        'isnull',
-        'isnotnull'
-    ]),
-    value: z.optional(z.string())
-});
-
-export const zCommentsControllerGetCommentsFilterArray = z.array(zCommentsControllerGetCommentsFilterItem);
-
-export const zCommentsControllerGetCommentsSortItem = z.object({
-    property: z.union([
-        z.literal('createdAt'),
-        z.literal('authorName')
-    ]),
-    direction: z.enum(['asc', 'desc'])
-});
-
-export const zCommentsControllerGetCommentsSortArray = z.array(zCommentsControllerGetCommentsSortItem);
-
-export const zCommentsControllerGetCommentRepliesSortItem = z.object({
-    property: z.union([
-        z.literal('createdAt'),
-        z.literal('authorName')
-    ]),
-    direction: z.enum(['asc', 'desc'])
-});
-
-export const zCommentsControllerGetCommentRepliesSortArray = z.array(zCommentsControllerGetCommentRepliesSortItem);
-
-export const zPostControllerGetUserPostsFilterItem = z.object({
-    property: z.union([
-        z.literal('title'),
-        z.literal('tag')
-    ]),
-    rule: z.enum([
-        'eq',
-        'neq',
-        'gt',
-        'gte',
-        'lt',
-        'lte',
-        'like',
-        'nlike',
-        'in',
-        'nin',
-        'isnull',
-        'isnotnull'
-    ]),
-    value: z.optional(z.string())
-});
-
-export const zPostControllerGetUserPostsFilterArray = z.array(zPostControllerGetUserPostsFilterItem);
-
-export const zPostControllerGetUserPostsSortItem = z.object({
-    property: z.union([
-        z.literal('title'),
-        z.literal('createdAt')
-    ]),
-    direction: z.enum(['asc', 'desc'])
-});
-
-export const zPostControllerGetUserPostsSortArray = z.array(zPostControllerGetUserPostsSortItem);
-
-export const zPublicPostControllerGetPostsFilterItem = z.object({
-    property: z.union([
-        z.literal('title'),
-        z.literal('tag')
-    ]),
-    rule: z.enum([
-        'eq',
-        'neq',
-        'gt',
-        'gte',
-        'lt',
-        'lte',
-        'like',
-        'nlike',
-        'in',
-        'nin',
-        'isnull',
-        'isnotnull'
-    ]),
-    value: z.optional(z.string())
-});
-
-export const zPublicPostControllerGetPostsFilterArray = z.array(zPublicPostControllerGetPostsFilterItem);
-
-export const zPublicPostControllerGetPostsSortItem = z.object({
-    property: z.union([
-        z.literal('title'),
-        z.literal('createdAt')
-    ]),
-    direction: z.enum(['asc', 'desc'])
-});
-
-export const zPublicPostControllerGetPostsSortArray = z.array(zPublicPostControllerGetPostsSortItem);
-
-export const zPublicAuthorControllerGetAuthorPostsSortItem = z.object({
-    property: z.union([
-        z.literal('title'),
-        z.literal('createdAt')
-    ]),
-    direction: z.enum(['asc', 'desc'])
-});
-
-export const zPublicAuthorControllerGetAuthorPostsSortArray = z.array(zPublicAuthorControllerGetAuthorPostsSortItem);
+export const zStatsControllerOrganizationId = z.string();
 
 export const zAppControllerGetHelloData = z.object({
     body: z.optional(z.never()),
@@ -886,667 +582,617 @@ export const zAppControllerGetHelloData = z.object({
     query: z.optional(z.never())
 });
 
-export const zCommentsControllerGetCommentsData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        postSlug: z.string()
-    }),
-    query: z.object({
-        filter: z.optional(zCommentsControllerGetCommentsFilterArray),
-        sort: z.optional(zCommentsControllerGetCommentsSortArray),
-        offset: z.int().gte(0).lte(9007199254740991).default(0),
-        pageSize: z.int().gte(1).lte(100).default(20)
-    })
-});
-
-/**
- * Schema for a paginated list of comments
- */
-export const zCommentsControllerGetCommentsResponse = zCommentsSchema;
-
-export const zCommentsControllerCreateCommentData = z.object({
-    body: z.object({
-        content: z.string().min(1).max(1000),
-        parentId: z.optional(z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/))
-    }),
-    path: z.object({
-        postSlug: z.string()
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * Schema for a comment
- */
-export const zCommentsControllerCreateCommentResponse = zCommentSchema;
-
-export const zCommentsControllerGetCommentCountData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        postSlug: z.string()
-    }),
-    query: z.optional(z.never())
-});
-
-export const zCommentsControllerGetCommentRepliesData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        commentId: z.string(),
-        postSlug: z.string()
-    }),
-    query: z.object({
-        sort: z.optional(zCommentsControllerGetCommentRepliesSortArray),
-        offset: z.int().gte(0).lte(9007199254740991).default(0),
-        pageSize: z.int().gte(1).lte(100).default(20)
-    })
-});
-
-/**
- * Schema for a paginated list of comments
- */
-export const zCommentsControllerGetCommentRepliesResponse = zCommentsSchema;
-
-export const zCommentsControllerDeleteCommentData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        commentId: z.string(),
-        postSlug: z.string()
-    }),
-    query: z.optional(z.never())
-});
-
-export const zPostControllerGetUserPostsData = z.object({
+export const zClubControllerListMineData = z.object({
     body: z.optional(z.never()),
     path: z.optional(z.never()),
-    query: z.object({
-        filter: z.optional(zPostControllerGetUserPostsFilterArray),
-        sort: z.optional(zPostControllerGetUserPostsSortArray),
-        offset: z.int().gte(0).lte(9007199254740991).default(0),
-        pageSize: z.int().gte(1).lte(100).default(20)
-    })
+    query: z.optional(z.never())
 });
 
 /**
- * Schema for a list of user's posts
+ * Successful response
  */
-export const zPostControllerGetUserPostsResponse = zUserPostsSchema;
+export const zClubControllerListMineResponse = zGetDefault;
 
-export const zPostControllerCreatePostData = z.object({
+export const zClubControllerGetOneData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zClubControllerGetOneResponse = zClubSchema;
+
+export const zClubControllerUpdateData = z.object({
     body: z.object({
-        title: z.string().min(1),
-        content: z.array(z.union([
-            z.object({
-                type: z.literal('text'),
-                data: z.string()
-            }),
-            z.object({
-                type: z.literal('image'),
-                data: z.string()
-            }),
-            z.object({
-                type: z.literal('video'),
-                data: z.string()
-            })
+        name: z.optional(z.string().min(1)),
+        venue: z.optional(z.union([
+            z.string().min(1),
+            z.null()
         ])),
-        coverImage: z.optional(z.url()),
-        tags: z.optional(z.array(z.string()))
+        sportType: z.optional(z.union([
+            z.enum([
+                'football',
+                'futsal',
+                'basketball',
+                'volleyball',
+                'tennis',
+                'padel',
+                'badminton',
+                'other'
+            ]),
+            z.null()
+        ])),
+        defaultMaxCapacity: z.optional(z.union([
+            z.int().gt(0).lte(9007199254740991),
+            z.null()
+        ]))
     }),
-    path: z.optional(z.never()),
+    path: z.object({
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
     query: z.optional(z.never())
 });
 
 /**
- * Schema for a user's post
+ * Successful response
  */
-export const zPostControllerCreatePostResponse = zUserPostSchema;
+export const zClubControllerUpdateResponse = zClubSchema;
 
-export const zPostControllerGetUserPostData = z.object({
+export const zClubControllerListMembersData = z.object({
     body: z.optional(z.never()),
     path: z.object({
-        id: z.string()
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
     }),
     query: z.optional(z.never())
 });
 
 /**
- * Schema for a user's post
+ * Successful response
  */
-export const zPostControllerGetUserPostResponse = zUserPostSchema;
+export const zClubControllerListMembersResponse = zGetOrganizationIdMembers;
 
-export const zPostControllerUpdatePostData = z.object({
+export const zClubControllerUpdateRoleData = z.object({
+    body: z.object({
+        role: z.enum(['admin', 'member'])
+    }),
+    path: z.object({
+        memberId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zClubControllerUpdateRoleResponse = zClubMemberSchema;
+
+export const zSeasonControllerListData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zSeasonControllerListResponse = zGetDefault;
+
+export const zSeasonControllerCreateData = z.object({
+    body: z.object({
+        name: z.string().min(1),
+        startsAt: z.string(),
+        endsAt: z.optional(z.string())
+    }),
+    path: z.object({
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zSeasonControllerCreateResponse = zSeasonSchema;
+
+export const zSeasonControllerGetData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        seasonId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zSeasonControllerGetResponse = zSeasonSchema;
+
+export const zSeasonControllerUpdateData = z.object({
+    body: z.object({
+        name: z.optional(z.string().min(1)),
+        startsAt: z.optional(z.string()),
+        endsAt: z.optional(z.union([
+            z.string(),
+            z.null()
+        ])),
+        status: z.optional(z.enum(['active', 'closed']))
+    }),
+    path: z.object({
+        seasonId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zSeasonControllerUpdateResponse = zSeasonSchema;
+
+export const zMatchControllerListData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.object({
+        seasonId: z.string()
+    })
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerListResponse = zGetDefault;
+
+export const zMatchControllerCreateData = z.object({
+    body: z.object({
+        seasonId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        title: z.string().min(1),
+        startsAt: z.string(),
+        location: z.optional(z.string()),
+        maxCapacity: z.int().gt(0).lte(9007199254740991),
+        reminderOffsetsHours: z.optional(z.array(z.int().gt(0).lte(9007199254740991))),
+        recurrence: z.optional(z.object({
+            frequency: z.enum([
+                'weekly',
+                'monthly',
+                'monthly_nth_weekday',
+                'custom'
+            ]),
+            rrule: z.optional(z.string()),
+            endsAt: z.optional(z.string()),
+            occurrenceCount: z.optional(z.int().gt(0).lte(52))
+        }))
+    }),
+    path: z.object({
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerCreateResponse = zPostDefault;
+
+export const zMatchControllerGetData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerGetResponse = zMatchSchema;
+
+export const zMatchControllerUpdateData = z.object({
     body: z.object({
         title: z.optional(z.string().min(1)),
-        content: z.optional(z.array(z.union([
-            z.object({
-                type: z.literal('text'),
-                data: z.string()
-            }),
-            z.object({
-                type: z.literal('image'),
-                data: z.string()
-            }),
-            z.object({
-                type: z.literal('video'),
-                data: z.string()
-            })
-        ]))),
-        coverImage: z.optional(z.url()),
-        tags: z.optional(z.array(z.string()))
-    }),
-    path: z.object({
-        id: z.string()
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * Schema for a user's post
- */
-export const zPostControllerUpdatePostResponse = zUserPostSchema;
-
-export const zPostControllerPublishPostData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        id: z.string()
-    }),
-    query: z.optional(z.never())
-});
-
-export const zPostControllerUnpublishPostData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        id: z.string()
-    }),
-    query: z.optional(z.never())
-});
-
-export const zPublicPostControllerGetRandomPostData = z.object({
-    body: z.optional(z.never()),
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
-/**
- * A public post
- */
-export const zPublicPostControllerGetRandomPostResponse = zPublicPostSchema;
-
-export const zPublicPostControllerGetPostData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        slug: z.string()
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * A public post
- */
-export const zPublicPostControllerGetPostResponse = zPublicPostSchema;
-
-export const zPublicPostControllerGetPostsData = z.object({
-    body: z.optional(z.never()),
-    path: z.optional(z.never()),
-    query: z.object({
-        filter: z.optional(zPublicPostControllerGetPostsFilterArray),
-        sort: z.optional(zPublicPostControllerGetPostsSortArray),
-        offset: z.int().gte(0).lte(9007199254740991).default(0),
-        pageSize: z.int().gte(1).lte(100).default(20)
-    })
-});
-
-/**
- * A list of public posts
- */
-export const zPublicPostControllerGetPostsResponse = zPublicPostsSchema;
-
-export const zPublicPostControllerLikePostData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        slug: z.string()
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * A public post
- */
-export const zPublicPostControllerLikePostResponse = zPublicPostSchema;
-
-export const zPublicAuthorControllerGetAuthorPostsData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        slug: z.string()
-    }),
-    query: z.object({
-        sort: z.optional(zPublicAuthorControllerGetAuthorPostsSortArray),
-        offset: z.int().gte(0).lte(9007199254740991).default(0),
-        pageSize: z.int().gte(1).lte(100).default(20)
-    })
-});
-
-/**
- * A list of posts from a specific author
- */
-export const zPublicAuthorControllerGetAuthorPostsResponse = zPublicAuthorPostsSchema;
-
-export const zAiExampleControllerGenerateTextData = z.object({
-    body: z.object({
-        prompt: z.string().min(1),
-        model: z.optional(z.enum([
-            'OPENAI_GPT_5_NANO',
-            'GOOGLE_GEMINI_3_FLASH',
-            'CLAUDE_HAIKU_3_5',
-            'CLAUDE_OPUS_4_5',
-            'MISTRAL_SMALL'
+        startsAt: z.optional(z.string()),
+        location: z.optional(z.union([
+            z.string(),
+            z.null()
         ])),
-        options: z.optional(z.object({
-            temperature: z.optional(z.number().gte(0).lte(2)),
-            maxTokens: z.optional(z.number().gt(0)),
-            topP: z.optional(z.number().gte(0).lte(1)),
-            frequencyPenalty: z.optional(z.number().gte(-2).lte(2)),
-            presencePenalty: z.optional(z.number().gte(-2).lte(2)),
-            maxSteps: z.optional(z.number().gt(0)),
-            stopWhen: z.optional(z.number().gt(0)),
-            telemetry: z.optional(z.object({
-                traceMode: z.optional(z.enum(['inherit', 'split'])),
-                traceId: z.optional(z.string()),
-                traceName: z.optional(z.string()),
-                spanName: z.optional(z.string()),
-                sessionId: z.optional(z.string()),
-                metadata: z.optional(z.record(z.string(), z.unknown())),
-                langfuseOriginalPrompt: z.optional(z.string())
-            })),
-            metadata: z.optional(z.record(z.string(), z.unknown()))
-        }))
-    }),
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
-/**
- * Response from text generation
- */
-export const zAiExampleControllerGenerateTextResponse = zGenerateTextResponse;
-
-export const zAiExampleControllerGenerateObjectData = z.object({
-    body: z.object({
-        prompt: z.string().min(1),
-        schemaType: z.enum([
-            'userProfile',
-            'task',
-            'product',
-            'recipe'
-        ]),
-        model: z.optional(z.enum([
-            'OPENAI_GPT_5_NANO',
-            'GOOGLE_GEMINI_3_FLASH',
-            'CLAUDE_HAIKU_3_5',
-            'CLAUDE_OPUS_4_5',
-            'MISTRAL_SMALL'
+        maxCapacity: z.optional(z.int().gt(0).lte(9007199254740991)),
+        blueScore: z.optional(z.union([
+            z.int().gte(0).lte(9007199254740991),
+            z.null()
         ])),
-        options: z.optional(z.object({
-            temperature: z.optional(z.number().gte(0).lte(2)),
-            maxTokens: z.optional(z.number().gt(0)),
-            topP: z.optional(z.number().gte(0).lte(1)),
-            frequencyPenalty: z.optional(z.number().gte(-2).lte(2)),
-            presencePenalty: z.optional(z.number().gte(-2).lte(2)),
-            maxSteps: z.optional(z.number().gt(0)),
-            stopWhen: z.optional(z.number().gt(0)),
-            telemetry: z.optional(z.object({
-                traceMode: z.optional(z.enum(['inherit', 'split'])),
-                traceId: z.optional(z.string()),
-                traceName: z.optional(z.string()),
-                spanName: z.optional(z.string()),
-                sessionId: z.optional(z.string()),
-                metadata: z.optional(z.record(z.string(), z.unknown())),
-                langfuseOriginalPrompt: z.optional(z.string())
-            })),
-            metadata: z.optional(z.record(z.string(), z.unknown()))
-        }))
-    }),
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
-/**
- * Response from structured object generation
- */
-export const zAiExampleControllerGenerateObjectResponse = zGenerateObjectResponse;
-
-export const zAiExampleControllerChatData = z.object({
-    body: z.object({
-        messages: z.array(z.object({
-            role: z.enum([
-                'user',
-                'assistant',
-                'system',
-                'tool'
-            ]),
-            content: z.string(),
-            metadata: z.optional(z.object({
-                isConsideredSystemMessage: z.optional(z.boolean()),
-                usage: z.optional(z.object({
-                    promptTokens: z.number(),
-                    completionTokens: z.number(),
-                    totalTokens: z.number()
-                })),
-                finishReason: z.optional(z.string()),
-                timestamp: z.optional(z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)),
-                toolCalls: z.optional(z.array(z.object({
-                    toolCallId: z.string(),
-                    toolName: z.string(),
-                    args: z.record(z.string(), z.unknown())
-                }))),
-                reasonning: z.optional(z.string()),
-                schemaType: z.optional(z.enum([
-                    'userProfile',
-                    'task',
-                    'product',
-                    'recipe',
-                    'none'
-                ]))
-            }))
-        })).min(1),
-        model: z.optional(z.enum([
-            'OPENAI_GPT_5_NANO',
-            'GOOGLE_GEMINI_3_FLASH',
-            'CLAUDE_HAIKU_3_5',
-            'CLAUDE_OPUS_4_5',
-            'MISTRAL_SMALL'
+        redScore: z.optional(z.union([
+            z.int().gte(0).lte(9007199254740991),
+            z.null()
         ])),
-        options: z.optional(z.object({
-            temperature: z.optional(z.number().gte(0).lte(2)),
-            maxTokens: z.optional(z.number().gt(0)),
-            topP: z.optional(z.number().gte(0).lte(1)),
-            frequencyPenalty: z.optional(z.number().gte(-2).lte(2)),
-            presencePenalty: z.optional(z.number().gte(-2).lte(2)),
-            maxSteps: z.optional(z.number().gt(0)),
-            stopWhen: z.optional(z.number().gt(0)),
-            telemetry: z.optional(z.object({
-                traceMode: z.optional(z.enum(['inherit', 'split'])),
-                traceId: z.optional(z.string()),
-                traceName: z.optional(z.string()),
-                spanName: z.optional(z.string()),
-                sessionId: z.optional(z.string()),
-                metadata: z.optional(z.record(z.string(), z.unknown())),
-                langfuseOriginalPrompt: z.optional(z.string())
-            })),
-            metadata: z.optional(z.record(z.string(), z.unknown()))
-        })),
-        schemaType: z.optional(z.enum([
-            'userProfile',
-            'task',
-            'product',
-            'recipe',
-            'none'
+        reminderOffsetsHours: z.optional(z.union([
+            z.array(z.int().gt(0).lte(9007199254740991)),
+            z.null()
         ]))
     }),
-    path: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
     query: z.optional(z.never())
 });
 
 /**
- * Response from AI chat conversation
+ * Successful response
  */
-export const zAiExampleControllerChatResponse = zChatResponse;
+export const zMatchControllerUpdateResponse = zMatchSchema;
 
-export const zAiExampleControllerStreamTextData = z.object({
+export const zMatchControllerCancelData = z.object({
     body: z.object({
-        prompt: z.string().min(1),
-        model: z.optional(z.enum([
-            'OPENAI_GPT_5_NANO',
-            'GOOGLE_GEMINI_3_FLASH',
-            'CLAUDE_HAIKU_3_5',
-            'CLAUDE_OPUS_4_5',
-            'MISTRAL_SMALL'
-        ])),
-        options: z.optional(z.object({
-            temperature: z.optional(z.number().gte(0).lte(2)),
-            maxTokens: z.optional(z.number().gt(0)),
-            topP: z.optional(z.number().gte(0).lte(1)),
-            frequencyPenalty: z.optional(z.number().gte(-2).lte(2)),
-            presencePenalty: z.optional(z.number().gte(-2).lte(2)),
-            maxSteps: z.optional(z.number().gt(0)),
-            stopWhen: z.optional(z.number().gt(0)),
-            telemetry: z.optional(z.object({
-                traceMode: z.optional(z.enum(['inherit', 'split'])),
-                traceId: z.optional(z.string()),
-                traceName: z.optional(z.string()),
-                spanName: z.optional(z.string()),
-                sessionId: z.optional(z.string()),
-                metadata: z.optional(z.record(z.string(), z.unknown())),
-                langfuseOriginalPrompt: z.optional(z.string())
-            })),
-            metadata: z.optional(z.record(z.string(), z.unknown()))
+        reason: z.optional(z.string())
+    }),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerCancelResponse = zMatchSchema;
+
+export const zMatchControllerMarkPlayedData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerMarkPlayedResponse = zMatchSchema;
+
+export const zMatchControllerListAttendancesData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerListAttendancesResponse = zGetMatchIdAttendances;
+
+export const zMatchControllerRespondData = z.object({
+    body: z.object({
+        status: z.enum(['present', 'absent'])
+    }),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerRespondResponse = zAttendanceSchema;
+
+export const zMatchControllerSetAttendanceData = z.object({
+    body: z.object({
+        status: z.enum([
+            'present',
+            'absent',
+            'pending'
+        ])
+    }),
+    path: z.object({
+        userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerSetAttendanceResponse = zAttendanceSchema;
+
+export const zMatchControllerListLineupsData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerListLineupsResponse = zGetMatchIdLineups;
+
+export const zMatchControllerSetLineupData = z.object({
+    body: z.object({
+        assignments: z.array(z.object({
+            userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+            team: z.enum(['blue', 'red'])
         }))
     }),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerSetLineupResponse = zPutMatchIdLineups;
+
+export const zMatchControllerSetPlayerTeamData = z.object({
+    body: z.object({
+        team: z.union([
+            z.enum(['blue', 'red']),
+            z.null()
+        ])
+    }),
+    path: z.object({
+        userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerSetPlayerTeamResponse = zPutMatchIdLineupsUserId;
+
+export const zNotificationControllerGetPreferencesData = z.object({
+    body: z.optional(z.never()),
     path: z.optional(z.never()),
     query: z.optional(z.never())
 });
 
-export const zAiExampleControllerStreamObjectData = z.object({
+/**
+ * Successful response
+ */
+export const zNotificationControllerGetPreferencesResponse = zNotificationPreferenceSchema;
+
+export const zNotificationControllerUpdatePreferencesData = z.object({
     body: z.object({
-        prompt: z.string().min(1),
-        schemaType: z.enum([
-            'userProfile',
-            'task',
-            'product',
-            'recipe'
-        ]),
-        model: z.optional(z.enum([
-            'OPENAI_GPT_5_NANO',
-            'GOOGLE_GEMINI_3_FLASH',
-            'CLAUDE_HAIKU_3_5',
-            'CLAUDE_OPUS_4_5',
-            'MISTRAL_SMALL'
-        ])),
-        options: z.optional(z.object({
-            temperature: z.optional(z.number().gte(0).lte(2)),
-            maxTokens: z.optional(z.number().gt(0)),
-            topP: z.optional(z.number().gte(0).lte(1)),
-            frequencyPenalty: z.optional(z.number().gte(-2).lte(2)),
-            presencePenalty: z.optional(z.number().gte(-2).lte(2)),
-            maxSteps: z.optional(z.number().gt(0)),
-            stopWhen: z.optional(z.number().gt(0)),
-            telemetry: z.optional(z.object({
-                traceMode: z.optional(z.enum(['inherit', 'split'])),
-                traceId: z.optional(z.string()),
-                traceName: z.optional(z.string()),
-                spanName: z.optional(z.string()),
-                sessionId: z.optional(z.string()),
-                metadata: z.optional(z.record(z.string(), z.unknown())),
-                langfuseOriginalPrompt: z.optional(z.string())
-            })),
-            metadata: z.optional(z.record(z.string(), z.unknown()))
+        emailEnabled: z.optional(z.boolean()),
+        pushEnabled: z.optional(z.boolean()),
+        notifyNewMatch: z.optional(z.boolean()),
+        notifyRsvpReminder: z.optional(z.boolean()),
+        notifyMatchCancelled: z.optional(z.boolean()),
+        chatMentionsOnly: z.optional(z.boolean()),
+        notifyChatMention: z.optional(z.boolean()),
+        notifyAllChatMessages: z.optional(z.boolean())
+    }),
+    path: z.optional(z.never()),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zNotificationControllerUpdatePreferencesResponse = zNotificationPreferenceSchema;
+
+export const zNotificationControllerRegisterDeviceData = z.object({
+    body: z.object({
+        token: z.string().min(1),
+        platform: z.enum([
+            'ios',
+            'android',
+            'web'
+        ])
+    }),
+    path: z.optional(z.never()),
+    query: z.optional(z.never())
+});
+
+export const zStatsControllerListMatchData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zStatsControllerListMatchResponse = zGetMatchesMatchIdStats;
+
+export const zStatsControllerUpsertData = z.object({
+    body: z.object({
+        stats: z.array(z.object({
+            userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+            goals: z.int().gte(0).lte(9007199254740991),
+            assists: z.int().gte(0).lte(9007199254740991)
         }))
     }),
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
-export const zAiExampleControllerStreamChatData = z.object({
-    body: z.object({
-        messages: z.array(z.object({
-            role: z.enum([
-                'user',
-                'assistant',
-                'system',
-                'tool'
-            ]),
-            content: z.string(),
-            metadata: z.optional(z.object({
-                isConsideredSystemMessage: z.optional(z.boolean()),
-                usage: z.optional(z.object({
-                    promptTokens: z.number(),
-                    completionTokens: z.number(),
-                    totalTokens: z.number()
-                })),
-                finishReason: z.optional(z.string()),
-                timestamp: z.optional(z.iso.datetime().regex(/^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$/)),
-                toolCalls: z.optional(z.array(z.object({
-                    toolCallId: z.string(),
-                    toolName: z.string(),
-                    args: z.record(z.string(), z.unknown())
-                }))),
-                reasonning: z.optional(z.string()),
-                schemaType: z.optional(z.enum([
-                    'userProfile',
-                    'task',
-                    'product',
-                    'recipe',
-                    'none'
-                ]))
-            }))
-        })).min(1),
-        model: z.optional(z.enum([
-            'OPENAI_GPT_5_NANO',
-            'GOOGLE_GEMINI_3_FLASH',
-            'CLAUDE_HAIKU_3_5',
-            'CLAUDE_OPUS_4_5',
-            'MISTRAL_SMALL'
-        ])),
-        options: z.optional(z.object({
-            temperature: z.optional(z.number().gte(0).lte(2)),
-            maxTokens: z.optional(z.number().gt(0)),
-            topP: z.optional(z.number().gte(0).lte(1)),
-            frequencyPenalty: z.optional(z.number().gte(-2).lte(2)),
-            presencePenalty: z.optional(z.number().gte(-2).lte(2)),
-            maxSteps: z.optional(z.number().gt(0)),
-            stopWhen: z.optional(z.number().gt(0)),
-            telemetry: z.optional(z.object({
-                traceMode: z.optional(z.enum(['inherit', 'split'])),
-                traceId: z.optional(z.string()),
-                traceName: z.optional(z.string()),
-                spanName: z.optional(z.string()),
-                sessionId: z.optional(z.string()),
-                metadata: z.optional(z.record(z.string(), z.unknown())),
-                langfuseOriginalPrompt: z.optional(z.string())
-            })),
-            metadata: z.optional(z.record(z.string(), z.unknown()))
-        }))
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
     }),
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
-export const zAiExampleUseCasesControllerUseCase1SingleGenerationData = z.object({
-    body: z.object({
-        prompt: z.string().min(1),
-        model: z.optional(z.enum([
-            'OPENAI_GPT_5_NANO',
-            'GOOGLE_GEMINI_3_FLASH',
-            'CLAUDE_HAIKU_3_5',
-            'CLAUDE_OPUS_4_5',
-            'MISTRAL_SMALL'
-        ])),
-        options: z.optional(z.object({
-            temperature: z.optional(z.number().gte(0).lte(2)),
-            maxTokens: z.optional(z.number().gt(0)),
-            topP: z.optional(z.number().gte(0).lte(1)),
-            frequencyPenalty: z.optional(z.number().gte(-2).lte(2)),
-            presencePenalty: z.optional(z.number().gte(-2).lte(2)),
-            maxSteps: z.optional(z.number().gt(0)),
-            stopWhen: z.optional(z.number().gt(0)),
-            telemetry: z.optional(z.object({
-                traceMode: z.optional(z.enum(['inherit', 'split'])),
-                traceId: z.optional(z.string()),
-                traceName: z.optional(z.string()),
-                spanName: z.optional(z.string()),
-                sessionId: z.optional(z.string()),
-                metadata: z.optional(z.record(z.string(), z.unknown())),
-                langfuseOriginalPrompt: z.optional(z.string())
-            })),
-            metadata: z.optional(z.record(z.string(), z.unknown()))
-        }))
-    }),
-    path: z.optional(z.never()),
     query: z.optional(z.never())
 });
 
 /**
- * Response from text generation
+ * Successful response
  */
-export const zAiExampleUseCasesControllerUseCase1SingleGenerationResponse = zGenerateTextResponse;
+export const zStatsControllerUpsertResponse = zPutMatchesMatchIdStats;
 
-export const zAiExampleUseCasesControllerUseCase2GroupedCallsData = z.object({
+export const zStatsControllerSeasonStatsData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        seasonId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zStatsControllerSeasonStatsResponse = zGetSeasonsSeasonIdStats;
+
+export const zStatsControllerHomeStatsData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zStatsControllerHomeStatsResponse = zSeasonHomeStatsSchema;
+
+export const zChatControllerListData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zChatControllerListResponse = zGetDefault;
+
+export const zChatControllerPostData = z.object({
     body: z.object({
-        prompts: z.array(z.string().min(1)).min(1).max(5),
-        model: z.optional(z.enum([
-            'OPENAI_GPT_5_NANO',
-            'GOOGLE_GEMINI_3_FLASH',
-            'CLAUDE_HAIKU_3_5',
-            'CLAUDE_OPUS_4_5',
-            'MISTRAL_SMALL'
+        body: z.string().min(1).max(4000),
+        mentionedUserIds: z.optional(z.array(z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)))
+    }),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zChatControllerPostResponse = zMatchMessageSchema;
+
+export const zPaymentControllerGetCostData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerGetCostResponse = zMatchCostSchema;
+
+export const zPaymentControllerUpsertCostData = z.object({
+    body: z.object({
+        pitchCostCents: z.int().gte(0).lte(9007199254740991),
+        extrasCostCents: z.int().gte(0).lte(9007199254740991).default(0)
+    }),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerUpsertCostResponse = zMatchCostSchema;
+
+export const zPaymentControllerListFeesData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerListFeesResponse = zGetMatchesMatchIdFees;
+
+export const zPaymentControllerUpdateFeeData = z.object({
+    body: z.object({
+        status: z.enum([
+            'owed',
+            'paid',
+            'waived'
+        ])
+    }),
+    path: z.object({
+        feeId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerUpdateFeeResponse = zSessionFeeSchema;
+
+export const zPaymentControllerGetPaymentLinkData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerGetPaymentLinkResponse = zClubPaymentLinkSchema;
+
+export const zPaymentControllerSetPaymentLinkData = z.object({
+    body: z.object({
+        paymentLink: z.optional(z.union([
+            z.url(),
+            z.null()
         ]))
     }),
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
-/**
- * Combined results from grouped LLM calls
- */
-export const zAiExampleUseCasesControllerUseCase2GroupedCallsResponse = zUseCase2GroupedCallsResponse;
-
-export const zAiExampleUseCasesControllerUseCase3LogicalUnitsData = z.object({
-    body: z.object({
-        workflowPrompts: z.array(z.string().min(1)).min(1).max(5),
-        model: z.optional(z.enum([
-            'OPENAI_GPT_5_NANO',
-            'GOOGLE_GEMINI_3_FLASH',
-            'CLAUDE_HAIKU_3_5',
-            'CLAUDE_OPUS_4_5',
-            'MISTRAL_SMALL'
-        ]))
+    path: z.object({
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
     }),
-    path: z.optional(z.never()),
     query: z.optional(z.never())
 });
 
 /**
- * One result per workflow (each in its own trace)
+ * Successful response
  */
-export const zAiExampleUseCasesControllerUseCase3LogicalUnitsResponse = zUseCase3LogicalUnitsResponse;
-
-export const zAiExampleUseCasesControllerUseCase4ChatSessionData = z.object({
-    body: z.object({
-        prompt: z.string().min(1),
-        sessionId: z.string().min(1),
-        model: z.optional(z.enum([
-            'OPENAI_GPT_5_NANO',
-            'GOOGLE_GEMINI_3_FLASH',
-            'CLAUDE_HAIKU_3_5',
-            'CLAUDE_OPUS_4_5',
-            'MISTRAL_SMALL'
-        ]))
-    }),
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
-/**
- * Response from text generation
- */
-export const zAiExampleUseCasesControllerUseCase4ChatSessionResponse = zGenerateTextResponse;
-
-export const zAiExampleUseCasesControllerUseCase5ChatSessionWithTurnsMergedData = z.object({
-    body: z.object({
-        prompt: z.string().min(1),
-        sessionId: z.string().min(1),
-        model: z.optional(z.enum([
-            'OPENAI_GPT_5_NANO',
-            'GOOGLE_GEMINI_3_FLASH',
-            'CLAUDE_HAIKU_3_5',
-            'CLAUDE_OPUS_4_5',
-            'MISTRAL_SMALL'
-        ]))
-    }),
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
-/**
- * Response from text generation
- */
-export const zAiExampleUseCasesControllerUseCase5ChatSessionWithTurnsMergedResponse = zGenerateTextResponse;
+export const zPaymentControllerSetPaymentLinkResponse = zClubPaymentLinkSchema;

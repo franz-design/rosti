@@ -48,20 +48,20 @@ modules/feature-name/
 
 ## API Design
 
-There is no module generator. Copy `apps/api/src/modules/example/posts/` and adapt it. That folder is the reference for entity, contract, mapper, service, controller, module, and e2e test.
+There is no module generator. Copy an existing domain module such as `apps/api/src/modules/seasons/` and adapt it. That folder is a reference for entity, contract, mapper, service, controller, and module.
 
 Then follow these steps (adapt as needed):
 
-1. Create an entity, using posts.entity.ts (or another existing entity file if not found) as reference;
-2. Create a contract, using posts.contract.ts (or another existing contract file if not found) as reference.
+1. Create an entity, using an existing entity file (for example `season.entity.ts`) as reference;
+2. Create a contract, using an existing contract file (for example `season.contract.ts`) as reference.
    a. The contract file should contain the schema for all CRUD actions (GET/POST/PUT/DELETE);
    b. If related contracts are needed (relations), create the related contract files first;
    c. When creating a contract, always start from the GET contract (nameOfEntitySchema) and then create the create and update contracts by extending the initial schema (you can use zod pick);
-3. Create a mapper, using posts.mapper.ts (or another existing mapper file if not found) as reference;
-4. Create a service, using posts.service.ts (or another existing service file if not found) as reference;
-5. Create a controller, using posts.controller.ts (or another existing controller file if not found) as reference;
-6. Create a module, using posts.module.ts (or another existing module file if not found) as reference;
-7. Add an e2e test under `tests/`, using posts.controller.e2e-spec.ts (or another existing e2e test if not found) as reference. See [API testing](/lonestone-boilerplate/guides/api-testing) for how those tests run.
+3. Create a mapper, using an existing mapper file as reference;
+4. Create a service, using an existing service file as reference;
+5. Create a controller, using an existing controller file as reference;
+6. Create a module, using an existing module file as reference;
+7. Add an e2e test under `tests/` when the module needs HTTP coverage. See [API testing](/lonestone-boilerplate/guides/api-testing) for how those tests run.
 
 ### Controllers
 

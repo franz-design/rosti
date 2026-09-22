@@ -6,7 +6,6 @@ Multi-club team manager: seasons, recurring matches, RSVP, blue/red lineups, goa
 |-----|------|
 | `apps/api` | NestJS REST API (auth, clubs, matches, stats, chat, payments stub) |
 | `apps/web-spa` | Authenticated web app (desktop + Capacitor mobile shell) |
-| `apps/web-ssr` | Public landing, invite links, privacy page |
 | `apps/documentation` | Product and engineering docs |
 
 ## Prerequisites
@@ -51,8 +50,7 @@ pnpm dev
 Typical local URLs (exact ports come from your `.env`):
 
 - API — OpenAPI docs at `/docs`
-- Web app (`web-spa`) — login / register / clubs / matches
-- Public site (`web-ssr`) — landing and `/invite/:invitationId`
+- Web app (`web-spa`) — login / register / clubs / matches / invite links
 - MailDev UI — catch verification and invite emails in development
 
 ### Manual setup (alternative)
@@ -63,7 +61,6 @@ If you prefer not to use `pnpm rock`:
 cp .env.example .env
 cp apps/api/.env.example apps/api/.env
 cp apps/web-spa/.env.example apps/web-spa/.env
-cp apps/web-ssr/.env.example apps/web-ssr/.env
 cp packages/openapi-generator/.env.example packages/openapi-generator/.env
 ```
 
@@ -84,7 +81,6 @@ See [Env files](apps/documentation/src/content/docs/core-features/0_env-file.mdx
 | `pnpm dev` | Run all apps in development |
 | `pnpm --filter=@rosti/api dev` | API only |
 | `pnpm --filter=@rosti/web-spa dev` | Web app only |
-| `pnpm --filter=@rosti/web-ssr dev` | Public site only |
 | `pnpm docs-only` | Documentation site |
 | `pnpm docker:up` / `docker:down` / `docker:logs` | Local Postgres + MailDev |
 | `pnpm --filter=@rosti/api db:migrate:up` | Apply migrations |
@@ -102,7 +98,6 @@ Mobile (Capacitor): after a SPA build, see [CAPACITOR.md](apps/web-spa/CAPACITOR
 apps/
   api/             NestJS API + MikroORM + Better Auth
   web-spa/         React authenticated app (+ Capacitor)
-  web-ssr/         React public site
   documentation/   Starlight docs
 packages/
   ui/              Shared UI (shadcn / Radix)
@@ -122,7 +117,6 @@ packages/
 
 - [API README](apps/api/README.md)
 - [Web SPA README](apps/web-spa/README.md)
-- [Web SSR README](apps/web-ssr/README.md)
 - [Capacitor / mobile](apps/web-spa/CAPACITOR.md)
 - [Documentation app README](apps/documentation/README.md)
 

@@ -7,13 +7,11 @@ import { ScheduleModule } from '@nestjs/schedule'
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup'
 import { LoggerModule } from 'nestjs-pino'
 import { AppController } from './app.controller'
-import { AiModule } from './modules/ai/ai.module'
 import { AuthModule } from './modules/auth/auth.module'
 import { ChatModule } from './modules/chat/chat.module'
 import { ClubModule } from './modules/clubs/club.module'
 import { DbModule } from './modules/db/db.module'
 import { EmailModule } from './modules/email/email.module'
-import { ExampleModule } from './modules/example/example.module'
 import { MatchModule } from './modules/matches/match.module'
 import { NotificationModule } from './modules/notifications/notification.module'
 import { PaymentModule } from './modules/payments/payment.module'
@@ -101,9 +99,7 @@ interface ExpressResponse extends ServerResponse<IncomingMessage> {
     DbModule,
     AuthModule,
     EmailModule,
-    AiModule,
     NestConfigModule,
-    ExampleModule,
     ClubModule,
     SeasonModule,
     MatchModule,

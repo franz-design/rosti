@@ -40,7 +40,6 @@ Le client est généré dans le répertoire `./client` et comprend :
 Les packages suivants dépendent d'OpenAPI Generator :
 
 - `apps/web-spa` : Application frontend React en SPA
-- `apps/web-ssr` : Application frontend React en SSR
 - `packages/ui` : Bibliothèque de composants UI partagés
 
 ## Configuration
@@ -66,7 +65,9 @@ client.setConfig({
 
 ```typescript
 // Exemple d'utilisation
-import { postControllerCreatePost } from '@rosti/openapi-generator'
+import { seasonControllerListSeasons } from '@rosti/openapi-generator'
 
-const posts = await postControllerCreatePost()
+const seasons = await seasonControllerListSeasons({
+  path: { organizationId: '...' },
+})
 ```

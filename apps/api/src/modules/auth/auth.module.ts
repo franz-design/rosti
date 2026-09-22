@@ -71,11 +71,10 @@ import { OrganizationService } from './organization.service'
           },
           sendInvitationEmail: async (data) => {
             const inviteUrl = `${config.clients.webApp.url}/invite/${data.invitation.id}?email=${encodeURIComponent(data.email)}&club=${encodeURIComponent(data.organization.name)}`
-            const landingUrl = `${config.clients.webSsr.url}/invite/${data.invitation.id}?email=${encodeURIComponent(data.email)}&club=${encodeURIComponent(data.organization.name)}`
             return emailService.sendEmail({
               to: data.email,
               subject: `Tu es invité·e à rejoindre ${data.organization.name} sur Rösti`,
-              content: `Bonjour,<br/>${data.inviter.user.name} t'invite à rejoindre <strong>${data.organization.name}</strong> sur Rösti.<br/><br/>Ordinateur : <a href="${inviteUrl}">${inviteUrl}</a><br/>Mobile : <a href="${landingUrl}">${landingUrl}</a>`,
+              content: `Bonjour,<br/>${data.inviter.user.name} t'invite à rejoindre <strong>${data.organization.name}</strong> sur Rösti.<br/><br/><a href="${inviteUrl}">${inviteUrl}</a>`,
             })
           },
         })

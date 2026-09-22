@@ -254,221 +254,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.user",
-          "updateRule": "cascade"
-        }
-      },
-      "comment": null
-    },
-    {
-      "name": "comment",
-      "schema": "public",
-      "columns": {
-        "authorName": {
-          "name": "authorName",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": 255,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "string"
-        },
-        "content": {
-          "name": "content",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 255,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "string"
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamptz(6)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 6,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        },
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": "gen_random_uuid()",
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "parentId": {
-          "name": "parentId",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "postId": {
-          "name": "postId",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "userId": {
-          "name": "userId",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        }
-      },
-      "indexes": [
-        {
-          "columnNames": [
-            "parentId"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "comment_parentId_index",
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"comment_parentId_index\" ON public.comment USING btree (\"parentId\")"
-        },
-        {
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "constraint": true,
-          "keyName": "comment_pkey",
-          "primary": true,
-          "unique": true
-        },
-        {
-          "columnNames": [
-            "postId"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "comment_postId_index",
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"comment_postId_index\" ON public.comment USING btree (\"postId\")"
-        },
-        {
-          "columnNames": [
-            "userId"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "comment_userId_index",
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"comment_userId_index\" ON public.comment USING btree (\"userId\")"
-        }
-      ],
-      "checks": [],
-      "triggers": [],
-      "foreignKeys": {
-        "comment_parentId_foreign": {
-          "columnNames": [
-            "parentId"
-          ],
-          "constraintName": "comment_parentId_foreign",
-          "localTableName": "public.comment",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.comment",
-          "updateRule": "cascade",
-          "deleteRule": "set null"
-        },
-        "comment_postId_foreign": {
-          "columnNames": [
-            "postId"
-          ],
-          "constraintName": "comment_postId_foreign",
-          "localTableName": "public.comment",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.post",
-          "updateRule": "cascade"
-        },
-        "comment_userId_foreign": {
-          "columnNames": [
-            "userId"
-          ],
-          "constraintName": "comment_userId_foreign",
-          "localTableName": "public.comment",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.user",
-          "updateRule": "cascade",
-          "deleteRule": "set null"
+          "referencedTableName": "public.user"
         }
       },
       "comment": null
@@ -488,7 +274,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -534,13 +320,13 @@
         },
         "token": {
           "name": "token",
-          "type": "varchar(512)",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "unique": false,
-          "length": 512,
+          "length": 255,
           "precision": null,
           "scale": null,
           "default": null,
@@ -560,7 +346,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -594,6 +380,16 @@
           "keyName": "device_token_pkey",
           "primary": true,
           "unique": true
+        },
+        {
+          "columnNames": [
+            "userId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "device_token_userId_index",
+          "primary": false,
+          "unique": false
         }
       ],
       "checks": [
@@ -616,7 +412,6 @@
             "id"
           ],
           "referencedTableName": "public.user",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -637,7 +432,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -804,9 +599,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.user",
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
+          "referencedTableName": "public.user"
         },
         "invitation_organizationId_foreign": {
           "columnNames": [
@@ -818,7 +611,6 @@
             "id"
           ],
           "referencedTableName": "public.organization",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -861,7 +653,8 @@
           "collation": null,
           "enumItems": [],
           "mappedType": "text"
-        },        "createdAt": {
+        },
+        "createdAt": {
           "name": "createdAt",
           "type": "timestamptz(6)",
           "unsigned": false,
@@ -872,7 +665,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -963,23 +756,6 @@
           "enumItems": [],
           "mappedType": "uuid"
         },
-        "reminderOffsetsHours": {
-          "name": "reminderOffsetsHours",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "json"
-        },
         "redScore": {
           "name": "redScore",
           "type": "int",
@@ -996,6 +772,23 @@
           "collation": null,
           "enumItems": [],
           "mappedType": "integer"
+        },
+        "reminderOffsetsHours": {
+          "name": "reminderOffsetsHours",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "json"
         },
         "seasonId": {
           "name": "seasonId",
@@ -1097,7 +890,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -1105,6 +898,16 @@
         }
       },
       "indexes": [
+        {
+          "columnNames": [
+            "organizationId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_organizationId_index",
+          "primary": false,
+          "unique": false
+        },
         {
           "columnNames": [
             "id"
@@ -1117,14 +920,23 @@
         },
         {
           "columnNames": [
+            "seasonId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_seasonId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "startsAt"
           ],
           "composite": false,
           "constraint": false,
           "keyName": "match_startsAt_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"match_startsAt_index\" ON public.match USING btree (\"startsAt\")"
+          "unique": false
         }
       ],
       "checks": [
@@ -1146,9 +958,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.user",
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
+          "referencedTableName": "public.user"
         },
         "match_organizationId_foreign": {
           "columnNames": [
@@ -1160,7 +970,6 @@
             "id"
           ],
           "referencedTableName": "public.organization",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         },
         "match_seasonId_foreign": {
@@ -1173,7 +982,6 @@
             "id"
           ],
           "referencedTableName": "public.season",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         },
         "match_seriesId_foreign": {
@@ -1186,7 +994,6 @@
             "id"
           ],
           "referencedTableName": "public.match_series",
-          "updateRule": "cascade",
           "deleteRule": "set null"
         }
       },
@@ -1207,7 +1014,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -1296,7 +1103,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -1323,6 +1130,16 @@
       "indexes": [
         {
           "columnNames": [
+            "matchId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_attendance_matchId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "matchId",
             "userId"
           ],
@@ -1330,8 +1147,7 @@
           "constraint": true,
           "keyName": "match_attendance_matchId_userId_unique",
           "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX \"match_attendance_matchId_userId_unique\" ON public.match_attendance USING btree (\"matchId\", \"userId\")"
+          "unique": true
         },
         {
           "columnNames": [
@@ -1342,6 +1158,16 @@
           "keyName": "match_attendance_pkey",
           "primary": true,
           "unique": true
+        },
+        {
+          "columnNames": [
+            "userId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_attendance_userId_index",
+          "primary": false,
+          "unique": false
         }
       ],
       "checks": [
@@ -1364,7 +1190,6 @@
             "id"
           ],
           "referencedTableName": "public.match",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         },
         "match_attendance_userId_foreign": {
@@ -1377,7 +1202,6 @@
             "id"
           ],
           "referencedTableName": "public.user",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -1398,7 +1222,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -1483,7 +1307,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -1496,11 +1320,20 @@
             "matchId"
           ],
           "composite": false,
+          "constraint": false,
+          "keyName": "match_cost_matchId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "matchId"
+          ],
+          "composite": false,
           "constraint": true,
           "keyName": "match_cost_matchId_unique",
           "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX \"match_cost_matchId_unique\" ON public.match_cost USING btree (\"matchId\")"
+          "unique": true
         },
         {
           "columnNames": [
@@ -1526,7 +1359,6 @@
             "id"
           ],
           "referencedTableName": "public.match",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -1547,7 +1379,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -1618,7 +1450,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -1645,6 +1477,16 @@
       "indexes": [
         {
           "columnNames": [
+            "matchId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_lineup_matchId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "matchId",
             "userId"
           ],
@@ -1652,8 +1494,7 @@
           "constraint": true,
           "keyName": "match_lineup_matchId_userId_unique",
           "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX \"match_lineup_matchId_userId_unique\" ON public.match_lineup USING btree (\"matchId\", \"userId\")"
+          "unique": true
         },
         {
           "columnNames": [
@@ -1686,7 +1527,6 @@
             "id"
           ],
           "referencedTableName": "public.match",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         },
         "match_lineup_userId_foreign": {
@@ -1699,7 +1539,6 @@
             "id"
           ],
           "referencedTableName": "public.user",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -1754,7 +1593,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -1805,7 +1644,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -1813,6 +1652,16 @@
         }
       },
       "indexes": [
+        {
+          "columnNames": [
+            "matchId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_message_matchId_index",
+          "primary": false,
+          "unique": false
+        },
         {
           "columnNames": [
             "id"
@@ -1837,7 +1686,6 @@
             "id"
           ],
           "referencedTableName": "public.user",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         },
         "match_message_matchId_foreign": {
@@ -1850,7 +1698,6 @@
             "id"
           ],
           "referencedTableName": "public.match",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -1871,7 +1718,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -2090,6 +1937,16 @@
       "indexes": [
         {
           "columnNames": [
+            "organizationId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_series_organizationId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "id"
           ],
           "composite": false,
@@ -2118,9 +1975,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.user",
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
+          "referencedTableName": "public.user"
         },
         "match_series_organizationId_foreign": {
           "columnNames": [
@@ -2132,7 +1987,6 @@
             "id"
           ],
           "referencedTableName": "public.organization",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         },
         "match_series_seasonId_foreign": {
@@ -2145,7 +1999,6 @@
             "id"
           ],
           "referencedTableName": "public.season",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -2183,7 +2036,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -2251,7 +2104,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -2278,6 +2131,16 @@
       "indexes": [
         {
           "columnNames": [
+            "matchId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_stat_matchId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "matchId",
             "userId"
           ],
@@ -2285,8 +2148,7 @@
           "constraint": true,
           "keyName": "match_stat_matchId_userId_unique",
           "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX \"match_stat_matchId_userId_unique\" ON public.match_stat USING btree (\"matchId\", \"userId\")"
+          "unique": true
         },
         {
           "columnNames": [
@@ -2312,7 +2174,6 @@
             "id"
           ],
           "referencedTableName": "public.match",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         },
         "match_stat_userId_foreign": {
@@ -2325,7 +2186,6 @@
             "id"
           ],
           "referencedTableName": "public.user",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -2346,7 +2206,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -2446,7 +2306,6 @@
             "id"
           ],
           "referencedTableName": "public.organization",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         },
         "member_userId_foreign": {
@@ -2459,7 +2318,6 @@
             "id"
           ],
           "referencedTableName": "public.user",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -2480,7 +2338,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -2563,7 +2421,6 @@
             "id"
           ],
           "referencedTableName": "public.user",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         },
         "message_mention_messageId_foreign": {
@@ -2576,7 +2433,6 @@
             "id"
           ],
           "referencedTableName": "public.match_message",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -2614,7 +2470,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -2767,7 +2623,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -2810,8 +2666,7 @@
           "constraint": true,
           "keyName": "notification_preference_userId_unique",
           "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX \"notification_preference_userId_unique\" ON public.notification_preference USING btree (\"userId\")"
+          "unique": true
         }
       ],
       "checks": [],
@@ -2827,7 +2682,6 @@
             "id"
           ],
           "referencedTableName": "public.user",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -2848,7 +2702,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -3052,433 +2906,6 @@
       "comment": null
     },
     {
-      "name": "post",
-      "schema": "public",
-      "columns": {
-        "coverImage": {
-          "name": "coverImage",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": 255,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "string"
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamptz(6)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 6,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        },
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": "gen_random_uuid()",
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "likesCount": {
-          "name": "likesCount",
-          "type": "int",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": "0",
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "integer"
-        },
-        "publishedAt": {
-          "name": "publishedAt",
-          "type": "timestamptz(6)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": 6,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        },
-        "slug": {
-          "name": "slug",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": true,
-          "length": 255,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "string"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamptz(6)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 6,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        },
-        "userId": {
-          "name": "userId",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        }
-      },
-      "indexes": [
-        {
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "constraint": true,
-          "keyName": "post_pkey",
-          "primary": true,
-          "unique": true
-        },
-        {
-          "columnNames": [
-            "publishedAt"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "post_publishedAt_index",
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"post_publishedAt_index\" ON public.post USING btree (\"publishedAt\")"
-        },
-        {
-          "columnNames": [
-            "slug"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "post_slug_index",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "slug"
-          ],
-          "composite": false,
-          "constraint": true,
-          "keyName": "post_slug_unique",
-          "primary": false,
-          "unique": true
-        },
-        {
-          "columnNames": [
-            "userId"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "post_userId_index",
-          "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"post_userId_index\" ON public.post USING btree (\"userId\")"
-        }
-      ],
-      "checks": [],
-      "triggers": [],
-      "foreignKeys": {
-        "post_userId_foreign": {
-          "columnNames": [
-            "userId"
-          ],
-          "constraintName": "post_userId_foreign",
-          "localTableName": "public.post",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.user",
-          "updateRule": "cascade"
-        }
-      },
-      "comment": null
-    },
-    {
-      "name": "postVersion",
-      "schema": "public",
-      "columns": {
-        "content": {
-          "name": "content",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "json"
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamptz(6)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 6,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        },
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": "gen_random_uuid()",
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "postId": {
-          "name": "postId",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "title": {
-          "name": "title",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": 255,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "string"
-        }
-      },
-      "indexes": [
-        {
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "constraint": true,
-          "keyName": "postVersion_pkey",
-          "primary": true,
-          "unique": true
-        },
-        {
-          "columnNames": [
-            "title"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "postVersion_title_index",
-          "primary": false,
-          "unique": false
-        }
-      ],
-      "checks": [],
-      "triggers": [],
-      "foreignKeys": {
-        "postVersion_postId_foreign": {
-          "columnNames": [
-            "postId"
-          ],
-          "constraintName": "postVersion_postId_foreign",
-          "localTableName": "public.postVersion",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.post",
-          "updateRule": "cascade"
-        }
-      },
-      "comment": null
-    },
-    {
-      "name": "post_tag",
-      "schema": "public",
-      "columns": {
-        "post": {
-          "name": "post",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "tag": {
-          "name": "tag",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        }
-      },
-      "indexes": [
-        {
-          "columnNames": [
-            "post",
-            "tag"
-          ],
-          "composite": true,
-          "constraint": true,
-          "keyName": "post_tag_pkey",
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "triggers": [],
-      "foreignKeys": {
-        "post_tag_post_foreign": {
-          "columnNames": [
-            "post"
-          ],
-          "constraintName": "post_tag_post_foreign",
-          "localTableName": "public.post_tag",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.post",
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
-        },
-        "post_tag_tag_foreign": {
-          "columnNames": [
-            "tag"
-          ],
-          "constraintName": "post_tag_tag_foreign",
-          "localTableName": "public.post_tag",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.tag",
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
-        }
-      },
-      "comment": null
-    },
-    {
       "name": "scheduled_job",
       "schema": "public",
       "columns": {
@@ -3493,7 +2920,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -3621,7 +3048,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -3629,6 +3056,16 @@
         }
       },
       "indexes": [
+        {
+          "columnNames": [
+            "matchId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "scheduled_job_matchId_index",
+          "primary": false,
+          "unique": false
+        },
         {
           "columnNames": [
             "id"
@@ -3647,8 +3084,7 @@
           "constraint": false,
           "keyName": "scheduled_job_runAt_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"scheduled_job_runAt_index\" ON public.scheduled_job USING btree (\"runAt\")"
+          "unique": false
         }
       ],
       "checks": [
@@ -3677,7 +3113,6 @@
             "id"
           ],
           "referencedTableName": "public.match",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -3698,7 +3133,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -3820,7 +3255,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -3836,8 +3271,7 @@
           "constraint": false,
           "keyName": "season_organizationId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"season_organizationId_index\" ON public.season USING btree (\"organizationId\")"
+          "unique": false
         },
         {
           "columnNames": [
@@ -3870,7 +3304,6 @@
             "id"
           ],
           "referencedTableName": "public.organization",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
@@ -4068,8 +3501,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "public.user",
-          "updateRule": "cascade"
+          "referencedTableName": "public.user"
         }
       },
       "comment": null
@@ -4106,7 +3538,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -4195,7 +3627,7 @@
           "length": 6,
           "precision": null,
           "scale": null,
-          "default": "now()",
+          "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
@@ -4222,6 +3654,16 @@
       "indexes": [
         {
           "columnNames": [
+            "matchId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "session_fee_matchId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "matchId",
             "userId"
           ],
@@ -4229,8 +3671,7 @@
           "constraint": true,
           "keyName": "session_fee_matchId_userId_unique",
           "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX \"session_fee_matchId_userId_unique\" ON public.session_fee USING btree (\"matchId\", \"userId\")"
+          "unique": true
         },
         {
           "columnNames": [
@@ -4263,7 +3704,6 @@
             "id"
           ],
           "referencedTableName": "public.match",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         },
         "session_fee_userId_foreign": {
@@ -4276,123 +3716,9 @@
             "id"
           ],
           "referencedTableName": "public.user",
-          "updateRule": "cascade",
           "deleteRule": "cascade"
         }
       },
-      "comment": null
-    },
-    {
-      "name": "tag",
-      "schema": "public",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": "gen_random_uuid()",
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "uuid"
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": true,
-          "length": 255,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "string"
-        },
-        "slug": {
-          "name": "slug",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": true,
-          "length": 255,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "collation": null,
-          "enumItems": [],
-          "mappedType": "string"
-        }
-      },
-      "indexes": [
-        {
-          "columnNames": [
-            "name"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "tag_name_index",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "name"
-          ],
-          "composite": false,
-          "constraint": true,
-          "keyName": "tag_name_unique",
-          "primary": false,
-          "unique": true
-        },
-        {
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "constraint": true,
-          "keyName": "tag_pkey",
-          "primary": true,
-          "unique": true
-        },
-        {
-          "columnNames": [
-            "slug"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "tag_slug_index",
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "slug"
-          ],
-          "composite": false,
-          "constraint": true,
-          "keyName": "tag_slug_unique",
-          "primary": false,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "triggers": [],
-      "foreignKeys": {},
       "comment": null
     },
     {

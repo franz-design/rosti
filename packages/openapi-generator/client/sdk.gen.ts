@@ -2,8 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import { aiExampleControllerChatResponseTransformer } from './transformers.gen';
-import type { AiExampleControllerChatData, AiExampleControllerChatResponses, AiExampleControllerGenerateObjectData, AiExampleControllerGenerateObjectResponses, AiExampleControllerGenerateTextData, AiExampleControllerGenerateTextResponses, AiExampleControllerStreamChatData, AiExampleControllerStreamChatResponses, AiExampleControllerStreamObjectData, AiExampleControllerStreamObjectResponses, AiExampleControllerStreamTextData, AiExampleControllerStreamTextResponses, AiExampleUseCasesControllerUseCase1SingleGenerationData, AiExampleUseCasesControllerUseCase1SingleGenerationResponses, AiExampleUseCasesControllerUseCase2GroupedCallsData, AiExampleUseCasesControllerUseCase2GroupedCallsResponses, AiExampleUseCasesControllerUseCase3LogicalUnitsData, AiExampleUseCasesControllerUseCase3LogicalUnitsResponses, AiExampleUseCasesControllerUseCase4ChatSessionData, AiExampleUseCasesControllerUseCase4ChatSessionResponses, AiExampleUseCasesControllerUseCase5ChatSessionWithTurnsMergedData, AiExampleUseCasesControllerUseCase5ChatSessionWithTurnsMergedResponses, AppControllerGetHelloData, AppControllerGetHelloResponses, CommentsControllerCreateCommentData, CommentsControllerCreateCommentResponses, CommentsControllerDeleteCommentData, CommentsControllerDeleteCommentResponses, CommentsControllerGetCommentCountData, CommentsControllerGetCommentCountResponses, CommentsControllerGetCommentRepliesData, CommentsControllerGetCommentRepliesResponses, CommentsControllerGetCommentsData, CommentsControllerGetCommentsResponses, PostControllerCreatePostData, PostControllerCreatePostResponses, PostControllerGetUserPostData, PostControllerGetUserPostResponses, PostControllerGetUserPostsData, PostControllerGetUserPostsResponses, PostControllerPublishPostData, PostControllerPublishPostResponses, PostControllerUnpublishPostData, PostControllerUnpublishPostResponses, PostControllerUpdatePostData, PostControllerUpdatePostResponses, PublicAuthorControllerGetAuthorPostsData, PublicAuthorControllerGetAuthorPostsResponses, PublicPostControllerGetPostData, PublicPostControllerGetPostResponses, PublicPostControllerGetPostsData, PublicPostControllerGetPostsResponses, PublicPostControllerGetRandomPostData, PublicPostControllerGetRandomPostResponses, PublicPostControllerLikePostData, PublicPostControllerLikePostResponses } from './types.gen';
+import type { AppControllerGetHelloData, AppControllerGetHelloResponses, ChatControllerListData, ChatControllerListResponses, ChatControllerPostData, ChatControllerPostResponses, ClubControllerGetOneData, ClubControllerGetOneResponses, ClubControllerListMembersData, ClubControllerListMembersResponses, ClubControllerListMineData, ClubControllerListMineResponses, ClubControllerUpdateData, ClubControllerUpdateResponses, ClubControllerUpdateRoleData, ClubControllerUpdateRoleResponses, MatchControllerCancelData, MatchControllerCancelResponses, MatchControllerCreateData, MatchControllerCreateResponses, MatchControllerGetData, MatchControllerGetResponses, MatchControllerListAttendancesData, MatchControllerListAttendancesResponses, MatchControllerListData, MatchControllerListLineupsData, MatchControllerListLineupsResponses, MatchControllerListResponses, MatchControllerMarkPlayedData, MatchControllerMarkPlayedResponses, MatchControllerRespondData, MatchControllerRespondResponses, MatchControllerSetAttendanceData, MatchControllerSetAttendanceResponses, MatchControllerSetLineupData, MatchControllerSetLineupResponses, MatchControllerSetPlayerTeamData, MatchControllerSetPlayerTeamResponses, MatchControllerUpdateData, MatchControllerUpdateResponses, NotificationControllerGetPreferencesData, NotificationControllerGetPreferencesResponses, NotificationControllerRegisterDeviceData, NotificationControllerRegisterDeviceResponses, NotificationControllerUpdatePreferencesData, NotificationControllerUpdatePreferencesResponses, PaymentControllerGetCostData, PaymentControllerGetCostResponses, PaymentControllerGetPaymentLinkData, PaymentControllerGetPaymentLinkResponses, PaymentControllerListFeesData, PaymentControllerListFeesResponses, PaymentControllerSetPaymentLinkData, PaymentControllerSetPaymentLinkResponses, PaymentControllerUpdateFeeData, PaymentControllerUpdateFeeResponses, PaymentControllerUpsertCostData, PaymentControllerUpsertCostResponses, SeasonControllerCreateData, SeasonControllerCreateResponses, SeasonControllerGetData, SeasonControllerGetResponses, SeasonControllerListData, SeasonControllerListResponses, SeasonControllerUpdateData, SeasonControllerUpdateResponses, StatsControllerHomeStatsData, StatsControllerHomeStatsResponses, StatsControllerListMatchData, StatsControllerListMatchResponses, StatsControllerSeasonStatsData, StatsControllerSeasonStatsResponses, StatsControllerUpsertData, StatsControllerUpsertResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -21,10 +20,12 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 
 export const appControllerGetHello = <ThrowOnError extends boolean = false>(options?: Options<AppControllerGetHelloData, ThrowOnError>) => (options?.client ?? client).get<AppControllerGetHelloResponses, unknown, ThrowOnError>({ url: '/api', ...options });
 
-export const commentsControllerGetComments = <ThrowOnError extends boolean = false>(options: Options<CommentsControllerGetCommentsData, ThrowOnError>) => (options.client ?? client).get<CommentsControllerGetCommentsResponses, unknown, ThrowOnError>({ url: '/api/posts/{postSlug}/comments', ...options });
+export const clubControllerListMine = <ThrowOnError extends boolean = false>(options?: Options<ClubControllerListMineData, ThrowOnError>) => (options?.client ?? client).get<ClubControllerListMineResponses, unknown, ThrowOnError>({ url: '/api/clubs', ...options });
 
-export const commentsControllerCreateComment = <ThrowOnError extends boolean = false>(options: Options<CommentsControllerCreateCommentData, ThrowOnError>) => (options.client ?? client).post<CommentsControllerCreateCommentResponses, unknown, ThrowOnError>({
-    url: '/api/posts/{postSlug}/comments',
+export const clubControllerGetOne = <ThrowOnError extends boolean = false>(options: Options<ClubControllerGetOneData, ThrowOnError>) => (options.client ?? client).get<ClubControllerGetOneResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}', ...options });
+
+export const clubControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<ClubControllerUpdateData, ThrowOnError>) => (options.client ?? client).patch<ClubControllerUpdateResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -32,16 +33,10 @@ export const commentsControllerCreateComment = <ThrowOnError extends boolean = f
     }
 });
 
-export const commentsControllerGetCommentCount = <ThrowOnError extends boolean = false>(options: Options<CommentsControllerGetCommentCountData, ThrowOnError>) => (options.client ?? client).get<CommentsControllerGetCommentCountResponses, unknown, ThrowOnError>({ url: '/api/posts/{postSlug}/comments/count', ...options });
+export const clubControllerListMembers = <ThrowOnError extends boolean = false>(options: Options<ClubControllerListMembersData, ThrowOnError>) => (options.client ?? client).get<ClubControllerListMembersResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/members', ...options });
 
-export const commentsControllerGetCommentReplies = <ThrowOnError extends boolean = false>(options: Options<CommentsControllerGetCommentRepliesData, ThrowOnError>) => (options.client ?? client).get<CommentsControllerGetCommentRepliesResponses, unknown, ThrowOnError>({ url: '/api/posts/{postSlug}/comments/{commentId}/replies', ...options });
-
-export const commentsControllerDeleteComment = <ThrowOnError extends boolean = false>(options: Options<CommentsControllerDeleteCommentData, ThrowOnError>) => (options.client ?? client).delete<CommentsControllerDeleteCommentResponses, unknown, ThrowOnError>({ url: '/api/posts/{postSlug}/comments/{commentId}', ...options });
-
-export const postControllerGetUserPosts = <ThrowOnError extends boolean = false>(options: Options<PostControllerGetUserPostsData, ThrowOnError>) => (options.client ?? client).get<PostControllerGetUserPostsResponses, unknown, ThrowOnError>({ url: '/api/admin/posts', ...options });
-
-export const postControllerCreatePost = <ThrowOnError extends boolean = false>(options: Options<PostControllerCreatePostData, ThrowOnError>) => (options.client ?? client).post<PostControllerCreatePostResponses, unknown, ThrowOnError>({
-    url: '/api/admin/posts',
+export const clubControllerUpdateRole = <ThrowOnError extends boolean = false>(options: Options<ClubControllerUpdateRoleData, ThrowOnError>) => (options.client ?? client).patch<ClubControllerUpdateRoleResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/members/{memberId}/role',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -49,10 +44,10 @@ export const postControllerCreatePost = <ThrowOnError extends boolean = false>(o
     }
 });
 
-export const postControllerGetUserPost = <ThrowOnError extends boolean = false>(options: Options<PostControllerGetUserPostData, ThrowOnError>) => (options.client ?? client).get<PostControllerGetUserPostResponses, unknown, ThrowOnError>({ url: '/api/admin/posts/{id}', ...options });
+export const seasonControllerList = <ThrowOnError extends boolean = false>(options: Options<SeasonControllerListData, ThrowOnError>) => (options.client ?? client).get<SeasonControllerListResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/seasons', ...options });
 
-export const postControllerUpdatePost = <ThrowOnError extends boolean = false>(options: Options<PostControllerUpdatePostData, ThrowOnError>) => (options.client ?? client).put<PostControllerUpdatePostResponses, unknown, ThrowOnError>({
-    url: '/api/admin/posts/{id}',
+export const seasonControllerCreate = <ThrowOnError extends boolean = false>(options: Options<SeasonControllerCreateData, ThrowOnError>) => (options.client ?? client).post<SeasonControllerCreateResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/seasons',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -60,22 +55,10 @@ export const postControllerUpdatePost = <ThrowOnError extends boolean = false>(o
     }
 });
 
-export const postControllerPublishPost = <ThrowOnError extends boolean = false>(options: Options<PostControllerPublishPostData, ThrowOnError>) => (options.client ?? client).patch<PostControllerPublishPostResponses, unknown, ThrowOnError>({ url: '/api/admin/posts/{id}/publish', ...options });
+export const seasonControllerGet = <ThrowOnError extends boolean = false>(options: Options<SeasonControllerGetData, ThrowOnError>) => (options.client ?? client).get<SeasonControllerGetResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/seasons/{seasonId}', ...options });
 
-export const postControllerUnpublishPost = <ThrowOnError extends boolean = false>(options: Options<PostControllerUnpublishPostData, ThrowOnError>) => (options.client ?? client).patch<PostControllerUnpublishPostResponses, unknown, ThrowOnError>({ url: '/api/admin/posts/{id}/unpublish', ...options });
-
-export const publicPostControllerGetRandomPost = <ThrowOnError extends boolean = false>(options?: Options<PublicPostControllerGetRandomPostData, ThrowOnError>) => (options?.client ?? client).get<PublicPostControllerGetRandomPostResponses, unknown, ThrowOnError>({ url: '/api/public/posts/random', ...options });
-
-export const publicPostControllerGetPost = <ThrowOnError extends boolean = false>(options: Options<PublicPostControllerGetPostData, ThrowOnError>) => (options.client ?? client).get<PublicPostControllerGetPostResponses, unknown, ThrowOnError>({ url: '/api/public/posts/{slug}', ...options });
-
-export const publicPostControllerGetPosts = <ThrowOnError extends boolean = false>(options: Options<PublicPostControllerGetPostsData, ThrowOnError>) => (options.client ?? client).get<PublicPostControllerGetPostsResponses, unknown, ThrowOnError>({ url: '/api/public/posts', ...options });
-
-export const publicPostControllerLikePost = <ThrowOnError extends boolean = false>(options: Options<PublicPostControllerLikePostData, ThrowOnError>) => (options.client ?? client).post<PublicPostControllerLikePostResponses, unknown, ThrowOnError>({ url: '/api/public/posts/{slug}/like', ...options });
-
-export const publicAuthorControllerGetAuthorPosts = <ThrowOnError extends boolean = false>(options: Options<PublicAuthorControllerGetAuthorPostsData, ThrowOnError>) => (options.client ?? client).get<PublicAuthorControllerGetAuthorPostsResponses, unknown, ThrowOnError>({ url: '/api/public/authors/{slug}/posts', ...options });
-
-export const aiExampleControllerGenerateText = <ThrowOnError extends boolean = false>(options: Options<AiExampleControllerGenerateTextData, ThrowOnError>) => (options.client ?? client).post<AiExampleControllerGenerateTextResponses, unknown, ThrowOnError>({
-    url: '/api/ai/generate-text',
+export const seasonControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<SeasonControllerUpdateData, ThrowOnError>) => (options.client ?? client).patch<SeasonControllerUpdateResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/seasons/{seasonId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -83,8 +66,10 @@ export const aiExampleControllerGenerateText = <ThrowOnError extends boolean = f
     }
 });
 
-export const aiExampleControllerGenerateObject = <ThrowOnError extends boolean = false>(options: Options<AiExampleControllerGenerateObjectData, ThrowOnError>) => (options.client ?? client).post<AiExampleControllerGenerateObjectResponses, unknown, ThrowOnError>({
-    url: '/api/ai/generate-object',
+export const matchControllerList = <ThrowOnError extends boolean = false>(options: Options<MatchControllerListData, ThrowOnError>) => (options.client ?? client).get<MatchControllerListResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/matches', ...options });
+
+export const matchControllerCreate = <ThrowOnError extends boolean = false>(options: Options<MatchControllerCreateData, ThrowOnError>) => (options.client ?? client).post<MatchControllerCreateResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/matches',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -92,9 +77,10 @@ export const aiExampleControllerGenerateObject = <ThrowOnError extends boolean =
     }
 });
 
-export const aiExampleControllerChat = <ThrowOnError extends boolean = false>(options: Options<AiExampleControllerChatData, ThrowOnError>) => (options.client ?? client).post<AiExampleControllerChatResponses, unknown, ThrowOnError>({
-    responseTransformer: aiExampleControllerChatResponseTransformer,
-    url: '/api/ai/chat',
+export const matchControllerGet = <ThrowOnError extends boolean = false>(options: Options<MatchControllerGetData, ThrowOnError>) => (options.client ?? client).get<MatchControllerGetResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/matches/{matchId}', ...options });
+
+export const matchControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<MatchControllerUpdateData, ThrowOnError>) => (options.client ?? client).patch<MatchControllerUpdateResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/matches/{matchId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -102,8 +88,8 @@ export const aiExampleControllerChat = <ThrowOnError extends boolean = false>(op
     }
 });
 
-export const aiExampleControllerStreamText = <ThrowOnError extends boolean = false>(options: Options<AiExampleControllerStreamTextData, ThrowOnError>) => (options.client ?? client).post<AiExampleControllerStreamTextResponses, unknown, ThrowOnError>({
-    url: '/api/ai/stream-text',
+export const matchControllerCancel = <ThrowOnError extends boolean = false>(options: Options<MatchControllerCancelData, ThrowOnError>) => (options.client ?? client).post<MatchControllerCancelResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/matches/{matchId}/cancel',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -111,8 +97,12 @@ export const aiExampleControllerStreamText = <ThrowOnError extends boolean = fal
     }
 });
 
-export const aiExampleControllerStreamObject = <ThrowOnError extends boolean = false>(options: Options<AiExampleControllerStreamObjectData, ThrowOnError>) => (options.client ?? client).post<AiExampleControllerStreamObjectResponses, unknown, ThrowOnError>({
-    url: '/api/ai/stream-object',
+export const matchControllerMarkPlayed = <ThrowOnError extends boolean = false>(options: Options<MatchControllerMarkPlayedData, ThrowOnError>) => (options.client ?? client).post<MatchControllerMarkPlayedResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/matches/{matchId}/played', ...options });
+
+export const matchControllerListAttendances = <ThrowOnError extends boolean = false>(options: Options<MatchControllerListAttendancesData, ThrowOnError>) => (options.client ?? client).get<MatchControllerListAttendancesResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/matches/{matchId}/attendances', ...options });
+
+export const matchControllerRespond = <ThrowOnError extends boolean = false>(options: Options<MatchControllerRespondData, ThrowOnError>) => (options.client ?? client).post<MatchControllerRespondResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/matches/{matchId}/attendances/me',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -120,8 +110,8 @@ export const aiExampleControllerStreamObject = <ThrowOnError extends boolean = f
     }
 });
 
-export const aiExampleControllerStreamChat = <ThrowOnError extends boolean = false>(options: Options<AiExampleControllerStreamChatData, ThrowOnError>) => (options.client ?? client).post<AiExampleControllerStreamChatResponses, unknown, ThrowOnError>({
-    url: '/api/ai/stream-chat',
+export const matchControllerSetAttendance = <ThrowOnError extends boolean = false>(options: Options<MatchControllerSetAttendanceData, ThrowOnError>) => (options.client ?? client).patch<MatchControllerSetAttendanceResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/matches/{matchId}/attendances/{userId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -129,8 +119,10 @@ export const aiExampleControllerStreamChat = <ThrowOnError extends boolean = fal
     }
 });
 
-export const aiExampleUseCasesControllerUseCase1SingleGeneration = <ThrowOnError extends boolean = false>(options: Options<AiExampleUseCasesControllerUseCase1SingleGenerationData, ThrowOnError>) => (options.client ?? client).post<AiExampleUseCasesControllerUseCase1SingleGenerationResponses, unknown, ThrowOnError>({
-    url: '/api/ai/examples/use-case-1-single-generation',
+export const matchControllerListLineups = <ThrowOnError extends boolean = false>(options: Options<MatchControllerListLineupsData, ThrowOnError>) => (options.client ?? client).get<MatchControllerListLineupsResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/matches/{matchId}/lineups', ...options });
+
+export const matchControllerSetLineup = <ThrowOnError extends boolean = false>(options: Options<MatchControllerSetLineupData, ThrowOnError>) => (options.client ?? client).put<MatchControllerSetLineupResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/matches/{matchId}/lineups',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -138,8 +130,8 @@ export const aiExampleUseCasesControllerUseCase1SingleGeneration = <ThrowOnError
     }
 });
 
-export const aiExampleUseCasesControllerUseCase2GroupedCalls = <ThrowOnError extends boolean = false>(options: Options<AiExampleUseCasesControllerUseCase2GroupedCallsData, ThrowOnError>) => (options.client ?? client).post<AiExampleUseCasesControllerUseCase2GroupedCallsResponses, unknown, ThrowOnError>({
-    url: '/api/ai/examples/use-case-2-grouped-calls',
+export const matchControllerSetPlayerTeam = <ThrowOnError extends boolean = false>(options: Options<MatchControllerSetPlayerTeamData, ThrowOnError>) => (options.client ?? client).put<MatchControllerSetPlayerTeamResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/matches/{matchId}/lineups/{userId}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -147,8 +139,10 @@ export const aiExampleUseCasesControllerUseCase2GroupedCalls = <ThrowOnError ext
     }
 });
 
-export const aiExampleUseCasesControllerUseCase3LogicalUnits = <ThrowOnError extends boolean = false>(options: Options<AiExampleUseCasesControllerUseCase3LogicalUnitsData, ThrowOnError>) => (options.client ?? client).post<AiExampleUseCasesControllerUseCase3LogicalUnitsResponses, unknown, ThrowOnError>({
-    url: '/api/ai/examples/use-case-3-logical-units',
+export const notificationControllerGetPreferences = <ThrowOnError extends boolean = false>(options?: Options<NotificationControllerGetPreferencesData, ThrowOnError>) => (options?.client ?? client).get<NotificationControllerGetPreferencesResponses, unknown, ThrowOnError>({ url: '/api/notifications/preferences', ...options });
+
+export const notificationControllerUpdatePreferences = <ThrowOnError extends boolean = false>(options: Options<NotificationControllerUpdatePreferencesData, ThrowOnError>) => (options.client ?? client).put<NotificationControllerUpdatePreferencesResponses, unknown, ThrowOnError>({
+    url: '/api/notifications/preferences',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -156,8 +150,8 @@ export const aiExampleUseCasesControllerUseCase3LogicalUnits = <ThrowOnError ext
     }
 });
 
-export const aiExampleUseCasesControllerUseCase4ChatSession = <ThrowOnError extends boolean = false>(options: Options<AiExampleUseCasesControllerUseCase4ChatSessionData, ThrowOnError>) => (options.client ?? client).post<AiExampleUseCasesControllerUseCase4ChatSessionResponses, unknown, ThrowOnError>({
-    url: '/api/ai/examples/use-case-4-chat-session',
+export const notificationControllerRegisterDevice = <ThrowOnError extends boolean = false>(options: Options<NotificationControllerRegisterDeviceData, ThrowOnError>) => (options.client ?? client).post<NotificationControllerRegisterDeviceResponses, unknown, ThrowOnError>({
+    url: '/api/notifications/devices',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -165,8 +159,58 @@ export const aiExampleUseCasesControllerUseCase4ChatSession = <ThrowOnError exte
     }
 });
 
-export const aiExampleUseCasesControllerUseCase5ChatSessionWithTurnsMerged = <ThrowOnError extends boolean = false>(options: Options<AiExampleUseCasesControllerUseCase5ChatSessionWithTurnsMergedData, ThrowOnError>) => (options.client ?? client).post<AiExampleUseCasesControllerUseCase5ChatSessionWithTurnsMergedResponses, unknown, ThrowOnError>({
-    url: '/api/ai/examples/use-case-5-chat-session-with-turns-merged',
+export const statsControllerListMatch = <ThrowOnError extends boolean = false>(options: Options<StatsControllerListMatchData, ThrowOnError>) => (options.client ?? client).get<StatsControllerListMatchResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/matches/{matchId}/stats', ...options });
+
+export const statsControllerUpsert = <ThrowOnError extends boolean = false>(options: Options<StatsControllerUpsertData, ThrowOnError>) => (options.client ?? client).put<StatsControllerUpsertResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/matches/{matchId}/stats',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const statsControllerSeasonStats = <ThrowOnError extends boolean = false>(options: Options<StatsControllerSeasonStatsData, ThrowOnError>) => (options.client ?? client).get<StatsControllerSeasonStatsResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/seasons/{seasonId}/stats', ...options });
+
+export const statsControllerHomeStats = <ThrowOnError extends boolean = false>(options: Options<StatsControllerHomeStatsData, ThrowOnError>) => (options.client ?? client).get<StatsControllerHomeStatsResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/home-stats', ...options });
+
+export const chatControllerList = <ThrowOnError extends boolean = false>(options: Options<ChatControllerListData, ThrowOnError>) => (options.client ?? client).get<ChatControllerListResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/matches/{matchId}/messages', ...options });
+
+export const chatControllerPost = <ThrowOnError extends boolean = false>(options: Options<ChatControllerPostData, ThrowOnError>) => (options.client ?? client).post<ChatControllerPostResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/matches/{matchId}/messages',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const paymentControllerGetCost = <ThrowOnError extends boolean = false>(options: Options<PaymentControllerGetCostData, ThrowOnError>) => (options.client ?? client).get<PaymentControllerGetCostResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/matches/{matchId}/cost', ...options });
+
+export const paymentControllerUpsertCost = <ThrowOnError extends boolean = false>(options: Options<PaymentControllerUpsertCostData, ThrowOnError>) => (options.client ?? client).put<PaymentControllerUpsertCostResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/matches/{matchId}/cost',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const paymentControllerListFees = <ThrowOnError extends boolean = false>(options: Options<PaymentControllerListFeesData, ThrowOnError>) => (options.client ?? client).get<PaymentControllerListFeesResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/matches/{matchId}/fees', ...options });
+
+export const paymentControllerUpdateFee = <ThrowOnError extends boolean = false>(options: Options<PaymentControllerUpdateFeeData, ThrowOnError>) => (options.client ?? client).patch<PaymentControllerUpdateFeeResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/fees/{feeId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const paymentControllerGetPaymentLink = <ThrowOnError extends boolean = false>(options: Options<PaymentControllerGetPaymentLinkData, ThrowOnError>) => (options.client ?? client).get<PaymentControllerGetPaymentLinkResponses, unknown, ThrowOnError>({ url: '/api/clubs/{organizationId}/payment-link', ...options });
+
+export const paymentControllerSetPaymentLink = <ThrowOnError extends boolean = false>(options: Options<PaymentControllerSetPaymentLinkData, ThrowOnError>) => (options.client ?? client).put<PaymentControllerSetPaymentLinkResponses, unknown, ThrowOnError>({
+    url: '/api/clubs/{organizationId}/payment-link',
     ...options,
     headers: {
         'Content-Type': 'application/json',

@@ -14,9 +14,7 @@
 - [1_auth.mdx](./src/content/docs/core-features/1_auth.mdx) - How the authentication system works, how to use it. Better Auth explanation.
 - [2_monitoring.mdx](./src/content/docs/core-features/2_monitoring.mdx) - How to report errors, log traces and monitor your project with Sentry
 - [3_filestorage.mdx](./src/content/docs/core-features/3_filestorage.mdx) - File storage explanation
-- [4_ai.mdx](./src/content/docs/core-features/4_ai.mdx) - How to use LLMs in your code (Langfuse, Vercel AI SDK, etc.)
 - [5_email.mdx](./src/content/docs/core-features/5_email.mdx) - Email explanation
-- [99_examples.mdx](./src/content/docs/core-features/99_examples.mdx) - Provided examples
 
 ## Explanations
 
@@ -42,7 +40,7 @@
 - [encrypt-env.mdx](./src/content/docs/guides/encrypt-env.mdx) - Setup env file encryption
 - [feature-flags.mdx](./src/content/docs/guides/feature-flags.mdx) - Ship a merged change dark with a single env-var check
 - [generating-types.mdx](./src/content/docs/guides/generating-types.mdx) - Generate types and SDKs from the OpenAPI schema
-- [rosti-production.mdx](./src/content/docs/guides/rosti-production.mdx) - How to deploy Rösti (API, SPA, SSR, mobile) to staging and production
+- [rosti-production.mdx](./src/content/docs/guides/rosti-production.mdx) - How to deploy Rösti (API, SPA, mobile) to staging and production
 
 ## References
 
