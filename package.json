@@ -21,7 +21,7 @@
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "generate": "pnpm --filter=@rosti/openapi-generator run generate",
-    "test": "pnpm -r test",
+    "test": "pnpm --filter=!@boilerstone/boilerplate -r test",
     "docs-only": "pnpm --filter=@rosti/documentation run dev",
     "knip": "knip --no-exit-code",
     "lint:pr": "tsx ./scripts/lint-pr.ts"
