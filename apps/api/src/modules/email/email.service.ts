@@ -1,6 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import { Traceable } from '@amplication/opentelemetry-nestjs'
 import { Injectable, Logger } from '@nestjs/common'
 import { createTransport, Transporter } from 'nodemailer'
@@ -102,7 +101,7 @@ export class EmailService {
   private readLogo(): Buffer {
     if (this.logo) return this.logo
 
-    const nextToSource = join(dirname(fileURLToPath(import.meta.url)), 'assets', 'rosti-logo.png')
+    const nextToSource = join(__dirname, 'assets', 'rosti-logo.png')
     const candidates = [
       nextToSource,
       join(process.cwd(), 'src/modules/email/assets/rosti-logo.png'),
