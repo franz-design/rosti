@@ -1,0 +1,50 @@
+name: Deploy on main
+
+# After a successful GHCR build for a push to main, dispatch Promote with the
+# sha-<short> image tag so Dokploy pulls api + web-spa for that commit.
+#
+# Target environment: repository variable DEPLOY_ON_MAIN_ENVIRONMENT
+# (staging or production). Defaults to production when unset (this project
+# deploys main straight to production). Override with the variable if needed.
+# Put DOKPLOY_URL, DOKPLOY_API_KEY, and DOKPLOY_APPLICATIONS on that
+# GitHub Environment (same secrets as Promote).
+
+on:
+  workflow_run:
+    workflows: ['Build Docker to GHCR']
+    types: [completed]
+
+permissions:
+  actions: write
+
+jobs:
+  dispatch:
+    name: Dispatch Promote for main SHA
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TARGET: ${{ vars.DEPLOY_ON_MAIN_ENVIRONMENT }}
+      HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - name: Dispatch Promote with sha tag
+        run: |
+          set -euo pipefail
+
+          target="${TARGET:-production}"
+          if [[ "${target}" != "staging" && "${target}" != "production" ]]; then
+            echo "DEPLOY_ON_MAIN_ENVIRONMENT must be 'staging' or 'production', got '${target}'."
+            exit 1
+          fi
+
+          # docker/metadata-action type=sha → sha-<7-char> (matches GHCR tags)
+          version="sha-${HEAD_SHA:0:7}"
+          echo "Images for main@${version} are built. Dispatching Promote -> ${target}."
+          gh workflow run promote.yml \
+            --repo "${GITHUB_REPOSITORY}" \
+            -f "environment=${target}" \
+            -f "version=${version}"
+          echo "If the '${target}' environment has required reviewers, Promote waits for an approval."

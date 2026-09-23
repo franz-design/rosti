@@ -52,10 +52,12 @@ Require pull requests, and require these status checks to pass:
 
 - [ ] `REQUIRE_RELEASE_NOTE` — optional. Release notes are not enforced by default; set this variable to `true` to make the **Release note** check block a Release PR until `releases/vX.Y.Z.mdx` exists. The boilerplate repository sets it.
 - [ ] `PROMOTE_ON_RELEASE` — optional. When set to `staging` or `production`, `promote-on-release.yml` dispatches Promote for that environment as soon as the tag images are built. Combine it with required reviewers on the environment to get an "Approve and deploy" button instead of an immediate deploy.
+- [ ] `DEPLOY_ON_MAIN_ENVIRONMENT` — optional. When set to `staging` or `production`, `deploy-on-main.yml` dispatches Promote with the `sha-<commit>` image tag after every successful GHCR build on `main`. Defaults to `production` if unset. Use this for merge-to-main auto-deploy (without versions). Put the Dokploy secrets on that same GitHub Environment.
 
 ```bash
 gh variable set REQUIRE_RELEASE_NOTE --body true
 gh variable set PROMOTE_ON_RELEASE --body production
+gh variable set DEPLOY_ON_MAIN_ENVIRONMENT --body production
 ```
 
 Do not apply branch protection blindly with the API on a repo that already has rules. Set it in the GitHub UI (Settings → Branches, or Rulesets) so you do not wipe existing rules.
