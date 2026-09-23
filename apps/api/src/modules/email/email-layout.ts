@@ -88,11 +88,11 @@ function renderHtml(
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:12px;">
           <tr>
             <td align="center" style="padding:28px 32px 8px;">
-              <img src="cid:${LOGO_CID}" width="200" alt="Rösti" style="display:block;margin:0 auto;border:0;outline:none;text-decoration:none;max-width:200px;width:100%;height:auto;">
+              <img src="cid:${LOGO_CID}" width="150" alt="Rösti" style="display:block;margin:0 auto;border:0;outline:none;text-decoration:none;max-width:150px;width:100%;height:auto;">
             </td>
           </tr>
           <tr>
-            <td align="center" style="padding:8px 32px 8px;text-align:center;">
+            <td align="center" style="padding:28px 32px 28px;text-align:center;">
               ${paragraphs}
               ${button}
             </td>
