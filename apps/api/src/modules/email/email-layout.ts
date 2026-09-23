@@ -65,7 +65,7 @@ function renderHtml(
   const paragraphs = input.paragraphs
     .map(
       (paragraph) =>
-        `<p style="margin:0 0 16px;font-family:${FONT};font-size:16px;line-height:1.5;color:#1c1917;">${escapeHtml(paragraph).replaceAll('\n', '<br>')}</p>`,
+        `<p style="margin:0 0 16px;font-family:${FONT};font-size:16px;line-height:1.5;color:#1c1917;text-align:center;">${escapeHtml(paragraph).replaceAll('\n', '<br>')}</p>`,
     )
     .join('')
   const button = input.action ? renderButton(input.action) : ''
@@ -88,24 +88,23 @@ function renderHtml(
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:12px;">
           <tr>
             <td align="center" style="padding:28px 32px 8px;">
-              <img src="cid:${LOGO_CID}" width="48" height="48" alt="Rösti" style="display:block;border:0;outline:none;text-decoration:none;">
-              <p style="margin:12px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:22px;line-height:1.2;color:#C74209;">Rösti</p>
+              <img src="cid:${LOGO_CID}" width="200" alt="Rösti" style="display:block;margin:0 auto;border:0;outline:none;text-decoration:none;max-width:200px;width:100%;height:auto;">
             </td>
           </tr>
           <tr>
-            <td style="padding:8px 32px 8px;">
+            <td align="center" style="padding:8px 32px 8px;text-align:center;">
               ${paragraphs}
               ${button}
             </td>
           </tr>
           <tr>
-            <td style="padding:8px 32px 28px;">
-              <p style="margin:0 0 8px;font-family:${FONT};font-size:13px;line-height:1.5;color:#78716c;">
+            <td align="center" style="padding:8px 32px 28px;text-align:center;">
+              <p style="margin:0 0 8px;font-family:${FONT};font-size:13px;line-height:1.5;color:#78716c;text-align:center;">
                 ${footerLink('Ouvrir Rösti', input.appUrl)}
                 &nbsp;·&nbsp;
                 ${unsubscribe}
               </p>
-              <p style="margin:0;font-family:${FONT};font-size:12px;line-height:1.5;color:#a8a29e;">${escapeHtml(input.reason)}</p>
+              <p style="margin:0;font-family:${FONT};font-size:12px;line-height:1.5;color:#a8a29e;text-align:center;">${escapeHtml(input.reason)}</p>
             </td>
           </tr>
         </table>
@@ -117,7 +116,7 @@ function renderHtml(
 }
 
 function renderButton(action: EmailAction): string {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 16px;">
+  return `<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:8px auto 16px;">
     <tr>
       <td bgcolor="#C74209" style="border-radius:8px;">
         <a href="${escapeHtml(action.url)}" style="display:inline-block;padding:12px 20px;font-family:${FONT};font-size:15px;line-height:1.2;color:#ffffff;text-decoration:none;">${escapeHtml(action.label)}</a>

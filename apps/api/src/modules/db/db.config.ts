@@ -16,10 +16,11 @@ export const entityGlobs = {
 }
 
 export function createMikroOrmOptions(options?: CreateMikroOrmOptions) {
-  // Production Docker images ship compiled JS only (no `src/`). The MikroORM
-  // CLI still detects SWC and would otherwise prefer `entitiesTs`, matching
-  // zero files and crashing migrate with "No entities were discovered".
+  // Production images ship compiled JS only. The MikroORM CLI forces
+  // `preferTs` unless MIKRO_ORM_CLI_PREFER_TS=false, then reads `pathTs`
+  // and `entitiesTs`. Point those at `dist/` so migrate still finds files.
   const preferTs = config.env !== 'production'
+  const migrationsPath = './dist/modules/db/migrations'
 
   return defineConfig({
     host: config.database.host,
@@ -40,8 +41,8 @@ export function createMikroOrmOptions(options?: CreateMikroOrmOptions) {
     debug: config.env === 'development',
     extensions: [SeedManager, Migrator],
     migrations: {
-      path: './dist/modules/db/migrations',
-      pathTs: './src/modules/db/migrations',
+      path: migrationsPath,
+      pathTs: preferTs ? './src/modules/db/migrations' : migrationsPath,
       allOrNothing: true,
       disableForeignKeys: false,
     },

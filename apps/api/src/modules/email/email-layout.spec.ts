@@ -12,6 +12,10 @@ describe('renderEmail', () => {
 
     expect(actual.html).toContain('Bonjour &lt;ami&gt;')
     expect(actual.html).toContain('src="cid:rosti-logo"')
+    expect(actual.html).toContain('width="200"')
+    expect(actual.html).toContain('max-width:200px')
+    expect(actual.html).toContain('text-align:center')
+    expect(actual.html).toContain('align="center"')
     expect(actual.html).toContain('https://app.lesk.fr/matches/1')
     expect(actual.html).toContain('Se désinscrire')
     expect(actual.text).toContain('Bonjour <ami>')

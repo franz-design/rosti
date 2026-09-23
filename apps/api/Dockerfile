@@ -33,7 +33,9 @@ COPY --from=builder /app/api/package.json ./package.json
 # Expose port
 EXPOSE 3000
 
-ENV MIKRO_ORM_CLI_USE_TS_NODE=false
+# MikroORM 7 ignores MIKRO_ORM_CLI_USE_TS_NODE. Without this, the CLI
+# looks for migrations in src/, which this image does not contain.
+ENV MIKRO_ORM_CLI_PREFER_TS=false
 ENV MIKRO_ORM_CLI_CONFIG=dist/modules/db/db.config.js
 
 # Start the application
