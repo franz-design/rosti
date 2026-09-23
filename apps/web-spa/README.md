@@ -80,7 +80,7 @@ In a SPA, environment variables must be defined at build time as they are integr
 ### Building the Image
 
 ```bash
-# At the project root — defaults bake `%VITE_*%` placeholders for runtime injection
+# At the project root — defaults bake `__VITE_*__` placeholders for runtime injection
 docker build -t lonestone/web-spa -f apps/web-spa/Dockerfile .
 
 # Optional: bake a fixed URL instead of a placeholder (no runtime override)
@@ -91,7 +91,7 @@ docker build -t lonestone/web-spa \
 
 ### Running the Container
 
-Set `VITE_*` at **runtime** (Dokploy Environment, `-e`, compose). The entrypoint replaces placeholders in the built JS:
+Set `VITE_*` at **runtime** (Dokploy Environment, `-e`, compose). The entrypoint replaces `__VITE_*__` placeholders in the built JS:
 
 ```bash
 docker run -p 80:80 \
@@ -99,4 +99,4 @@ docker run -p 80:80 \
   lonestone/web-spa
 ```
 
-> **Important**: Images from CI embed `%VITE_API_URL%` (and store URL placeholders). Setting those vars only at build time is optional; setting them only at runtime on an old image that was built **without** placeholders has no effect. App code uses `import.meta.env.VITE_*` — Vite inlines the build-arg value into the bundle.
+> **Important**: CI images embed `__VITE_API_URL__` (and store URL placeholders). Do **not** use `%VITE_*%` — Vite treats that as HTML env syntax and can corrupt the string in the bundle. Setting runtime env on an image built **without** placeholders has no effect. App code uses `import.meta.env.VITE_*`; Vite inlines the build-arg value into the bundle.

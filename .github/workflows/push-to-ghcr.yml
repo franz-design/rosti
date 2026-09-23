@@ -22,11 +22,12 @@ jobs:
             build_args: ''
           - dockerfile: ./apps/web-spa/Dockerfile
             image: ${{ github.repository }}-web-spa
-            # Placeholders so Dokploy runtime env can inject real URLs
+            # Placeholders so Dokploy runtime env can inject real URLs.
+            # Use __VITE_*__ — %VITE_*% is mangled by Vite.
             build_args: |
-              VITE_API_URL=%VITE_API_URL%
-              VITE_APP_STORE_URL=%VITE_APP_STORE_URL%
-              VITE_PLAY_STORE_URL=%VITE_PLAY_STORE_URL%
+              VITE_API_URL=__VITE_API_URL__
+              VITE_APP_STORE_URL=__VITE_APP_STORE_URL__
+              VITE_PLAY_STORE_URL=__VITE_PLAY_STORE_URL__
 
     permissions:
       contents: read

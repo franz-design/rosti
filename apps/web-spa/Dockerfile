@@ -11,10 +11,12 @@ FROM base AS builder
 
 # Bake literal placeholders into the JS bundle so Dokploy/runtime `-e VITE_*`
 # can replace them via docker-entrypoint.sh without rebuilding the image.
+# Use __VITE_*__ (not %VITE_*%): percent placeholders conflict with Vite HTML
+# env syntax and get corrupted in the client bundle (e.g. baseURL becomes "29var").
 # Override with a concrete URL only when you intentionally want a fixed build.
-ARG VITE_API_URL=%VITE_API_URL%
-ARG VITE_APP_STORE_URL=%VITE_APP_STORE_URL%
-ARG VITE_PLAY_STORE_URL=%VITE_PLAY_STORE_URL%
+ARG VITE_API_URL=__VITE_API_URL__
+ARG VITE_APP_STORE_URL=__VITE_APP_STORE_URL__
+ARG VITE_PLAY_STORE_URL=__VITE_PLAY_STORE_URL__
 ENV VITE_API_URL=${VITE_API_URL}
 ENV VITE_APP_STORE_URL=${VITE_APP_STORE_URL}
 ENV VITE_PLAY_STORE_URL=${VITE_PLAY_STORE_URL}
@@ -34,7 +36,7 @@ COPY apps/web-spa/nginx.conf /etc/nginx/conf.d/default.conf
 # Copy build files to nginx directory
 COPY --from=builder /app/apps/web-spa/build/client /usr/share/nginx/html
 
-# Runtime injection: replace %VITE_*% placeholders in static assets
+# Runtime injection: replace __VITE_*__ placeholders in static assets
 COPY apps/web-spa/docker-entrypoint.sh /docker-entrypoint.d/99-replace-env.sh
 RUN chmod +x /docker-entrypoint.d/99-replace-env.sh
 
