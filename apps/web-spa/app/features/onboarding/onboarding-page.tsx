@@ -10,6 +10,15 @@ import {
   defaultNextMatchDate,
   type RecurrenceChoice,
 } from '@/features/matches/utils/match-schedule-utils'
+import {
+  clampMatchDateToSeason,
+  defaultSeasonWindow,
+  endOfCalendarDay,
+  isCalendarEndBeforeStart,
+  isMatchDateOutsideSeason,
+  seasonWindowLabel,
+  toCalendarDateString,
+} from '@/features/seasons/utils/season-dates'
 import { authClient } from '@/lib/auth-client'
 import { rostiApi, type SportType } from '@/lib/rosti-api'
 import { OnboardingHeader } from './components/onboarding-header'
@@ -21,6 +30,8 @@ import { slugify } from './utils/slugify'
 
 type OnboardingRecurrence = Exclude<RecurrenceChoice, 'once'>
 
+const initialSeason = defaultSeasonWindow()
+
 export default function OnboardingPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -31,7 +42,11 @@ export default function OnboardingPage() {
   const [venue, setVenue] = useState('')
   const [sportType, setSportType] = useState<SportType>('football')
   const [maxPlayers, setMaxPlayers] = useState(10)
-  const [matchDate, setMatchDate] = useState<Date | undefined>(() => defaultNextMatchDate())
+  const [seasonStartsAt, setSeasonStartsAt] = useState(() => initialSeason.startsAt)
+  const [seasonEndsAt, setSeasonEndsAt] = useState(() => initialSeason.endsAt)
+  const [matchDate, setMatchDate] = useState<Date | undefined>(() =>
+    clampMatchDateToSeason(defaultNextMatchDate(), initialSeason.startsAt, initialSeason.endsAt),
+  )
   const [matchTime, setMatchTime] = useState('19:00')
   const [recurrence, setRecurrence] = useState<OnboardingRecurrence>('weekly')
   const [emails, setEmails] = useState<string[]>([])
@@ -51,6 +66,30 @@ export default function OnboardingPage() {
   )
 
   const dayOfMonth = matchDate?.getDate() ?? 1
+
+  const handleSeasonStartsAtChange = (value: Date | undefined) => {
+    if (!value) return
+    setSeasonStartsAt(value)
+    setMatchDate((current) =>
+      current ? clampMatchDateToSeason(current, value, seasonEndsAt) : current,
+    )
+  }
+
+  const handleSeasonEndsAtChange = (value: Date | undefined) => {
+    if (!value) return
+    setSeasonEndsAt(value)
+    setMatchDate((current) =>
+      current ? clampMatchDateToSeason(current, seasonStartsAt, value) : current,
+    )
+  }
+
+  const handleMatchDateChange = (value: Date | undefined) => {
+    if (!value) {
+      setMatchDate(undefined)
+      return
+    }
+    setMatchDate(clampMatchDateToSeason(value, seasonStartsAt, seasonEndsAt))
+  }
 
   const step1 = useMutation({
     mutationFn: async () => {
@@ -89,13 +128,22 @@ export default function OnboardingPage() {
   const step3 = useMutation({
     mutationFn: async () => {
       if (!clubId || !matchDate) throw new Error(t('onboarding.errors.requiredFields'))
+      if (isCalendarEndBeforeStart(seasonStartsAt, seasonEndsAt)) {
+        throw new Error(t('onboarding.errors.seasonEndBeforeStart'))
+      }
+      if (isMatchDateOutsideSeason(matchDate, seasonStartsAt, seasonEndsAt)) {
+        throw new Error(t('onboarding.errors.matchOutsideSeason'))
+      }
+
       const seasons = await rostiApi.listSeasons(clubId)
       let seasonId = seasons.find((s) => s.status === 'active')?.id
       if (!seasonId) {
-        const year = new Date().getFullYear()
         const season = await rostiApi.createSeason(clubId, {
-          name: t('onboarding.step3.seasonName', { year }),
-          startsAt: new Date().toISOString().slice(0, 10),
+          name: t('onboarding.step3.seasonName', {
+            year: seasonWindowLabel(seasonStartsAt, seasonEndsAt),
+          }),
+          startsAt: toCalendarDateString(seasonStartsAt),
+          endsAt: toCalendarDateString(seasonEndsAt),
         })
         seasonId = season.id
       }
@@ -108,7 +156,7 @@ export default function OnboardingPage() {
         maxCapacity: maxPlayers,
         recurrence: {
           frequency: recurrence,
-          occurrenceCount: 12,
+          endsAt: endOfCalendarDay(seasonEndsAt).toISOString(),
         },
       })
     },
@@ -178,13 +226,17 @@ export default function OnboardingPage() {
 
       {step === 3 ? (
         <ScheduleStep
+          seasonStartsAt={seasonStartsAt}
+          seasonEndsAt={seasonEndsAt}
           matchDate={matchDate}
           matchTime={matchTime}
           recurrence={recurrence}
           weekdayName={weekdayName}
           dayOfMonth={dayOfMonth}
           isPending={isPending}
-          onDateChange={setMatchDate}
+          onSeasonStartsAtChange={handleSeasonStartsAtChange}
+          onSeasonEndsAtChange={handleSeasonEndsAtChange}
+          onDateChange={handleMatchDateChange}
           onTimeChange={setMatchTime}
           onRecurrenceChange={setRecurrence}
           onBack={() => setStep(2)}

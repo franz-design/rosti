@@ -18,12 +18,16 @@ import {
 type OnboardingRecurrence = Exclude<RecurrenceChoice, 'once'>
 
 interface ScheduleStepProps {
+  seasonStartsAt: Date
+  seasonEndsAt: Date
   matchDate: Date | undefined
   matchTime: string
   recurrence: OnboardingRecurrence
   weekdayName: string
   dayOfMonth: number
   isPending: boolean
+  onSeasonStartsAtChange: (value: Date | undefined) => void
+  onSeasonEndsAtChange: (value: Date | undefined) => void
   onDateChange: (value: Date | undefined) => void
   onTimeChange: (value: string) => void
   onRecurrenceChange: (value: OnboardingRecurrence) => void
@@ -32,12 +36,16 @@ interface ScheduleStepProps {
 }
 
 export function ScheduleStep({
+  seasonStartsAt,
+  seasonEndsAt,
   matchDate,
   matchTime,
   recurrence,
   weekdayName,
   dayOfMonth,
   isPending,
+  onSeasonStartsAtChange,
+  onSeasonEndsAtChange,
   onDateChange,
   onTimeChange,
   onRecurrenceChange,
@@ -48,6 +56,25 @@ export function ScheduleStep({
 
   return (
     <div className="space-y-4">
+      <div className="space-y-2">
+        <Label>{t('onboarding.step3.seasonStartsAt')}</Label>
+        <DatePicker
+          value={seasonStartsAt}
+          onDateChange={onSeasonStartsAtChange}
+          localeCode="fr-FR"
+          placeholder={t('onboarding.step3.datePlaceholder')}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>{t('onboarding.step3.seasonEndsAt')}</Label>
+        <DatePicker
+          value={seasonEndsAt}
+          onDateChange={onSeasonEndsAtChange}
+          localeCode="fr-FR"
+          placeholder={t('onboarding.step3.datePlaceholder')}
+        />
+        <p className="text-xs text-muted-foreground">{t('onboarding.step3.seasonHint')}</p>
+      </div>
       <div className="space-y-2">
         <Label>{t('onboarding.step3.date')}</Label>
         <DatePicker

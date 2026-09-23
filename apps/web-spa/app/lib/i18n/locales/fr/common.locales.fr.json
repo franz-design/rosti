@@ -413,7 +413,9 @@
       "requiredFields": "Merci de remplir tous les champs.",
       "createClub": "Impossible de créer le club.",
       "missingClub": "Club introuvable. Reprends depuis le début.",
-      "maxPlayers": "Il faut au moins 2 joueurs."
+      "maxPlayers": "Il faut au moins 2 joueurs.",
+      "seasonEndBeforeStart": "La fin de saison doit être le même jour ou après le début.",
+      "matchOutsideSeason": "Le premier match doit être dans la saison."
     },
     "sports": {
       "football": "Foot",
@@ -436,6 +438,9 @@
       "maxPlayers": "Nombre max de joueurs par match"
     },
     "step3": {
+      "seasonStartsAt": "Début de saison",
+      "seasonEndsAt": "Fin de saison",
+      "seasonHint": "Les matchs seront créés jusqu'à cette date. Par défaut : saison en cours ou à venir (sept. → juin).",
       "date": "Date du prochain match",
       "datePlaceholder": "Choisir une date",
       "time": "Heure",
@@ -444,7 +449,7 @@
       "everyNthWeekday": "Tous les {{ordinal}} {{day}}s du mois",
       "everyMonthDate": "Tous les {{day}} du mois",
       "monthlyNthFallback": "1er jour du mois",
-      "recurrenceHint": "12 prochaines occurrences seront créées.",
+      "recurrenceHint": "Les occurrences sont créées jusqu'à la fin de la saison.",
       "seasonName": "Saison {{year}}",
       "matchTitle": "Match — {{club}}"
     },
