@@ -292,6 +292,7 @@
       "players": "Joueurs",
       "invite": "Invitations",
       "seasons": "Saisons",
+      "notifications": "Notifications",
       "payment": "Paiement"
     },
     "invite": {
@@ -333,6 +334,18 @@
       "title": "Saisons",
       "hint": "Crée, renomme ou clôture les saisons du club. Une seule est en cours.",
       "manage": "Gérer les saisons"
+    },
+    "matchInvite": {
+      "title": "Inscription aux matchs",
+      "hint": "Les joueurs invités reçoivent seulement l'invitation à rejoindre l'équipe. L'inscription au prochain match part au délai choisi, avant la date du match.",
+      "leadLabel": "Envoi de l'inscription",
+      "reminderLabel": "Rappel",
+      "reminderHint": "Le rappel part uniquement aux joueurs qui n'ont pas encore répondu.",
+      "noReminder": "Pas de rappel",
+      "dayBefore": "1 jour avant",
+      "daysBefore": "{{count}} jours avant",
+      "save": "Enregistrer",
+      "saved": "Délais d'inscription enregistrés"
     }
   },
   "seasons": {

@@ -43,6 +43,18 @@ export class Organization {
   @Property({ nullable: true, type: 'int' })
   defaultMaxCapacity?: number
 
+  /** Days before kickoff when the next match registration email is sent. */
+  @Property({ fieldName: 'matchInviteLeadDays', type: 'int', default: 5 })
+  matchInviteLeadDays: number = 5
+
+  /** Optional reminder, in days before kickoff. Only unanswered players receive it. */
+  @Property({
+    fieldName: 'matchInviteReminderLeadDays',
+    type: 'int',
+    nullable: true,
+  })
+  matchInviteReminderLeadDays?: number
+
   @Property({ fieldName: 'createdAt' })
   createdAt: Date = new Date()
 }

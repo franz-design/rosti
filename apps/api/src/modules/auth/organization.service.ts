@@ -1,5 +1,6 @@
 import { EntityManager } from '@mikro-orm/core'
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -12,6 +13,8 @@ export interface UpdateOrganizationInput {
   venue?: string | null
   sportType?: SportType | null
   defaultMaxCapacity?: number | null
+  matchInviteLeadDays?: number
+  matchInviteReminderLeadDays?: number | null
 }
 
 @Injectable()
@@ -66,7 +69,11 @@ export class OrganizationService {
     )
   }
 
-  async updateMemberRole(memberId: string, newRole: ClubRole, actorUserId: string): Promise<Member> {
+  async updateMemberRole(
+    memberId: string,
+    newRole: ClubRole,
+    actorUserId: string,
+  ): Promise<Member> {
     const member = await this.em.findOne(
       Member,
       { id: memberId },
@@ -113,6 +120,22 @@ export class OrganizationService {
     if (data.sportType !== undefined) org.sportType = data.sportType ?? undefined
     if (data.defaultMaxCapacity !== undefined) {
       org.defaultMaxCapacity = data.defaultMaxCapacity ?? undefined
+    }
+    if (data.matchInviteLeadDays !== undefined || data.matchInviteReminderLeadDays !== undefined) {
+      const leadDays = data.matchInviteLeadDays ?? org.matchInviteLeadDays
+      const reminderLeadDays =
+        data.matchInviteReminderLeadDays === undefined
+          ? org.matchInviteReminderLeadDays
+          : (data.matchInviteReminderLeadDays ?? undefined)
+      if (reminderLeadDays != null && reminderLeadDays >= leadDays) {
+        throw new BadRequestException(
+          'The reminder must be closer to the match than the invitation',
+        )
+      }
+      if (data.matchInviteLeadDays !== undefined) org.matchInviteLeadDays = data.matchInviteLeadDays
+      if (data.matchInviteReminderLeadDays !== undefined) {
+        org.matchInviteReminderLeadDays = reminderLeadDays
+      }
     }
 
     await this.em.flush()

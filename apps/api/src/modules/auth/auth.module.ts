@@ -9,6 +9,7 @@ import { toNodeHandler } from 'better-auth/node'
 import { config } from '../../config/env.config'
 import { EmailModule } from '../email/email.module'
 import { EmailService } from '../email/email.service'
+import { invitationEmail, resetPasswordEmail, verificationEmail } from './auth-email'
 import { BetterAuthType, createBetterAuth } from './auth.config'
 import { AFTER_HOOK_KEY, BEFORE_HOOK_KEY, HOOK_KEY } from './auth.decorator'
 import { AuthModuleOptions, ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } from './auth.definition'
@@ -54,27 +55,35 @@ import { OrganizationService } from './organization.service'
           trustedOrigins: config.betterAuth.trustedOrigins,
           orm,
           sendResetPassword: async (data) => {
-            const webUrl = `${config.clients.webApp.url}/reset-password?token=${data.token}`
             return emailService.sendEmail({
               to: data.user.email,
-              subject: 'Reset your password',
-              content: `Hello ${data.user.name}, please reset your password with the link below:<br/>Web app: <a href="${webUrl}">${webUrl}</a>`,
+              ...resetPasswordEmail({
+                name: data.user.name,
+                appUrl: config.clients.webApp.url,
+                token: data.token,
+              }),
             })
           },
           sendVerificationEmail: async (data) => {
-            const url = `${config.clients.webApp.url}/verify-email?token=${data.token}`
             return emailService.sendEmail({
               to: data.user.email,
-              subject: 'Verify your email',
-              content: `Hello ${data.user.name}, please verify your email by clicking on the link below: <a href="${url}">${url}</a>`,
+              ...verificationEmail({
+                name: data.user.name,
+                appUrl: config.clients.webApp.url,
+                token: data.token,
+              }),
             })
           },
           sendInvitationEmail: async (data) => {
-            const inviteUrl = `${config.clients.webApp.url}/invite/${data.invitation.id}?email=${encodeURIComponent(data.email)}&club=${encodeURIComponent(data.organization.name)}`
             return emailService.sendEmail({
               to: data.email,
-              subject: `Tu es invité·e à rejoindre ${data.organization.name} sur Rösti`,
-              content: `Bonjour,<br/>${data.inviter.user.name} t'invite à rejoindre <strong>${data.organization.name}</strong> sur Rösti.<br/><br/><a href="${inviteUrl}">${inviteUrl}</a>`,
+              ...invitationEmail({
+                appUrl: config.clients.webApp.url,
+                invitationId: data.invitation.id,
+                email: data.email,
+                clubName: data.organization.name,
+                inviterName: data.inviter.user.name,
+              }),
             })
           },
         })

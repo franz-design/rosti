@@ -86,9 +86,9 @@ export class MatchService {
 
     for (const match of matches) {
       await this.seedPendingAttendances(match)
-      await this.notificationService.scheduleMatchReminders(match)
-      await this.notificationService.notifyNewMatch(match)
+      await this.notificationService.scheduleScoreReminder(match)
     }
+    await this.notificationService.syncUpcomingMatchInvites(organization.id)
 
     return matches
   }
@@ -279,7 +279,9 @@ export class MatchService {
     const hasScore = match.blueScore != null && match.redScore != null
     if (startsAtChanged) {
       await this.notificationService.cancelMatchJobs(match.id)
-      await this.notificationService.scheduleMatchReminders(match)
+      await this.notificationService.scheduleMatchReminders(match, {
+        resetInvite: true,
+      })
     } else if (hasScore && (data.blueScore !== undefined || data.redScore !== undefined)) {
       await this.notificationService.cancelMatchJobs(match.id, ScheduledJobType.ScoreReminder)
     }
@@ -300,6 +302,7 @@ export class MatchService {
     await this.em.flush()
     await this.notificationService.cancelMatchJobs(match.id)
     await this.notificationService.notifyMatchCancelled(match)
+    await this.notificationService.syncUpcomingMatchInvites(match.organization.id)
     return match
   }
 
