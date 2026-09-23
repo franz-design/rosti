@@ -16,6 +16,11 @@ export const entityGlobs = {
 }
 
 export function createMikroOrmOptions(options?: CreateMikroOrmOptions) {
+  // Production Docker images ship compiled JS only (no `src/`). The MikroORM
+  // CLI still detects SWC and would otherwise prefer `entitiesTs`, matching
+  // zero files and crashing migrate with "No entities were discovered".
+  const preferTs = config.env !== 'production'
+
   return defineConfig({
     host: config.database.host,
     port: config.database.port,
@@ -23,7 +28,8 @@ export function createMikroOrmOptions(options?: CreateMikroOrmOptions) {
     password: config.database.password,
     dbName: config.database.name,
     entities: entityGlobs.entities,
-    entitiesTs: entityGlobs.entitiesTs,
+    entitiesTs: preferTs ? entityGlobs.entitiesTs : [],
+    preferTs,
     metadataProvider: ReflectMetadataProvider,
     // Column names mirror entity property names verbatim (camelCase),
     // matching the database schema. Relation FK columns still declare an
