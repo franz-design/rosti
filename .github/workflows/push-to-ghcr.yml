@@ -19,8 +19,14 @@ jobs:
         include:
           - dockerfile: ./apps/api/Dockerfile
             image: ${{ github.repository }}-api
+            build_args: ''
           - dockerfile: ./apps/web-spa/Dockerfile
             image: ${{ github.repository }}-web-spa
+            # Placeholders so Dokploy runtime env can inject real URLs
+            build_args: |
+              VITE_API_URL=%VITE_API_URL%
+              VITE_APP_STORE_URL=%VITE_APP_STORE_URL%
+              VITE_PLAY_STORE_URL=%VITE_PLAY_STORE_URL%
 
     permissions:
       contents: read
@@ -74,6 +80,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: ${{ matrix.build_args }}
 
       # This step generates an artifact attestation for the image, which is an unforgeable statement about where and how it was built.
       # It increases supply chain security for people who consume the image. For more information,

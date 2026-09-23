@@ -80,7 +80,10 @@ In a SPA, environment variables must be defined at build time as they are integr
 ### Building the Image
 
 ```bash
-# At the project root
+# At the project root — defaults bake `%VITE_*%` placeholders for runtime injection
+docker build -t lonestone/web-spa -f apps/web-spa/Dockerfile .
+
+# Optional: bake a fixed URL instead of a placeholder (no runtime override)
 docker build -t lonestone/web-spa \
   --build-arg VITE_API_URL=https://api.example.com \
   -f apps/web-spa/Dockerfile .
@@ -88,13 +91,7 @@ docker build -t lonestone/web-spa \
 
 ### Running the Container
 
-```bash
-docker run -p 80:80 lonestone/web-spa
-```
-
-### Runtime Variable Replacement
-
-If you need to replace certain environment variables without rebuilding the image, you can use the runtime replacement mechanism:
+Set `VITE_*` at **runtime** (Dokploy Environment, `-e`, compose). The entrypoint replaces placeholders in the built JS:
 
 ```bash
 docker run -p 80:80 \
@@ -102,14 +99,4 @@ docker run -p 80:80 \
   lonestone/web-spa
 ```
 
-> **Important**: This mechanism works by searching for placeholders like `%VITE_API_URL%` in JavaScript files and replacing them with the provided values. For this to work, your code must use these placeholders.
-
-Example usage in code:
-
-```typescript
-// Direct usage (will be replaced at runtime)
-const apiUrl = '%VITE_API_URL%'
-
-// Or with a default value
-const apiUrl = '%VITE_API_URL%' || 'https://api.default.com'
-```
+> **Important**: Images from CI embed `%VITE_API_URL%` (and store URL placeholders). Setting those vars only at build time is optional; setting them only at runtime on an old image that was built **without** placeholders has no effect. App code uses `import.meta.env.VITE_*` — Vite inlines the build-arg value into the bundle.

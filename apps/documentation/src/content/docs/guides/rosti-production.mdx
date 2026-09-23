@@ -31,9 +31,9 @@ API:
 - `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASSWORD`, `EMAIL_FROM`
 - `SENTRY_DSN` (recommended)
 
-SPA:
+SPA (Dokploy **runtime** env on the `web-spa` service — CI images embed `%VITE_*%` placeholders):
 
-- `VITE_API_URL`
+- `VITE_API_URL` (e.g. `https://rosti-api.example.com` — no trailing `/api`)
 - `VITE_APP_STORE_URL`, `VITE_PLAY_STORE_URL` (invite deep links)
 
 Mobile (Capacitor):

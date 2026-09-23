@@ -9,8 +9,15 @@ WORKDIR /app
 # Stage 2: Installing deps and building
 FROM base AS builder
 
-ARG VITE_API_URL
+# Bake literal placeholders into the JS bundle so Dokploy/runtime `-e VITE_*`
+# can replace them via docker-entrypoint.sh without rebuilding the image.
+# Override with a concrete URL only when you intentionally want a fixed build.
+ARG VITE_API_URL=%VITE_API_URL%
+ARG VITE_APP_STORE_URL=%VITE_APP_STORE_URL%
+ARG VITE_PLAY_STORE_URL=%VITE_PLAY_STORE_URL%
 ENV VITE_API_URL=${VITE_API_URL}
+ENV VITE_APP_STORE_URL=${VITE_APP_STORE_URL}
+ENV VITE_PLAY_STORE_URL=${VITE_PLAY_STORE_URL}
 
 COPY . .
 RUN pnpm install --frozen-lockfile
