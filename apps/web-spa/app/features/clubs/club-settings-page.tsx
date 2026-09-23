@@ -8,6 +8,7 @@ import { Navigate } from 'react-router'
 import { ClubPlayersSection } from './components/players/club-players-section'
 import { ClubSettingsTabsList } from './components/settings/club-settings-tabs'
 import { InviteMembersSection } from './components/settings/invite-members-section'
+import { MatchInviteSettingsSection } from './components/settings/match-invite-settings-section'
 import { PaymentLinkSection } from './components/settings/payment-link-section'
 import { SeasonsSettingsSection } from './components/settings/seasons-settings-section'
 import { useClub } from './hooks/club-context'
@@ -91,6 +92,10 @@ export default function ClubSettingsPage() {
 
         <TabsContent value="seasons" className="outline-none">
           <SeasonsSettingsSection />
+        </TabsContent>
+
+        <TabsContent value="notifications" className="outline-none">
+          <MatchInviteSettingsSection />
         </TabsContent>
 
         <TabsContent value="payment" className="outline-none">

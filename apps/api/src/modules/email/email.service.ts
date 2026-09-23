@@ -1,14 +1,12 @@
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { Traceable } from '@amplication/opentelemetry-nestjs'
 import { Injectable, Logger } from '@nestjs/common'
 import { createTransport, Transporter } from 'nodemailer'
 import { config } from '../../config/env.config'
+import { EmailBody, renderEmail } from './email-layout'
 
-export interface EmailOptions {
-  to: string
-  subject: string
-  content: string
-  html?: string
-}
+const LOGO_CID = 'rosti-logo'
 
 interface SmtpConfig {
   host: string
@@ -20,11 +18,16 @@ interface SmtpConfig {
   }
 }
 
+export interface EmailMessage extends EmailBody {
+  to: string
+}
+
 @Traceable()
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name)
   private transporter: Transporter
+  private logo: Buffer | undefined
 
   constructor() {
     const transportConfig: SmtpConfig = {
@@ -33,7 +36,6 @@ export class EmailService {
       secure: config.email.secure,
     }
 
-    // Only add auth if user and password are provided
     if (config.email.user && config.email.password) {
       transportConfig.auth = {
         user: config.email.user,
@@ -44,21 +46,41 @@ export class EmailService {
     this.transporter = createTransport(transportConfig)
   }
 
-  async sendEmail({ to, subject, content, html }: EmailOptions): Promise<void> {
+  /**
+   * Sends one Rösti email. The body is plain text; the layout adds the logo,
+   * the HTML version, the app link, and the unsubscribe link when provided.
+   */
+  async sendEmail(message: EmailMessage): Promise<void> {
+    const appUrl = config.clients.webApp.url.replace(/\/$/, '')
+    const rendered = renderEmail({ ...message, appUrl })
+    const subject = message.subject.replace(/[\r\n]/g, ' ').trim()
+
     try {
-      const mailOptions = {
-        from: config.email.from,
-        to,
+      const info = await this.transporter.sendMail({
+        from: { name: 'Rösti', address: config.email.from },
+        to: message.to,
         subject,
-        text: content,
-        html: html || content,
-      }
+        text: rendered.text,
+        html: rendered.html,
+        attachments: [
+          {
+            filename: 'rosti-logo.png',
+            content: this.readLogo(),
+            cid: LOGO_CID,
+            contentDisposition: 'inline',
+          },
+        ],
+        headers: message.unsubscribeUrl
+          ? {
+              'List-Unsubscribe': `<${message.unsubscribeUrl}>`,
+              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            }
+          : undefined,
+      })
 
-      const info = await this.transporter.sendMail(mailOptions)
-
-      this.logger.log(`Email sent successfully to ${to}: ${info.messageId}`)
+      this.logger.log(`Email sent successfully to ${message.to}: ${info.messageId}`)
     } catch (error) {
-      this.logger.error(`Failed to send email to ${to}:`, error)
+      this.logger.error(`Failed to send email to ${message.to}:`, error)
       throw new Error(
         `Failed to send email: ${error instanceof Error ? error.message : 'Unknown error'}`,
       )
@@ -74,5 +96,22 @@ export class EmailService {
       this.logger.error('Email service connection verification failed:', error)
       return false
     }
+  }
+
+  private readLogo(): Buffer {
+    if (this.logo) return this.logo
+
+    const nextToSource = join(__dirname, 'assets', 'rosti-logo.png')
+    const candidates = [
+      nextToSource,
+      join(process.cwd(), 'src/modules/email/assets/rosti-logo.png'),
+      join(process.cwd(), 'dist/modules/email/assets/rosti-logo.png'),
+      join(process.cwd(), 'apps/api/src/modules/email/assets/rosti-logo.png'),
+    ]
+    const path = candidates.find((candidate) => existsSync(candidate))
+    if (!path) throw new Error('Rösti logo file is missing')
+
+    this.logo = readFileSync(path)
+    return this.logo
   }
 }

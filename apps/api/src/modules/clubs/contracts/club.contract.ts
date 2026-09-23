@@ -46,6 +46,8 @@ export const clubSchema = z
     venue: z.string().nullish(),
     sportType: z.nativeEnum(SportType).nullish(),
     defaultMaxCapacity: z.number().int().positive().nullish(),
+    matchInviteLeadDays: z.number().int().min(1).max(30),
+    matchInviteReminderLeadDays: z.number().int().min(1).max(29).nullish(),
     createdAt: z.coerce.date(),
   })
   .meta({ title: 'ClubSchema' })
@@ -59,6 +61,8 @@ export const updateClubSchema = z
     venue: z.string().min(1).nullish(),
     sportType: z.nativeEnum(SportType).nullish(),
     defaultMaxCapacity: z.number().int().positive().nullish(),
+    matchInviteLeadDays: z.number().int().min(1).max(30).optional(),
+    matchInviteReminderLeadDays: z.number().int().min(1).max(29).nullish(),
   })
   .meta({ title: 'UpdateClubSchema' })
 

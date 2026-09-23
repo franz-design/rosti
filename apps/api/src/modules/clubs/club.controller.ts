@@ -6,6 +6,7 @@ import { Session } from '../auth/auth.decorator'
 import { AuthGuard } from '../auth/auth.guard'
 import { Organization } from '../auth/auth.entity'
 import { OrganizationService } from '../auth/organization.service'
+import { NotificationService } from '../notifications/notification.service'
 import {
   ClubDto,
   clubMembersSchema,
@@ -27,6 +28,8 @@ function toClubDto(o: Organization): ClubDto {
     venue: o.venue,
     sportType: o.sportType,
     defaultMaxCapacity: o.defaultMaxCapacity,
+    matchInviteLeadDays: o.matchInviteLeadDays,
+    matchInviteReminderLeadDays: o.matchInviteReminderLeadDays,
     createdAt: o.createdAt,
   }
 }
@@ -34,7 +37,10 @@ function toClubDto(o: Organization): ClubDto {
 @TypedController('clubs', undefined, { tags: ['Clubs'] })
 @UseGuards(AuthGuard)
 export class ClubController {
-  constructor(private readonly organizationService: OrganizationService) {}
+  constructor(
+    private readonly organizationService: OrganizationService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   @TypedRoute.Get('', clubsSchema)
   async listMine(@Session() session: LoggedInBetterAuthSession): Promise<ClubDto[]> {
@@ -64,6 +70,9 @@ export class ClubController {
       session.user.id,
       body,
     )
+    if (body.matchInviteLeadDays !== undefined || body.matchInviteReminderLeadDays !== undefined) {
+      await this.notificationService.syncUpcomingMatchInvites(organizationId)
+    }
     return toClubDto(o)
   }
 
@@ -94,11 +103,7 @@ export class ClubController {
     @TypedParam('memberId', z.string().uuid()) memberId: string,
     @TypedBody(updateMemberRoleSchema) body: UpdateMemberRoleInput,
   ) {
-    const m = await this.organizationService.updateMemberRole(
-      memberId,
-      body.role,
-      session.user.id,
-    )
+    const m = await this.organizationService.updateMemberRole(memberId, body.role, session.user.id)
     return {
       id: m.id,
       userId: m.user.id,

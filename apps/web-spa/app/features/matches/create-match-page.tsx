@@ -65,7 +65,6 @@ export default function CreateMatchPage() {
         startsAt: startsAt.toISOString(),
         location: location.trim() || undefined,
         maxCapacity: maxPlayers,
-        reminderOffsetsHours: [120, 48],
         recurrence:
           recurrence === 'once'
             ? undefined

@@ -5,6 +5,8 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": false,
-    "builder": "swc"
+    "builder": "swc",
+    "assets": ["modules/email/assets/**/*"],
+    "watchAssets": true
   }
 }

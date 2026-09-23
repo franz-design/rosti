@@ -15,6 +15,9 @@ export function ClubSettingsTabsList() {
       <TabsTrigger value="seasons" className="flex-none px-3">
         {t('clubSettings.tabs.seasons')}
       </TabsTrigger>
+      <TabsTrigger value="notifications" className="flex-none px-3">
+        {t('clubSettings.tabs.notifications')}
+      </TabsTrigger>
       <TabsTrigger value="payment" className="flex-none px-3">
         {t('clubSettings.tabs.payment')}
       </TabsTrigger>

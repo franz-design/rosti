@@ -14,6 +14,7 @@ import { MatchAttendance } from '../modules/matches/match-attendance.entity'
 import { MatchLineup } from '../modules/matches/match-lineup.entity'
 import { MatchSeries } from '../modules/matches/match-series.entity'
 import { Match } from '../modules/matches/match.entity'
+import { DEFAULT_MATCH_INVITE_LEAD_DAYS } from '../modules/notifications/match-invite'
 import { SeasonStatus } from '../modules/seasons/contracts/season.contract'
 import { Season } from '../modules/seasons/season.entity'
 import { MatchStat } from '../modules/stats/match-stat.entity'
@@ -39,6 +40,7 @@ const CLUB = {
   venue: 'Stade des Développeurs',
   sportType: SportType.Football,
   defaultMaxCapacity: 14,
+  matchInviteLeadDays: DEFAULT_MATCH_INVITE_LEAD_DAYS,
 }
 
 const PLAYERS: Array<{ firstName: string; lastName: string }> = [
@@ -85,6 +87,7 @@ export class RostiSeeder extends Seeder {
       venue: CLUB.venue,
       sportType: CLUB.sportType,
       defaultMaxCapacity: CLUB.defaultMaxCapacity,
+      matchInviteLeadDays: CLUB.matchInviteLeadDays,
       createdAt: new Date(),
     })
 

@@ -27,6 +27,8 @@ export const rostiApi = {
       venue?: string | null
       sportType?: SportType | null
       defaultMaxCapacity?: number | null
+      matchInviteLeadDays?: number
+      matchInviteReminderLeadDays?: number | null
     },
   ) =>
     request<Club>(`/clubs/${orgId}`, {
@@ -202,6 +204,8 @@ export interface Club {
   venue?: string | null
   sportType?: SportType | null
   defaultMaxCapacity?: number | null
+  matchInviteLeadDays: number
+  matchInviteReminderLeadDays?: number | null
   createdAt: string
 }
 

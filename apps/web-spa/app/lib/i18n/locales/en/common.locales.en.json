@@ -292,6 +292,7 @@
       "players": "Players",
       "invite": "Invitations",
       "seasons": "Seasons",
+      "notifications": "Notifications",
       "payment": "Payment"
     },
     "invite": {
@@ -333,6 +334,18 @@
       "title": "Seasons",
       "hint": "Create, rename, or close the club seasons. Only one stays active.",
       "manage": "Manage seasons"
+    },
+    "matchInvite": {
+      "title": "Match registration",
+      "hint": "Invited players only receive the invitation to join the team. The registration email for the next match goes out at the delay you choose, before kickoff.",
+      "leadLabel": "Registration email",
+      "reminderLabel": "Reminder",
+      "reminderHint": "The reminder is sent only to players who have not answered yet.",
+      "noReminder": "No reminder",
+      "dayBefore": "1 day before",
+      "daysBefore": "{{count}} days before",
+      "save": "Save",
+      "saved": "Registration delays saved"
     }
   },
   "seasons": {
