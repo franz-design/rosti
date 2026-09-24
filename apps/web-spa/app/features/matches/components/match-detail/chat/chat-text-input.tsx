@@ -56,12 +56,12 @@ const mentionsInputStyle: MentionsInputStyle = {
       width: '100%',
     },
     highlighter: {
-      padding: '0.75rem 0.625rem',
+      padding: '0.5rem 0.75rem',
       border: '1px solid transparent',
       borderRadius: 'var(--radius)',
     },
     input: {
-      padding: '0.75rem 0.625rem',
+      padding: '0.5rem 0.75rem',
       border: '1px solid transparent',
       borderRadius: 'var(--radius)',
     },
@@ -119,7 +119,7 @@ export function ChatTextInput({
 
   return (
     <form
-      className="flex shrink-0 items-stretch gap-2 border-t bg-background p-3"
+      className="flex shrink-0 items-end gap-2 border-t bg-background p-3"
       onSubmit={(event) => {
         event.preventDefault()
         if (!canSubmit) return
@@ -128,9 +128,11 @@ export function ChatTextInput({
     >
       <div
         className={cn(
-          'min-w-0 flex-1 rounded-lg border border-input bg-transparent text-base transition-colors',
+          'min-h-11 min-w-0 flex-1 rounded-lg border border-input bg-transparent transition-colors',
+          // 16px keeps iOS Safari from zooming the page when the field takes focus
+          'text-base',
           'focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50',
-          'md:text-sm dark:bg-input/30',
+          'dark:bg-input/30',
         )}
       >
         <MentionsInput
@@ -158,12 +160,7 @@ export function ChatTextInput({
           />
         </MentionsInput>
       </div>
-      <Button
-        type="submit"
-        disabled={!canSubmit}
-        size="icon"
-        className="aspect-square size-auto min-w-10 self-stretch"
-      >
+      <Button type="submit" disabled={!canSubmit} size="icon" className="size-11 shrink-0">
         <Send className="size-4" />
         <span className="sr-only">{t('matches.detail.chat.send')}</span>
       </Button>

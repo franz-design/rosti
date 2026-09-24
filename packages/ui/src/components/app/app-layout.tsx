@@ -6,6 +6,7 @@ import {
   SidebarTrigger,
 } from '@rosti/ui/components/primitives/sidebar'
 import { Separator } from '@rosti/ui/components/primitives/separator'
+import { useViewportHeight } from '@rosti/ui/hooks/use-viewport-height'
 
 interface AppLayoutProps {
   sidebar: ReactNode
@@ -19,6 +20,9 @@ interface AppLayoutProps {
  * Generic app shell: collapsible sidebar + header + main content area.
  * Pass a `<Sidebar>` tree from primitives/sidebar as `sidebar`.
  *
+ * The shell is pinned to the visible viewport so the document itself never scrolls;
+ * scrolling belongs to the regions `children` marks as scrollable.
+ *
  * @example
  * <AppLayout sidebar={<AppSidebar />}>
  *   <main>...</main>
@@ -31,10 +35,15 @@ export function AppLayout({
   defaultOpen = true,
   className,
 }: AppLayoutProps) {
+  useViewportHeight()
+
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      className="fixed inset-x-0 top-(--app-viewport-offset) h-(--app-height) min-h-0 overflow-hidden"
+    >
       {sidebar}
-      <SidebarInset className={cn('flex flex-col', className)}>
+      <SidebarInset className={cn('flex min-h-0 flex-col overflow-hidden', className)}>
         {header !== undefined ? <AppLayoutHeader>{header}</AppLayoutHeader> : null}
         {children}
       </SidebarInset>

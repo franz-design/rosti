@@ -28,7 +28,7 @@ export default function InvitePage() {
   }, [invitationId, email, club])
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="min-h-dvh flex items-center justify-center p-6">
       <div className="max-w-md space-y-4 text-center">
         <h1 className="text-2xl font-black">
           {t('invite.title', { club: club || t('invite.fallbackClub') })}

@@ -9,7 +9,7 @@ import { ChatTextInput } from './chat-text-input'
 interface ChatTabProps {
   messages: MatchMessage[]
   currentUserId?: string
-  endRef: RefObject<HTMLDivElement | null>
+  scrollRef: RefObject<HTMLDivElement | null>
   draft: string
   onDraftChange: (value: string) => void
   onSubmit: () => void
@@ -19,7 +19,7 @@ interface ChatTabProps {
 export function ChatTab({
   messages,
   currentUserId,
-  endRef,
+  scrollRef,
   draft,
   onDraftChange,
   onSubmit,
@@ -55,7 +55,7 @@ export function ChatTab({
       <ChatConversation
         messages={messages}
         currentUserId={currentUserId}
-        endRef={endRef}
+        scrollRef={scrollRef}
         mentionNameById={mentionNameById}
       />
       <ChatTextInput

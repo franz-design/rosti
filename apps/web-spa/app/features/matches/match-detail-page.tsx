@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router'
 import { useClub } from '@/features/clubs/hooks/club-context'
+import { useFullBleedShell } from '@/features/dashboard/hooks/app-shell-context'
 import { authClient } from '@/lib/auth-client'
 import { rostiApi } from '@/lib/rosti-api'
 import { AttendanceTab } from './components/match-detail/attendance/attendance-tab'
@@ -49,8 +50,11 @@ export default function MatchDetailPage() {
   const pendingStatSave = useRef<Record<string, PlayerStatDraft> | null>(null)
   const [busyUserId, setBusyUserId] = useState<string | null>(null)
   const [isLineupOpen, setIsLineupOpen] = useState(false)
-  const chatEndRef = useRef<HTMLDivElement>(null)
+  const chatScrollRef = useRef<HTMLDivElement>(null)
   const dateLocale = i18n.language?.startsWith('en') ? 'en-GB' : 'fr-FR'
+  const isChat = tab === 'chat'
+
+  useFullBleedShell(isChat)
 
   const enabled = !!orgId && !!matchId
 
@@ -162,9 +166,11 @@ export default function MatchDetailPage() {
   }, [loadedMatchId, matchBlueScore, matchRedScore])
 
   useEffect(() => {
-    if (tab !== 'chat') return
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, tab])
+    if (!isChat) return
+    const conversation = chatScrollRef.current
+    if (!conversation) return
+    conversation.scrollTop = conversation.scrollHeight
+  }, [messages, isChat])
 
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: ['attendances', orgId, matchId] })
@@ -282,18 +288,11 @@ export default function MatchDetailPage() {
     minute: '2-digit',
   })
   const canRsvp = match.status === 'scheduled'
-  const isChat = tab === 'chat'
   const canManageComposition = isClubAdmin && match.status !== 'cancelled'
   const showMatchResult = shouldShowMatchResult(match)
 
   return (
-    <div
-      className={cn(
-        'flex flex-col',
-        isChat &&
-          '-m-6 h-dvh max-md:-mb-[calc(1.5rem+var(--bottom-nav-height))] max-md:h-[calc(100dvh-var(--bottom-nav-height)-var(--header-height))]',
-      )}
-    >
+    <div className={cn('flex flex-col', isChat && 'min-h-0 flex-1')}>
       <Tabs
         value={tab}
         onValueChange={(value) => setTab(value as MatchTab)}
@@ -345,7 +344,7 @@ export default function MatchDetailPage() {
           <ChatTab
             messages={messages}
             currentUserId={session?.user?.id}
-            endRef={chatEndRef}
+            scrollRef={chatScrollRef}
             draft={message}
             onDraftChange={setMessage}
             onSubmit={() => postMsg.mutate()}

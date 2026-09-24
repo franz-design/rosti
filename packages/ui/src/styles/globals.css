@@ -26,6 +26,17 @@
 :root {
   --header-height: 3rem;
   --bottom-nav-height: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+
+  /* Visible viewport metrics, kept in sync with window.visualViewport by useViewportHeight.
+     iOS Safari never shrinks the layout viewport when the on-screen keyboard opens, so any
+     unit based on it (vh, dvh, svh) overshoots the area the user can actually see. */
+  --app-height: 100dvh;
+  --app-viewport-offset: 0px;
+  --keyboard-height: 0px;
+
+  /* Space the bottom nav overlays, released once the keyboard hides it. */
+  --bottom-nav-inset: max(0px, calc(var(--bottom-nav-height) - var(--keyboard-height)));
+
   --radius: 0.625rem;
 
   /* Rösti yellow — primary fill token (NEVER use as text color on white) */
@@ -257,7 +268,8 @@
   }
 
   body {
-    @apply font-sans min-h-screen bg-background text-foreground;
+    @apply font-sans min-h-dvh bg-background text-foreground;
+    overscroll-behavior: none;
   }
 
   h1,
