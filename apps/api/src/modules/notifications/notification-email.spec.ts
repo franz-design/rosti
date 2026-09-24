@@ -23,7 +23,7 @@ describe('notification emails', () => {
     const actual = rsvpReminderEmail({ ...MATCH, location: '  ' }, APP_URL)
 
     expect(actual.paragraphs[0]).toBe(
-      'Le match a lieu lundi 23 novembre à 11h. Dis si tu seras là.',
+      'Le match a lieu lundi 23 novembre à 11h. Est-ce que tu seras présent ?',
     )
     expect(actual.paragraphs.join(' ')).not.toContain('2026-11-23')
   })
