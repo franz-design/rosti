@@ -50,7 +50,10 @@ export default function MatchDetailPage() {
   const pendingStatSave = useRef<Record<string, PlayerStatDraft> | null>(null)
   const [busyUserId, setBusyUserId] = useState<string | null>(null)
   const [isLineupOpen, setIsLineupOpen] = useState(false)
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0)
   const chatScrollRef = useRef<HTMLDivElement>(null)
+  const knownMessageIds = useRef<Set<string> | null>(null)
+  const trackedMessageMatchId = useRef<string | undefined>(matchId)
   const dateLocale = i18n.language?.startsWith('en') ? 'en-GB' : 'fr-FR'
   const isChat = tab === 'chat'
 
@@ -76,11 +79,14 @@ export default function MatchDetailPage() {
     enabled,
   })
 
-  const { data: messages = [] } = useQuery({
+  const { data: messagesData } = useQuery({
     queryKey: ['messages', orgId, matchId],
     queryFn: () => rostiApi.listMessages(orgId!, matchId!),
     enabled,
+    refetchInterval: 2000,
+    refetchIntervalInBackground: false,
   })
+  const messages = messagesData ?? []
 
   const { data: stats = [] } = useQuery({
     queryKey: ['match-stats', orgId, matchId],
@@ -171,6 +177,33 @@ export default function MatchDetailPage() {
     if (!conversation) return
     conversation.scrollTop = conversation.scrollHeight
   }, [messages, isChat])
+
+  useEffect(() => {
+    if (!messagesData) return
+
+    const messageIds = new Set(messagesData.map(({ id }) => id))
+    if (trackedMessageMatchId.current !== matchId || knownMessageIds.current === null) {
+      trackedMessageMatchId.current = matchId
+      knownMessageIds.current = messageIds
+      setUnreadMessageCount(0)
+      return
+    }
+
+    const previousMessageIds = knownMessageIds.current
+    knownMessageIds.current = messageIds
+
+    if (isChat) {
+      setUnreadMessageCount(0)
+      return
+    }
+
+    const newMessageCount = messagesData.filter(
+      ({ id, authorId }) => !previousMessageIds.has(id) && authorId !== session?.user?.id,
+    ).length
+    if (newMessageCount > 0) {
+      setUnreadMessageCount((count) => count + newMessageCount)
+    }
+  }, [isChat, matchId, messagesData, session?.user?.id])
 
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: ['attendances', orgId, matchId] })
@@ -300,7 +333,7 @@ export default function MatchDetailPage() {
       >
         <div className={cn('shrink-0 space-y-4', isChat && 'border-b px-6 pt-6 pb-3')}>
           <MatchDetailHeader match={match} onCancel={() => cancel.mutate()} />
-          <MatchDetailTabsList />
+          <MatchDetailTabsList unreadMessageCount={unreadMessageCount} />
         </div>
 
         <TabsContent

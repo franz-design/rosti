@@ -1,7 +1,12 @@
+import { Badge } from '@rosti/ui/components/primitives/badge'
 import { TabsList, TabsTrigger } from '@rosti/ui/components/primitives/tabs'
 import { useTranslation } from 'react-i18next'
 
-export function MatchDetailTabsList() {
+interface MatchDetailTabsListProps {
+  unreadMessageCount: number
+}
+
+export function MatchDetailTabsList({ unreadMessageCount }: MatchDetailTabsListProps) {
   const { t } = useTranslation()
 
   return (
@@ -12,8 +17,11 @@ export function MatchDetailTabsList() {
       <TabsTrigger value="attendance" className="px-3">
         {t('matches.detail.tabs.attendance')}
       </TabsTrigger>
-      <TabsTrigger value="chat" className="px-3">
+      <TabsTrigger value="chat" className="gap-1.5 px-3">
         {t('matches.detail.tabs.chat')}
+        {unreadMessageCount > 0 && (
+          <Badge className="h-5 min-w-5 px-1.5">{Math.min(unreadMessageCount, 99)}</Badge>
+        )}
       </TabsTrigger>
       <TabsTrigger value="stats" className="px-3">
         {t('matches.detail.tabs.stats')}
