@@ -1,4 +1,4 @@
-import { MapPin } from 'lucide-react'
+import { MapPin } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 
 interface HomeHeaderProps {

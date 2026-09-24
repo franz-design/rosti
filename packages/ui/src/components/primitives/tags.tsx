@@ -1,5 +1,5 @@
 import type { ComponentProps, MouseEventHandler, ReactNode } from 'react'
-import { XIcon } from 'lucide-react'
+import { XIcon } from '@rosti/ui/icons'
 import { createContext, use, useEffect, useRef, useState } from 'react'
 import { Badge } from './badge'
 import { Button } from './button'

@@ -24,8 +24,8 @@ export function AppBottomNav() {
                 to={item.to}
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
-                  'flex h-full flex-col items-center justify-center gap-0.5 px-1 text-[10px] font-medium',
-                  isActive ? 'text-primary' : 'text-muted-foreground',
+                  'flex h-full flex-col items-center justify-center gap-0.5 px-1 text-xs font-medium',
+                  isActive ? 'text-primary' : 'text-foreground',
                 )}
               >
                 <item.icon className="size-5 shrink-0" />

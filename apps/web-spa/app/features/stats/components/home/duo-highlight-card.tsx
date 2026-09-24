@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarGroup } from '@rosti/ui/components/primitives/avatar'
-import { UsersRound } from 'lucide-react'
+import { UsersRound } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import { getPlayerInitials } from '@/features/matches/utils/lineup-positions'
 import type { PlayedTogether } from '@/lib/rosti-api'

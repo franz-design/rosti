@@ -1,4 +1,4 @@
-import { SearchIcon } from 'lucide-react'
+import { SearchIcon } from '@rosti/ui/icons'
 import type { ReactNode } from 'react'
 import { useCallback, useRef } from 'react'
 import {

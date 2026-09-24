@@ -1,5 +1,5 @@
 import { Button } from '@rosti/ui/components/primitives/button'
-import { RefreshCw, Shield, ShieldOff, Trash2 } from 'lucide-react'
+import { RefreshCw, Shield, ShieldOff, Trash2 } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import type { PlayerRow } from './player-row'
 

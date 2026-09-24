@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from '@rosti/ui/components/primitives/dialog'
 import { InputGroup, InputGroupAddon } from '@rosti/ui/components/primitives/input-group'
-import { SearchIcon, CheckIcon } from 'lucide-react'
+import { SearchIcon, CheckIcon } from '@rosti/ui/icons'
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
   return (

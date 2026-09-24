@@ -1,18 +1,18 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@rosti/ui/components/primitives/tabs'
+import { Tabs, TabsContent } from '@rosti/ui/components/primitives/tabs'
 import { toast } from '@rosti/ui/components/primitives/sonner'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
+import { useTabSearchParam } from '@/common/hooks/use-tab-search-param'
 import { useClub } from '@/features/clubs/hooks/club-context'
 import { rostiApi, type Match } from '@/lib/rosti-api'
 import { MatchCardActions } from './components/match-card-actions'
 import { MatchesHeader } from './components/matches-header'
 import { MatchesList } from './components/matches-list'
+import { DEFAULT_MATCHES_TAB, MATCHES_TABS, MatchesTabsList } from './components/matches-tabs-list'
 import { PostponeMatchDialog } from './components/postpone-match-dialog'
 import { listPastMatches, listUpcomingMatches } from './utils/match-filters'
-
-type MatchesTab = 'upcoming' | 'past'
 
 export default function MatchesPage() {
   const { t, i18n } = useTranslation()
@@ -21,7 +21,7 @@ export default function MatchesPage() {
   const queryClient = useQueryClient()
   const orgId = activeClub?.id
   const [postponeMatch, setPostponeMatch] = useState<Match | null>(null)
-  const [listTab, setListTab] = useState<MatchesTab>('upcoming')
+  const [listTab, setListTab] = useTabSearchParam(MATCHES_TABS, DEFAULT_MATCHES_TAB)
 
   const { data: matches = [], isLoading } = useQuery({
     queryKey: ['matches', orgId],
@@ -68,19 +68,8 @@ export default function MatchesPage() {
     <div className="space-y-6">
       <MatchesHeader clubName={activeClub.name} />
 
-      <Tabs
-        value={listTab}
-        onValueChange={(value) => setListTab(value as MatchesTab)}
-        className="gap-4"
-      >
-        <TabsList className="h-9 w-fit justify-start gap-1 rounded-lg border border-border bg-muted p-1">
-          <TabsTrigger value="upcoming" className="px-3">
-            {t('matches.tabs.upcoming')}
-          </TabsTrigger>
-          <TabsTrigger value="past" className="px-3">
-            {t('matches.tabs.past')}
-          </TabsTrigger>
-        </TabsList>
+      <Tabs value={listTab} onValueChange={setListTab} className="gap-4">
+        <MatchesTabsList />
 
         <TabsContent value="upcoming" className="outline-none">
           <MatchesList

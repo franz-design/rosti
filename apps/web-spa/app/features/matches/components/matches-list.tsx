@@ -1,5 +1,5 @@
 import { EmptyState } from '@rosti/ui/components/app'
-import { CalendarDays } from 'lucide-react'
+import { CalendarDays } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
 import type { Match } from '@/lib/rosti-api'

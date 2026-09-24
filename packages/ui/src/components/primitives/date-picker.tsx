@@ -1,4 +1,4 @@
-import { CalendarIcon } from 'lucide-react'
+import { CalendarIcon } from '@rosti/ui/icons'
 import * as React from 'react'
 import { type Locale } from 'react-day-picker'
 import { fr } from 'react-day-picker/locale'
@@ -31,6 +31,9 @@ function parseDate(input: string): Date | undefined {
   return undefined
 }
 
+const DEFAULT_YEARS_BACK = 10
+const DEFAULT_YEARS_AHEAD = 10
+
 interface DatePickerProps {
   initialDate?: Date
   value?: Date
@@ -40,6 +43,10 @@ interface DatePickerProps {
   disabled?: boolean
   locale?: Locale
   localeCode?: string
+  /** Earliest selectable month. Defaults to 10 years before today. */
+  startMonth?: Date
+  /** Latest selectable month. Defaults to 10 years after today. */
+  endMonth?: Date
 }
 
 export function DatePicker({
@@ -51,6 +58,8 @@ export function DatePicker({
   disabled,
   locale,
   localeCode = 'fr-FR',
+  startMonth,
+  endMonth,
 }: DatePickerProps) {
   const resolvedLocale = locale ?? (localeCode.startsWith('fr') ? fr : undefined)
   const [open, setOpen] = React.useState(false)
@@ -59,6 +68,17 @@ export function DatePicker({
   const date = controlled ? value : internalDate
   const [month, setMonth] = React.useState<Date | undefined>(date ?? initialDate)
   const [inputValue, setInputValue] = React.useState(date ? formatDate(date, localeCode) : '')
+
+  const selectedYear = date?.getFullYear()
+  const navRange = React.useMemo(() => {
+    const currentYear = new Date().getFullYear()
+    const firstYear = startMonth?.getFullYear() ?? currentYear - DEFAULT_YEARS_BACK
+    const lastYear = endMonth?.getFullYear() ?? currentYear + DEFAULT_YEARS_AHEAD
+    return {
+      start: startMonth ?? new Date(Math.min(firstYear, selectedYear ?? firstYear), 0, 1),
+      end: endMonth ?? new Date(Math.max(lastYear, selectedYear ?? lastYear), 11, 31),
+    }
+  }, [startMonth, endMonth, selectedYear])
 
   React.useEffect(() => {
     if (controlled) {
@@ -136,6 +156,8 @@ export function DatePicker({
               selected={date}
               month={month}
               onMonthChange={setMonth}
+              startMonth={navRange.start}
+              endMonth={navRange.end}
               captionLayout="dropdown"
               locale={resolvedLocale}
               onSelect={(selected) => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Match } from '../../../lib/rosti-api'
-import { shouldShowMatchResult } from './match-filters'
+import { getMatchesListHref, shouldShowMatchResult } from './match-filters'
 
 function buildMatch(overrides: Partial<Match> = {}): Match {
   return {
@@ -43,5 +43,29 @@ describe('shouldShowMatchResult', () => {
   it('hides the result on a cancelled match', () => {
     const inputMatch = buildMatch({ status: 'cancelled' })
     expect(shouldShowMatchResult(inputMatch, now)).toBe(false)
+  })
+})
+
+describe('getMatchesListHref', () => {
+  const now = Date.parse('2026-09-21T18:00:00.000Z')
+
+  it('opens the upcoming tab for a scheduled match that has not started', () => {
+    const inputMatch = buildMatch({
+      status: 'scheduled',
+      startsAt: '2026-09-22T18:00:00.000Z',
+    })
+    expect(getMatchesListHref(inputMatch, now)).toBe('/matches?tab=upcoming')
+  })
+
+  it('opens the past tab for a match that already started', () => {
+    const inputMatch = buildMatch({
+      status: 'scheduled',
+      startsAt: '2026-09-21T17:00:00.000Z',
+    })
+    expect(getMatchesListHref(inputMatch, now)).toBe('/matches?tab=past')
+  })
+
+  it('opens the past tab for a played match', () => {
+    expect(getMatchesListHref(buildMatch({ status: 'played' }), now)).toBe('/matches?tab=past')
   })
 })

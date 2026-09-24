@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon } from '@rosti/ui/icons'
 import { useState } from 'react'
 import { Badge } from './badge'
 import { Button } from './button'

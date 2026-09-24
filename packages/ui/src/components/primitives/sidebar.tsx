@@ -19,7 +19,7 @@ import {
 } from '@rosti/ui/components/primitives/sheet'
 import { Skeleton } from '@rosti/ui/components/primitives/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@rosti/ui/components/primitives/tooltip'
-import { PanelLeftIcon } from 'lucide-react'
+import { PanelLeftIcon } from '@rosti/ui/icons'
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -459,7 +459,7 @@ const sidebarMenuButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'text-foreground font-semibold hover:bg-sidebar-accent hover:text-primary',
+        default: 'text-foreground font-medium hover:bg-sidebar-accent hover:text-primary',
         outline:
           'bg-background shadow-[0_0_0_1px_var(--sidebar-border)] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_var(--sidebar-accent)]',
       },

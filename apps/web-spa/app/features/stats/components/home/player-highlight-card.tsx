@@ -1,4 +1,4 @@
-import type { LucideIcon } from 'lucide-react'
+import type { SolarIcon } from '@rosti/ui/icons'
 import type { PlayerHighlight } from '@/lib/rosti-api'
 import { HighlightLabel } from './highlight-label'
 import { HighlightShell } from './highlight-shell'
@@ -6,7 +6,7 @@ import type { HighlightTone } from './highlight-tone'
 import { PlayerIdentity } from './player-identity'
 
 interface PlayerHighlightCardProps {
-  icon: LucideIcon
+  icon: SolarIcon
   tone: HighlightTone
   label: string
   player: PlayerHighlight | null

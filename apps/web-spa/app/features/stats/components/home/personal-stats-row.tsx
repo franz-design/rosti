@@ -1,4 +1,4 @@
-import { CalendarDays, CloudRain, Target, Trophy, type LucideIcon } from 'lucide-react'
+import { CalendarDays, CloudRain, Target, Trophy, type SolarIcon } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import type { SeasonHomeStats } from '@/lib/rosti-api'
 import type { HighlightTone } from './highlight-tone'
@@ -12,7 +12,7 @@ export function PersonalStatsRow({ stats }: PersonalStatsRowProps) {
   const { t } = useTranslation()
 
   const tiles: Array<{
-    icon: LucideIcon
+    icon: SolarIcon
     tone: HighlightTone
     label: string
     value: number

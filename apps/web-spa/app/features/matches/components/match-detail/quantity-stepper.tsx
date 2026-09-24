@@ -1,4 +1,4 @@
-import { Minus, Plus } from 'lucide-react'
+import { Minus, Plus } from '@rosti/ui/icons'
 import { useId, useState } from 'react'
 import { cn } from '@rosti/ui/lib/utils'
 

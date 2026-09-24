@@ -1,5 +1,5 @@
 import { cn } from '@rosti/ui/lib/utils'
-import { CalendarDays, MapPin, Users } from 'lucide-react'
+import { CalendarDays, MapPin, Users } from '@rosti/ui/icons'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'

@@ -1,5 +1,5 @@
 import { EmptyState } from '@rosti/ui/components/app'
-import { CalendarRange } from 'lucide-react'
+import { CalendarRange } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import type { Season } from '@/lib/rosti-api'
 import { sortSeasons } from '../utils/season-dates'

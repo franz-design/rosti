@@ -7,7 +7,7 @@ import {
   FileIcon,
   FileTextIcon,
   FileVideoIcon,
-} from 'lucide-react'
+} from '@rosti/ui/icons'
 import * as React from 'react'
 import { cn } from '@rosti/ui/lib/utils'
 

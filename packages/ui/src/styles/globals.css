@@ -39,6 +39,9 @@
 
   --radius: 0.625rem;
 
+  /* Read by every Solar icon that does not set `strokeWidth` itself (library default is 1.5). */
+  --solar-stroke-width: 2;
+
   /* Rösti yellow — primary fill token (NEVER use as text color on white) */
   /* #fff056 = oklch(0.95 0.18 105) */
 

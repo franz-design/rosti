@@ -11,7 +11,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@rosti/ui/components/primitives/input-group'
-import { ChevronDownIcon, XIcon, CheckIcon } from 'lucide-react'
+import { ChevronDownIcon, XIcon, CheckIcon } from '@rosti/ui/icons'
 
 const Combobox = ComboboxPrimitive.Root
 

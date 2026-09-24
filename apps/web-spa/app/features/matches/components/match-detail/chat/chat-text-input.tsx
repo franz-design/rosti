@@ -1,6 +1,6 @@
 import { Button } from '@rosti/ui/components/primitives/button'
 import { cn } from '@rosti/ui/lib/utils'
-import { Send } from 'lucide-react'
+import { Send } from '@rosti/ui/icons'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Mention, MentionsInput, type MentionsInputStyle } from 'react-mentions'

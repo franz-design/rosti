@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@rosti/ui/components/primitives/dialog'
-import { XIcon } from 'lucide-react'
+import { XIcon } from '@rosti/ui/icons'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Attendance, Lineup, SportType } from '@/lib/rosti-api'

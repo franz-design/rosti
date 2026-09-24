@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@rosti/ui/components/primitives/dropdown-menu'
 import { SidebarMenuButton } from '@rosti/ui/components/primitives/sidebar'
-import { ChevronUp, Globe, LogOut, Moon, Sun, User } from 'lucide-react'
+import { ChevronUp, Globe, LogOut, Moon, Sun, User } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router'
 import useTheme from '@/hooks/useTheme'

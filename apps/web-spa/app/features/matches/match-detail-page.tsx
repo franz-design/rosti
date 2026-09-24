@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router'
+import { useTabSearchParam } from '@/common/hooks/use-tab-search-param'
 import { useClub } from '@/features/clubs/hooks/club-context'
 import { useFullBleedShell } from '@/features/dashboard/hooks/app-shell-context'
 import { authClient } from '@/lib/auth-client'
@@ -13,14 +14,16 @@ import { AttendanceTab } from './components/match-detail/attendance/attendance-t
 import { ChatTab } from './components/match-detail/chat/chat-tab'
 import { LineupDialog } from './components/match-detail/lineup/lineup-dialog'
 import { MatchDetailHeader } from './components/match-detail/match-detail-header'
-import { MatchDetailTabsList } from './components/match-detail/match-detail-tabs-list'
+import {
+  DEFAULT_MATCH_DETAIL_TAB,
+  MATCH_DETAIL_TABS,
+  MatchDetailTabsList,
+} from './components/match-detail/match-detail-tabs-list'
 import type { PlayerStatDraft } from './components/match-detail/player-stat-draft'
 import { StatsTab } from './components/match-detail/stats/stats-tab'
 import { SummaryTab } from './components/match-detail/summary-tab'
 import { extractMentionIds, toPlainMentionBody } from './utils/chat-mentions'
 import { shouldPromptEnterScore, shouldShowMatchResult } from './utils/match-filters'
-
-type MatchTab = 'summary' | 'attendance' | 'chat' | 'stats'
 
 function playerStatsMatch(
   left: Record<string, PlayerStatDraft>,
@@ -41,7 +44,7 @@ export default function MatchDetailPage() {
   const orgId = activeClub?.id
   const queryClient = useQueryClient()
   const { data: session } = authClient.useSession()
-  const [tab, setTab] = useState<MatchTab>('summary')
+  const [tab, setTab] = useTabSearchParam(MATCH_DETAIL_TABS, DEFAULT_MATCH_DETAIL_TAB)
   const [message, setMessage] = useState('')
   const [statDrafts, setStatDrafts] = useState<Record<string, PlayerStatDraft>>({})
   const [scoreDraft, setScoreDraft] = useState({ blue: 0, red: 0 })
@@ -328,7 +331,7 @@ export default function MatchDetailPage() {
     <div className={cn('flex flex-col', isChat && 'min-h-0 flex-1')}>
       <Tabs
         value={tab}
-        onValueChange={(value) => setTab(value as MatchTab)}
+        onValueChange={setTab}
         className={cn('w-full min-h-0 flex-col gap-0', isChat && 'flex-1')}
       >
         <div className={cn('shrink-0 space-y-4', isChat && 'border-b px-6 pt-6 pb-3')}>

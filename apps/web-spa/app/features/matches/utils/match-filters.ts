@@ -20,6 +20,13 @@ export function isPastMatch(match: Match, now: number = Date.now()): boolean {
 }
 
 /**
+ * List URL that opens the tab where this match belongs.
+ */
+export function getMatchesListHref(match: Match, now: number = Date.now()): string {
+  return isUpcomingMatch(match, now) ? '/matches?tab=upcoming' : '/matches?tab=past'
+}
+
+/**
  * Upcoming matches, soonest first.
  */
 export function listUpcomingMatches(matches: Match[], now: number = Date.now()): Match[] {

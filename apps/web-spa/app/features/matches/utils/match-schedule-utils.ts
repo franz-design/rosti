@@ -1,5 +1,42 @@
 export type RecurrenceChoice = 'once' | 'weekly' | 'monthly_nth_weekday' | 'monthly'
 
+export type RecurrenceEndMode = 'count' | 'season'
+
+export const DEFAULT_OCCURRENCE_COUNT = 12
+export const MAX_OCCURRENCE_COUNT = 52
+
+export interface MatchRecurrencePayload {
+  frequency: Exclude<RecurrenceChoice, 'once'>
+  endsAt?: string
+  occurrenceCount?: number
+}
+
+export function clampOccurrenceCount(value: number): number {
+  if (!Number.isFinite(value)) return DEFAULT_OCCURRENCE_COUNT
+  return Math.min(MAX_OCCURRENCE_COUNT, Math.max(1, Math.round(value)))
+}
+
+export function buildMatchRecurrencePayload(input: {
+  recurrence: RecurrenceChoice
+  endMode: RecurrenceEndMode
+  occurrenceCount: number
+  seasonEndsAtIso?: string
+}): MatchRecurrencePayload | undefined {
+  if (input.recurrence === 'once') return undefined
+
+  if (input.endMode === 'season' && input.seasonEndsAtIso) {
+    return {
+      frequency: input.recurrence,
+      endsAt: input.seasonEndsAtIso,
+    }
+  }
+
+  return {
+    frequency: input.recurrence,
+    occurrenceCount: clampOccurrenceCount(input.occurrenceCount),
+  }
+}
+
 export const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
   const h = Math.floor(i / 2)
   const m = i % 2 === 0 ? '00' : '30'

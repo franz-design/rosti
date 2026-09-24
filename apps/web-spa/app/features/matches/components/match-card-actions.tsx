@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@rosti/ui/components/primitives/dropdown-menu'
-import { MoreVertical } from 'lucide-react'
+import { MoreVertical } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import type { Match } from '@/lib/rosti-api'
 

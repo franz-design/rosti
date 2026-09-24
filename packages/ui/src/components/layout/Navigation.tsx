@@ -15,7 +15,7 @@ import {
   SheetTrigger,
 } from '@rosti/ui/components/primitives/sheet'
 import { cn } from '@rosti/ui/lib/utils'
-import { Menu } from 'lucide-react'
+import { Menu } from '@rosti/ui/icons'
 import * as React from 'react'
 import { Link, NavLink } from 'react-router'
 

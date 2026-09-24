@@ -1,4 +1,4 @@
-import { CalendarDays, CloudRain, Target, Trophy } from 'lucide-react'
+import { CalendarDays, CloudRain, Target, Trophy } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import type { SeasonHomeStats } from '@/lib/rosti-api'
 import { DuoHighlightCard } from './duo-highlight-card'

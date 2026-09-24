@@ -11,7 +11,13 @@ import {
 } from '@rosti/ui/components/primitives/select'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
-import { TIME_OPTIONS, type RecurrenceChoice } from '@/features/matches/utils/match-schedule-utils'
+import {
+  MAX_OCCURRENCE_COUNT,
+  TIME_OPTIONS,
+  type RecurrenceChoice,
+  type RecurrenceEndMode,
+} from '@/features/matches/utils/match-schedule-utils'
+import { OccurrencesPicker } from './occurrences-picker'
 import { RecurrencePicker } from './recurrence-picker'
 
 interface CreateMatchFormValues {
@@ -21,6 +27,9 @@ interface CreateMatchFormValues {
   matchDate: Date | undefined
   matchTime: string
   recurrence: RecurrenceChoice
+  endMode: RecurrenceEndMode
+  occurrenceCount: number
+  canUntilSeason: boolean
 }
 
 interface CreateMatchFormProps {
@@ -34,6 +43,8 @@ interface CreateMatchFormProps {
   onDateChange: (value: Date | undefined) => void
   onTimeChange: (value: string) => void
   onRecurrenceChange: (value: RecurrenceChoice) => void
+  onEndModeChange: (value: RecurrenceEndMode) => void
+  onOccurrenceCountChange: (value: number) => void
   onSubmit: () => void
 }
 
@@ -48,12 +59,14 @@ export function CreateMatchForm({
   onDateChange,
   onTimeChange,
   onRecurrenceChange,
+  onEndModeChange,
+  onOccurrenceCountChange,
   onSubmit,
 }: CreateMatchFormProps) {
   const { t } = useTranslation()
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="matchTitle">{t('createMatch.matchTitle')}</Label>
         <Input
@@ -123,13 +136,34 @@ export function CreateMatchForm({
         />
       </div>
 
+      {values.recurrence !== 'once' ? (
+        <div className="space-y-2">
+          <Label htmlFor="occurrenceCount">{t('createMatch.occurrences')}</Label>
+          <OccurrencesPicker
+            endMode={values.endMode}
+            onEndModeChange={onEndModeChange}
+            occurrenceCount={values.occurrenceCount}
+            onOccurrenceCountChange={onOccurrenceCountChange}
+            canUntilSeason={values.canUntilSeason}
+          />
+        </div>
+      ) : null}
+
       <div className="flex gap-2 pt-2">
         <Button variant="outline" className="flex-1" render={<Link to="/matches" />}>
           {t('createMatch.back')}
         </Button>
         <Button
           className="flex-1"
-          disabled={isPending || !values.matchDate || !values.title.trim() || values.maxPlayers < 2}
+          disabled={
+            isPending ||
+            !values.matchDate ||
+            !values.title.trim() ||
+            values.maxPlayers < 2 ||
+            (values.recurrence !== 'once' &&
+              values.endMode === 'count' &&
+              (values.occurrenceCount < 1 || values.occurrenceCount > MAX_OCCURRENCE_COUNT))
+          }
           loading={isPending}
           onClick={onSubmit}
         >

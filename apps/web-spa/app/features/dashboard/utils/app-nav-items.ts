@@ -1,11 +1,14 @@
-import { CalendarDays, Home, Settings, type LucideIcon } from 'lucide-react'
+import { type SolarIcon } from '@rosti/ui/icons'
+import { CalendarIcon } from '@solar-icons/react/bold/calendar'
+import { HomeSmileIcon } from '@solar-icons/react/bold/home-smile'
+import { SettingsIcon } from '@solar-icons/react/bold/settings'
 import { useTranslation } from 'react-i18next'
 import { useClub } from '@/features/clubs/hooks/club-context'
 
 export interface AppNavItem {
   label: string
   to: string
-  icon: LucideIcon
+  icon: SolarIcon
 }
 
 export function isAppNavItemActive(pathname: string, to: string): boolean {
@@ -24,17 +27,17 @@ export function useAppNavItems(): AppNavItem[] {
     {
       label: t('nav.home'),
       to: '/dashboard',
-      icon: Home,
+      icon: HomeSmileIcon,
     },
     {
       label: t('nav.matches'),
       to: '/matches',
-      icon: CalendarDays,
+      icon: CalendarIcon,
     },
     {
       label: t('nav.settings'),
       to: isClubAdmin ? '/club-settings' : '/dashboard/profile',
-      icon: Settings,
+      icon: SettingsIcon,
     },
   ]
 }

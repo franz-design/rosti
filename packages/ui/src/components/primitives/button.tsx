@@ -1,6 +1,6 @@
 import { Button as ButtonPrimitive } from '@base-ui/react/button'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { Loader2Icon } from 'lucide-react'
+import { Loader2Icon } from '@rosti/ui/icons'
 
 import { cn } from '@rosti/ui/lib/utils'
 

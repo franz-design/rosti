@@ -1,6 +1,6 @@
 import { Badge } from '@rosti/ui/components/primitives/badge'
 import { Input } from '@rosti/ui/components/primitives/input'
-import { XIcon } from 'lucide-react'
+import { XIcon } from '@rosti/ui/icons'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 

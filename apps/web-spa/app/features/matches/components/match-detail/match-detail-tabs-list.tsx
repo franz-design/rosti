@@ -2,6 +2,10 @@ import { Badge } from '@rosti/ui/components/primitives/badge'
 import { TabsList, TabsTrigger } from '@rosti/ui/components/primitives/tabs'
 import { useTranslation } from 'react-i18next'
 
+export const MATCH_DETAIL_TABS = ['summary', 'attendance', 'chat', 'stats'] as const
+export type MatchTab = (typeof MATCH_DETAIL_TABS)[number]
+export const DEFAULT_MATCH_DETAIL_TAB: MatchTab = 'summary'
+
 interface MatchDetailTabsListProps {
   unreadMessageCount: number
 }

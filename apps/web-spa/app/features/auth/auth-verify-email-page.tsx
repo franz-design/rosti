@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
+import { Loader2 } from '@rosti/ui/icons'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router'

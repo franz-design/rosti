@@ -1,5 +1,5 @@
 import { Button } from '@rosti/ui/components/primitives/button'
-import { Plus } from 'lucide-react'
+import { Plus } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 

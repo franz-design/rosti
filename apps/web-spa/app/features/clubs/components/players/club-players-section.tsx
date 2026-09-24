@@ -1,7 +1,7 @@
 import { Input } from '@rosti/ui/components/primitives/input'
 import { toast } from '@rosti/ui/components/primitives/sonner'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Loader2, Search } from 'lucide-react'
+import { Loader2, Search } from '@rosti/ui/icons'
 import { useState, type ChangeEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { filterPlayersByName } from '@/features/clubs/utils/filter-players'

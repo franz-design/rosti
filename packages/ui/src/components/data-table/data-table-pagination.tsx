@@ -1,5 +1,5 @@
 import type { Table as TanstackTable } from '@tanstack/react-table'
-import { ArrowLeftIcon, ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon } from '@rosti/ui/icons'
 import { Button } from '@rosti/ui/components/primitives/button'
 import {
   Select,

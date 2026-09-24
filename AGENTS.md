@@ -20,5 +20,13 @@ Read all the documentation cited in the README.md file that could be useful to u
 
 You must always follow these guidelines.
 
+# Verifying your work
+
+Never use the browser to check your work on your own initiative. No browser subagent, no browser tools, no throwaway HTML page, no local server started just to look at something. Use only typecheck, lint, tests and reading the source.
+
+Use the browser only when I explicitly ask for it.
+
+When you cannot verify something without a browser, say so plainly and let me check it myself.
+
 Before committing or opening a PR, read `CONTRIBUTING.md` and follow it.
 Never write the token `BREAKING-CHANGE:` in a commit message unless you intend to force a major release.

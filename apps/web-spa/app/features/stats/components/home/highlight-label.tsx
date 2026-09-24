@@ -1,9 +1,9 @@
 import { cn } from '@rosti/ui/lib/utils'
-import type { LucideIcon } from 'lucide-react'
+import type { SolarIcon } from '@rosti/ui/icons'
 import { HIGHLIGHT_TONE_CLASS, type HighlightTone } from './highlight-tone'
 
 interface HighlightLabelProps {
-  icon: LucideIcon
+  icon: SolarIcon
   tone: HighlightTone
   label: string
 }

@@ -1,16 +1,25 @@
 import { toast } from '@rosti/ui/components/primitives/sonner'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Navigate, useNavigate } from 'react-router'
 import { useClub } from '@/features/clubs/hooks/club-context'
+import {
+  endOfCalendarDay,
+  isMatchDateOutsideSeason,
+  parseCalendarDate,
+} from '@/features/seasons/utils/season-dates'
+import { fetchSeasonsQueryOptions } from '@/features/seasons/utils/seasons-queries'
 import { rostiApi } from '@/lib/rosti-api'
 import { CreateMatchForm } from './components/create-match/create-match-form'
 import { CreateMatchHeader } from './components/create-match/create-match-header'
 import {
+  buildMatchRecurrencePayload,
   combineDateAndTime,
+  DEFAULT_OCCURRENCE_COUNT,
   defaultNextMatchDate,
   type RecurrenceChoice,
+  type RecurrenceEndMode,
 } from './utils/match-schedule-utils'
 
 export default function CreateMatchPage() {
@@ -26,6 +35,23 @@ export default function CreateMatchPage() {
   const [matchDate, setMatchDate] = useState<Date | undefined>(() => defaultNextMatchDate())
   const [matchTime, setMatchTime] = useState('19:00')
   const [recurrence, setRecurrence] = useState<RecurrenceChoice>('weekly')
+  const [endMode, setEndMode] = useState<RecurrenceEndMode>('count')
+  const [occurrenceCount, setOccurrenceCount] = useState(DEFAULT_OCCURRENCE_COUNT)
+
+  const { data: seasons = [] } = useQuery({
+    ...fetchSeasonsQueryOptions(activeClub?.id ?? ''),
+    enabled: !!activeClub,
+  })
+  const activeSeason = seasons.find((season) => season.status === 'active')
+  const seasonStartsAt = activeSeason ? parseCalendarDate(activeSeason.startsAt) : null
+  const seasonEndsAt = activeSeason?.endsAt ? parseCalendarDate(activeSeason.endsAt) : null
+  const canUntilSeason = !!seasonEndsAt
+
+  useEffect(() => {
+    if (!canUntilSeason && endMode === 'season') {
+      setEndMode('count')
+    }
+  }, [canUntilSeason, endMode])
 
   useEffect(() => {
     if (!activeClub || defaultsReady) return
@@ -47,8 +73,7 @@ export default function CreateMatchPage() {
       if (!matchDate || !title.trim()) throw new Error(t('createMatch.errors.requiredFields'))
       if (maxPlayers < 2) throw new Error(t('createMatch.errors.maxPlayers'))
 
-      const seasons = await rostiApi.listSeasons(activeClub.id)
-      let seasonId = seasons.find((s) => s.status === 'active')?.id
+      let seasonId = activeSeason?.id
       if (!seasonId) {
         const year = new Date().getFullYear()
         const season = await rostiApi.createSeason(activeClub.id, {
@@ -58,6 +83,16 @@ export default function CreateMatchPage() {
         seasonId = season.id
       }
 
+      if (
+        recurrence !== 'once' &&
+        endMode === 'season' &&
+        seasonStartsAt &&
+        seasonEndsAt &&
+        isMatchDateOutsideSeason(matchDate, seasonStartsAt, seasonEndsAt)
+      ) {
+        throw new Error(t('createMatch.errors.matchOutsideSeason'))
+      }
+
       const startsAt = combineDateAndTime(matchDate, matchTime)
       await rostiApi.createMatches(activeClub.id, {
         seasonId,
@@ -65,18 +100,18 @@ export default function CreateMatchPage() {
         startsAt: startsAt.toISOString(),
         location: location.trim() || undefined,
         maxCapacity: maxPlayers,
-        recurrence:
-          recurrence === 'once'
-            ? undefined
-            : {
-                frequency: recurrence,
-                occurrenceCount: 12,
-              },
+        recurrence: buildMatchRecurrencePayload({
+          recurrence,
+          endMode,
+          occurrenceCount,
+          seasonEndsAtIso: seasonEndsAt ? endOfCalendarDay(seasonEndsAt).toISOString() : undefined,
+        }),
       })
     },
     onSuccess: () => {
       toast.success(t('createMatch.success'))
       void queryClient.invalidateQueries({ queryKey: ['matches', activeClub?.id] })
+      void queryClient.invalidateQueries({ queryKey: ['seasons', activeClub?.id] })
       navigate('/matches')
     },
     onError: (err: Error) => toast.error(err.message),
@@ -90,7 +125,17 @@ export default function CreateMatchPage() {
     <div className="mx-auto w-full max-w-lg space-y-8">
       <CreateMatchHeader clubName={activeClub.name} />
       <CreateMatchForm
-        values={{ title, location, maxPlayers, matchDate, matchTime, recurrence }}
+        values={{
+          title,
+          location,
+          maxPlayers,
+          matchDate,
+          matchTime,
+          recurrence,
+          endMode,
+          occurrenceCount,
+          canUntilSeason,
+        }}
         weekdayName={weekdayName}
         dayOfMonth={dayOfMonth}
         isPending={create.isPending}
@@ -100,6 +145,8 @@ export default function CreateMatchPage() {
         onDateChange={setMatchDate}
         onTimeChange={setMatchTime}
         onRecurrenceChange={setRecurrence}
+        onEndModeChange={setEndMode}
+        onOccurrenceCountChange={setOccurrenceCount}
         onSubmit={() => create.mutate()}
       />
     </div>

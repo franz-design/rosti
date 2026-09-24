@@ -151,6 +151,7 @@
     "time": "Time",
     "datePlaceholder": "Pick a date",
     "detail": {
+      "back": "Back",
       "loading": "Loading match…",
       "noLocation": "No location set",
       "tabs": {
@@ -251,17 +252,22 @@
     "time": "Time",
     "recurrence": "Recurrence",
     "once": "One-time only",
-    "everyWeek": "Every week — every {{day}}",
+    "everyWeek": "Every week - every {{day}}",
     "everyNthWeekday": "Every {{ordinal}} {{day}} of the month",
     "everyMonthDate": "Every month on the {{day}}",
     "monthlyNthFallback": "First weekday of the month",
-    "recurrenceHint": "The next 12 occurrences will be created.",
+    "occurrences": "Occurrences",
+    "occurrenceCount": "Number of occurrences",
+    "untilSeasonEnd": "Until the end of the season",
+    "recurrenceHint": "The next {{count}} occurrences will be created.",
+    "recurrenceHintSeason": "Occurrences are created until the end of the season (52 maximum).",
     "seasonName": "Season {{year}}",
-    "defaultTitle": "Match — {{club}}",
+    "defaultTitle": "Match - {{club}}",
     "errors": {
       "requiredFields": "Please fill in all fields.",
       "maxPlayers": "You need at least 2 players.",
-      "missingClub": "Club not found."
+      "missingClub": "Club not found.",
+      "matchOutsideSeason": "The first match date is outside the season."
     }
   },
   "join": {
@@ -362,8 +368,8 @@
     "reopen": "Reopen",
     "statusActive": "Active",
     "statusClosed": "Closed",
-    "rangeOpen": "{{start}} — ongoing",
-    "rangeClosed": "{{start}} — {{end}}",
+    "rangeOpen": "{{start}} - ongoing",
+    "rangeClosed": "{{start}} - {{end}}",
     "rangeStartOnly": "Since {{start}}",
     "saved": "{{name}} saved",
     "savedClosedPrevious": "{{name}} is now active. {{previous}} was closed.",
@@ -445,13 +451,13 @@
       "datePlaceholder": "Pick a date",
       "time": "Time",
       "recurrence": "Recurrence",
-      "everyWeek": "Every week — every {{day}}",
+      "everyWeek": "Every week - every {{day}}",
       "everyNthWeekday": "Every {{ordinal}} {{day}} of the month",
       "everyMonthDate": "Every month on the {{day}}",
       "monthlyNthFallback": "First weekday of the month",
       "recurrenceHint": "Occurrences are created until the end of the season.",
       "seasonName": "Season {{year}}",
-      "matchTitle": "Match — {{club}}"
+      "matchTitle": "Match - {{club}}"
     },
     "step4": {
       "emails": "Invite players",

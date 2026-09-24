@@ -1,5 +1,5 @@
 import { Button } from '@rosti/ui/components/primitives/button'
-import { CalendarDays, Clock, MapPin } from 'lucide-react'
+import { CalendarDays, Clock, MapPin } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import type { Attendance, Lineup, Match } from '@/lib/rosti-api'
 import { AttendanceGroup } from './attendance/attendance-group'

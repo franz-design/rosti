@@ -71,7 +71,7 @@ export function MatchInviteSettingsSection() {
       <div className="space-y-2">
         <Label>{t('clubSettings.matchInvite.leadLabel')}</Label>
         <Select value={String(leadDays)} onValueChange={handleLeadChange}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full lg:w-auto lg:min-w-64">
             <SelectValue>{(value) => formatLeadDays(Number(value), t)}</SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -99,7 +99,7 @@ export function MatchInviteSettingsSection() {
             setReminderDays(Number(value))
           }}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full lg:w-auto lg:min-w-64">
             <SelectValue>
               {(value) =>
                 value == null || value === NO_REMINDER

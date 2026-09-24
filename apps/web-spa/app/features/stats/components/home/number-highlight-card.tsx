@@ -1,10 +1,10 @@
-import type { LucideIcon } from 'lucide-react'
+import type { SolarIcon } from '@rosti/ui/icons'
 import { HighlightLabel } from './highlight-label'
 import { HighlightShell } from './highlight-shell'
 import type { HighlightTone } from './highlight-tone'
 
 interface NumberHighlightCardProps {
-  icon: LucideIcon
+  icon: SolarIcon
   tone: HighlightTone
   label: string
   value: number

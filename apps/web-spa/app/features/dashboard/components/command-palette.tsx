@@ -8,7 +8,7 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from '@rosti/ui/components/primitives/command'
-import { CalendarRange, LayoutDashboard, Moon, Sun, User } from 'lucide-react'
+import { CalendarRange, LayoutDashboard, Moon, Sun, User } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
 import useTheme from '@/hooks/useTheme'

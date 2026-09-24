@@ -30,7 +30,7 @@ export function AppSidebarNav() {
                       : ''
                   }
                 >
-                  <item.icon className="h-4 w-4 shrink-0" />
+                  <item.icon size={20} strokeWidth={2} />
                   <span>{item.label}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>

@@ -7,7 +7,7 @@ import {
   TriangleAlertIcon,
   OctagonXIcon,
   Loader2Icon,
-} from 'lucide-react'
+} from '@rosti/ui/icons'
 import { cn } from '@rosti/ui/lib/utils'
 
 const Toaster = ({ toastOptions, ...props }: ToasterProps) => {
