@@ -128,11 +128,15 @@ export default function MatchDetailPage() {
     })
   }, [presentPlayers, stats])
 
+  const loadedMatchId = match?.id
+  const matchBlueScore = match?.blueScore
+  const matchRedScore = match?.redScore
+
   useEffect(() => {
-    if (!match) return
-    const server = { blue: match.blueScore ?? 0, red: match.redScore ?? 0 }
-    if (scoreSyncedForMatch.current !== match.id) {
-      scoreSyncedForMatch.current = match.id
+    if (!loadedMatchId) return
+    const server = { blue: matchBlueScore ?? 0, red: matchRedScore ?? 0 }
+    if (scoreSyncedForMatch.current !== loadedMatchId) {
+      scoreSyncedForMatch.current = loadedMatchId
       savingScore.current = null
       setScoreDraft(server)
       return
@@ -155,7 +159,7 @@ export default function MatchDetailPage() {
       }
       return current
     })
-  }, [match?.id, match?.blueScore, match?.redScore])
+  }, [loadedMatchId, matchBlueScore, matchRedScore])
 
   useEffect(() => {
     if (tab !== 'chat') return

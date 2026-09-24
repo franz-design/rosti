@@ -1,4 +1,4 @@
-import { CalendarDays, Home, LayoutDashboard, Settings, type LucideIcon } from 'lucide-react'
+import { CalendarDays, Home, Settings, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useClub } from '@/features/clubs/hooks/club-context'
 

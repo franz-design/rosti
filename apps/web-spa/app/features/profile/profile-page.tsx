@@ -32,6 +32,10 @@ export default function ProfilePage() {
   const { data: sessionData, refetch } = authClient.useSession()
   const user = sessionData?.user as ProfileUser | undefined
 
+  const firstName = user?.firstName
+  const lastName = user?.lastName
+  const fullName = user?.name
+
   const form = useForm<ProfileNameParts>({
     resolver: zodResolver(profileDetailsSchema),
     defaultValues: getNameParts(user),
@@ -39,8 +43,8 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (form.formState.isDirty) return
-    form.reset(getNameParts(user))
-  }, [form, user?.firstName, user?.lastName, user?.name])
+    form.reset(getNameParts({ firstName, lastName, name: fullName }))
+  }, [form, firstName, lastName, fullName])
 
   const { mutate: saveProfile, isPending } = useMutation({
     mutationFn: async (data: ProfileNameParts) => {

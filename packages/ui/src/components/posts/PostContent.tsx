@@ -28,5 +28,9 @@ function PostImage({ data }: { data: string }) {
 }
 
 function PostVideo({ data }: { data: string }) {
-  return <video src={data} controls />
+  return (
+    <video src={data} controls>
+      <track kind="captions" />
+    </video>
+  )
 }
