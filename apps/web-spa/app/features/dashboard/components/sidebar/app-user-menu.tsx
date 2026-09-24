@@ -1,6 +1,7 @@
 import type { SupportedLocale } from '@rosti/i18n/config'
 import { SUPPORTED_LOCALES } from '@rosti/i18n/config'
 import { Avatar, AvatarFallback } from '@rosti/ui/components/primitives/avatar'
+import { Button } from '@rosti/ui/components/primitives/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +12,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@rosti/ui/components/primitives/dropdown-menu'
+import { SidebarMenuButton } from '@rosti/ui/components/primitives/sidebar'
 import { ChevronUp, Globe, LogOut, Moon, Sun, User } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router'
@@ -18,7 +20,11 @@ import useTheme from '@/hooks/useTheme'
 import { authClient } from '@/lib/auth-client'
 import { useI18nStore } from '@/lib/i18n/i18n-client'
 
-export function AppUserMenu() {
+interface AppUserMenuProps {
+  variant?: 'sidebar' | 'compact'
+}
+
+export function AppUserMenu({ variant = 'sidebar' }: AppUserMenuProps) {
   const { t, i18n } = useTranslation()
   const { data: sessionData } = authClient.useSession()
   const navigate = useNavigate()
@@ -38,21 +44,50 @@ export function AppUserMenu() {
     .toUpperCase()
     .slice(0, 2)
 
+  const isCompact = variant === 'compact'
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent transition-colors outline-none">
-        <Avatar size="sm">
-          <AvatarFallback>{userInitials}</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-1 flex-col items-start leading-none overflow-hidden">
-          <span className="truncate text-xs font-semibold text-sidebar-foreground">{userName}</span>
-          <span className="truncate text-[10px] text-muted-foreground">
-            {sessionData?.user?.email}
-          </span>
-        </div>
-        <ChevronUp className="ml-auto size-4 text-muted-foreground" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="top" align="start" className="w-56">
+      {isCompact ? (
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              aria-label={t('dashboard.userMenu')}
+            />
+          }
+        >
+          <Avatar size="sm">
+            <AvatarFallback>{userInitials}</AvatarFallback>
+          </Avatar>
+        </DropdownMenuTrigger>
+      ) : (
+        <DropdownMenuTrigger
+          render={
+            <SidebarMenuButton
+              size="lg"
+              className="data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground"
+            />
+          }
+          className="cursor-pointer"
+        >
+          <Avatar size="sm">
+            <AvatarFallback>{userInitials}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-1 flex-col items-start overflow-hidden leading-none">
+            <span className="truncate text-xs font-semibold text-foreground">{userName}</span>
+            <span className="truncate text-[10px] text-foreground">{sessionData?.user?.email}</span>
+          </div>
+          <ChevronUp className="ml-auto size-4 text-foreground" />
+        </DropdownMenuTrigger>
+      )}
+      <DropdownMenuContent
+        side={isCompact ? 'bottom' : 'top'}
+        align={isCompact ? 'end' : 'start'}
+        className="w-56"
+      >
         <DropdownMenuItem render={<Link to="/dashboard/profile" />}>
           <User className="mr-2 h-4 w-4" />
           <span>{t('dashboard.profile')}</span>

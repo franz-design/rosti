@@ -16,10 +16,13 @@ export const entityGlobs = {
 }
 
 export function createMikroOrmOptions(options?: CreateMikroOrmOptions) {
-  // Production images ship compiled JS only. The MikroORM CLI forces
-  // `preferTs` unless MIKRO_ORM_CLI_PREFER_TS=false, then reads `pathTs`
-  // and `entitiesTs`. Point those at `dist/` so migrate still finds files.
-  const preferTs = config.env !== 'production'
+  // Nest (`nest start` / `node dist/main.js`) runs compiled JS. Always prefer
+  // `entities` (dist) there — Node's native type-stripping cannot resolve the
+  // extensionless imports in `src/**/*.entity.ts`.
+  //
+  // The MikroORM CLI registers a TS loader and forces `preferTs` unless
+  // `MIKRO_ORM_CLI_PREFER_TS=false` (see Dockerfile). Keep `entitiesTs` /
+  // `pathTs` populated so local `db:migrate:*` can still read `src/`.
   const migrationsPath = './dist/modules/db/migrations'
 
   return defineConfig({
@@ -29,8 +32,8 @@ export function createMikroOrmOptions(options?: CreateMikroOrmOptions) {
     password: config.database.password,
     dbName: config.database.name,
     entities: entityGlobs.entities,
-    entitiesTs: preferTs ? entityGlobs.entitiesTs : [],
-    preferTs,
+    entitiesTs: entityGlobs.entitiesTs,
+    preferTs: false,
     metadataProvider: ReflectMetadataProvider,
     // Column names mirror entity property names verbatim (camelCase),
     // matching the database schema. Relation FK columns still declare an
@@ -42,7 +45,7 @@ export function createMikroOrmOptions(options?: CreateMikroOrmOptions) {
     extensions: [SeedManager, Migrator],
     migrations: {
       path: migrationsPath,
-      pathTs: preferTs ? './src/modules/db/migrations' : migrationsPath,
+      pathTs: './src/modules/db/migrations',
       allOrNothing: true,
       disableForeignKeys: false,
     },

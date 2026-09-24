@@ -86,9 +86,8 @@
     "profile": "Profil"
   },
   "nav": {
-    "home": "Accueil",
+    "home": "Dashboard",
     "matches": "Matchs",
-    "notifications": "Notifications",
     "clubSettings": "Paramètres du club",
     "settings": "Paramètres"
   },
@@ -210,7 +209,8 @@
       "chat": {
         "placeholder": "Écrire un message…",
         "send": "Envoyer",
-        "empty": "Aucun message pour l’instant. Lance la conversation !"
+        "empty": "Aucun message pour l’instant. Lance la conversation !",
+        "mentionSuggestions": "Mentionner un membre du club"
       },
       "stats": {
         "score": "Score",
@@ -336,16 +336,16 @@
       "manage": "Gérer les saisons"
     },
     "matchInvite": {
-      "title": "Inscription aux matchs",
-      "hint": "Les joueurs invités reçoivent seulement l'invitation à rejoindre l'équipe. L'inscription au prochain match part au délai choisi, avant la date du match.",
-      "leadLabel": "Envoi de l'inscription",
+      "title": "Invitation aux matchs",
+      "hint": "L'invitation au prochain match part au délai choisi avant la date du match.",
+      "leadLabel": "Envoi de l'invitation",
       "reminderLabel": "Rappel",
       "reminderHint": "Le rappel part uniquement aux joueurs qui n'ont pas encore répondu.",
       "noReminder": "Pas de rappel",
       "dayBefore": "1 jour avant",
       "daysBefore": "{{count}} jours avant",
       "save": "Enregistrer",
-      "saved": "Délais d'inscription enregistrés"
+      "saved": "Délais d'invitation enregistrés"
     }
   },
   "seasons": {
@@ -485,6 +485,21 @@
     "eyebrow": "Compte",
     "title": "Profil",
     "description": "Les détails de votre compte.",
+    "tabs": {
+      "info": "Vos informations",
+      "notifications": "Préférences de notification"
+    },
+    "notifications": {
+      "description": "Choisis comment Rösti te contacte.",
+      "saved": "Préférences enregistrées",
+      "emailEnabled": "Notifications par email",
+      "pushEnabled": "Notifications push",
+      "notifyNewMatch": "Nouveau match",
+      "notifyRsvpReminder": "Rappels RSVP",
+      "notifyMatchCancelled": "Match annulé",
+      "notifyChatMention": "Mentions dans le chat",
+      "notifyAllChatMessages": "Tous les messages du chat"
+    },
     "firstName": "Prénom",
     "lastName": "Nom",
     "email": "Email",

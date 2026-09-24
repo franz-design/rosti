@@ -341,7 +341,7 @@ async function promptDatabaseConfig(): Promise<EnvConfig['database']> {
     return {
       user: existingVars.DATABASE_USER || 'postgres',
       password: existingVars.DATABASE_PASSWORD || 'postgres',
-      name: existingVars.DATABASE_NAME || 'lonestone_test',
+      name: existingVars.DATABASE_NAME || 'rosti_db',
       host: existingVars.DATABASE_HOST || 'localhost',
       port: Number.parseInt(existingVars.DATABASE_PORT || '5111', 10),
     }
@@ -366,9 +366,9 @@ async function promptDatabaseConfig(): Promise<EnvConfig['database']> {
   const name = missingVars.includes('DATABASE_NAME')
     ? await prompt(
         'Database name',
-        existingVars.DATABASE_NAME || exampleVars.DATABASE_NAME || 'lonestone_test',
+        existingVars.DATABASE_NAME || exampleVars.DATABASE_NAME || 'rosti_db',
       )
-    : existingVars.DATABASE_NAME || 'lonestone_test'
+    : existingVars.DATABASE_NAME || 'rosti_db'
 
   const host = missingVars.includes('DATABASE_HOST')
     ? await prompt(

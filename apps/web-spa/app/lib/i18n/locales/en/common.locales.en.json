@@ -88,7 +88,6 @@
   "nav": {
     "home": "Home",
     "matches": "Matches",
-    "notifications": "Notifications",
     "clubSettings": "Club settings",
     "settings": "Settings"
   },
@@ -210,7 +209,8 @@
       "chat": {
         "placeholder": "Write a message…",
         "send": "Send",
-        "empty": "No messages yet. Start the conversation!"
+        "empty": "No messages yet. Start the conversation!",
+        "mentionSuggestions": "Mention a club member"
       },
       "stats": {
         "score": "Score",
@@ -485,6 +485,21 @@
     "eyebrow": "Account",
     "title": "Profile",
     "description": "Your account details.",
+    "tabs": {
+      "info": "Your information",
+      "notifications": "Notification preferences"
+    },
+    "notifications": {
+      "description": "Choose how Rösti contacts you.",
+      "saved": "Preferences saved",
+      "emailEnabled": "Email notifications",
+      "pushEnabled": "Push notifications",
+      "notifyNewMatch": "New match",
+      "notifyRsvpReminder": "RSVP reminders",
+      "notifyMatchCancelled": "Match cancelled",
+      "notifyChatMention": "Chat mentions",
+      "notifyAllChatMessages": "All chat messages"
+    },
     "firstName": "First name",
     "lastName": "Last name",
     "email": "Email",

@@ -159,7 +159,7 @@ export const AuthRegisterForm: React.FC<AuthRegisterFormProps> = ({
             </FormItem>
           )}
         />
-        <Button className="w-full" type="submit" disabled={isPending}>
+        <Button className="w-full" type="submit" disabled={isPending} loading={isPending}>
           {t('auth.register.signUp')}
         </Button>
       </form>

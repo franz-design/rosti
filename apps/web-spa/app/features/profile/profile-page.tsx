@@ -1,14 +1,18 @@
 import { toast } from '@rosti/ui/components/primitives/sonner'
+import { Tabs, TabsContent } from '@rosti/ui/components/primitives/tabs'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
+import { useTabSearchParam } from '@/common/hooks/use-tab-search-param'
+import { NotificationPreferencesSection } from '@/features/notifications/components/notification-preferences-section'
 import { authClient } from '@/lib/auth-client'
 import { ProfileDetailsForm } from './components/profile-details-form'
 import { ProfileHeader } from './components/profile-header'
 import { ProfileIdentity } from './components/profile-identity'
+import { DEFAULT_PROFILE_TAB, PROFILE_TABS, ProfileTabsList } from './components/profile-tabs'
 import {
   getNameParts,
   getProfileDisplayName,
@@ -24,6 +28,7 @@ const profileDetailsSchema = z.object({
 
 export default function ProfilePage() {
   const { t } = useTranslation()
+  const [profileTab, setProfileTab] = useTabSearchParam(PROFILE_TABS, DEFAULT_PROFILE_TAB)
   const { data: sessionData, refetch } = authClient.useSession()
   const user = sessionData?.user as ProfileUser | undefined
 
@@ -69,13 +74,26 @@ export default function ProfilePage() {
   return (
     <div className="space-y-8">
       <ProfileHeader />
-      <ProfileIdentity displayName={displayName} initials={initials} email={user?.email} />
-      <ProfileDetailsForm
-        form={form}
-        email={user?.email}
-        isPending={isPending}
-        onSubmit={(data) => saveProfile(data)}
-      />
+
+      <Tabs value={profileTab} onValueChange={setProfileTab} className="gap-4">
+        <ProfileTabsList />
+
+        <TabsContent value="info" className="outline-none">
+          <div className="space-y-8">
+            <ProfileIdentity displayName={displayName} initials={initials} email={user?.email} />
+            <ProfileDetailsForm
+              form={form}
+              email={user?.email}
+              isPending={isPending}
+              onSubmit={(data) => saveProfile(data)}
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="notifications" className="outline-none">
+          <NotificationPreferencesSection />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

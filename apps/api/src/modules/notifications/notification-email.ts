@@ -19,7 +19,7 @@ export function newMatchEmail(match: MatchEmailSource, appUrl: string): Notifica
     subject: oneLine(`Nouveau match : ${match.title}`),
     paragraphs: [
       `Un nouveau match est prévu ${whenAndWhere(match)}.`,
-      'Dis si tu viens.',
+      'Inscris-toi dès maintenant.',
     ],
     action: { label: 'Voir le match', url: matchUrl(appUrl, match.id) },
   }
@@ -42,19 +42,16 @@ export function cancelledMatchEmail(
 
 export function rsvpReminderEmail(match: MatchEmailSource, appUrl: string): NotificationEmailCopy {
   return {
-    subject: oneLine(`Tu confirmes pour ${match.title} ?`),
-    paragraphs: [`Le match a lieu ${whenAndWhere(match)}. Dis si tu seras là.`],
+    subject: oneLine(`Rappel : réponds à l'invitation au match ${match.title} ?`),
+    paragraphs: [`Le match a lieu ${whenAndWhere(match)}. Est-ce que tu seras présent ?`],
     action: { label: 'Répondre', url: matchUrl(appUrl, match.id) },
   }
 }
 
 export function scoreReminderEmail(match: MatchEmailSource, appUrl: string): NotificationEmailCopy {
   return {
-    subject: oneLine(`Le score de ${match.title}`),
-    paragraphs: [
-      `Le match ${whenAndWhere(match)} est terminé.`,
-      'Indique le score dans Rösti.',
-    ],
+    subject: oneLine(`Renseigne le score de ${match.title}`),
+    paragraphs: [`Le match ${whenAndWhere(match)} est terminé.`, 'Indique le score dans Rösti.'],
     action: { label: 'Saisir le score', url: matchUrl(appUrl, match.id) },
   }
 }

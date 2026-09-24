@@ -11,7 +11,6 @@ export const zUpdateNotificationPreferenceSchema = z.object({
     notifyNewMatch: z.optional(z.boolean()),
     notifyRsvpReminder: z.optional(z.boolean()),
     notifyMatchCancelled: z.optional(z.boolean()),
-    chatMentionsOnly: z.optional(z.boolean()),
     notifyChatMention: z.optional(z.boolean()),
     notifyAllChatMessages: z.optional(z.boolean())
 });
@@ -236,7 +235,6 @@ export const zNotificationPreferenceSchema = z.object({
     notifyNewMatch: z.boolean(),
     notifyRsvpReminder: z.boolean(),
     notifyMatchCancelled: z.boolean(),
-    chatMentionsOnly: z.boolean(),
     notifyChatMention: z.boolean(),
     notifyAllChatMessages: z.boolean()
 });
@@ -983,7 +981,6 @@ export const zNotificationControllerUpdatePreferencesData = z.object({
         notifyNewMatch: z.optional(z.boolean()),
         notifyRsvpReminder: z.optional(z.boolean()),
         notifyMatchCancelled: z.optional(z.boolean()),
-        chatMentionsOnly: z.optional(z.boolean()),
         notifyChatMention: z.optional(z.boolean()),
         notifyAllChatMessages: z.optional(z.boolean())
     }),

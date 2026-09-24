@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useClub } from '@/features/clubs/hooks/club-context'
+import { shouldShowHomeStats } from '../../utils/home-stats-visibility'
 import { fetchHomeStatsQueryOptions } from '../../utils/stats-queries'
 import { ClubStatsGrid } from './club-stats-grid'
 import { HomeStatsSkeleton } from './home-stats-skeleton'
@@ -18,9 +19,9 @@ export default function HomeStatsSection() {
 
   if (!organizationId) return null
   if (isLoading) return <HomeStatsSkeleton />
+  if (!shouldShowHomeStats(data?.club.matchesPlayed ?? 0)) return null
 
-  const stats = data
-  const seasonName = stats?.season?.name
+  const seasonName = data?.season?.name
 
   return (
     <div className="min-w-0 space-y-8">
@@ -30,12 +31,12 @@ export default function HomeStatsSection() {
           subtitle={seasonName ?? t('home.stats.noSeason')}
           subtitleTo="/seasons"
         />
-        <ClubStatsGrid stats={stats} />
+        <ClubStatsGrid stats={data} />
       </section>
 
       <section className="space-y-3">
         <SectionHeading title={t('home.stats.personalTitle')} />
-        <PersonalStatsRow stats={stats?.me} />
+        <PersonalStatsRow stats={data?.me} />
       </section>
     </div>
   )

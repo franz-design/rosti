@@ -34,7 +34,12 @@ export function InvitesStep({
         />
       </div>
       <div className="flex flex-col gap-2">
-        <Button className="w-full" disabled={isPending || emails.length === 0} onClick={onSend}>
+        <Button
+          className="w-full"
+          disabled={isPending || emails.length === 0}
+          loading={isPending}
+          onClick={onSend}
+        >
           {t('onboarding.step4.sendInvites')}
         </Button>
         <Button variant="ghost" className="w-full" disabled={isPending} onClick={onSkip}>

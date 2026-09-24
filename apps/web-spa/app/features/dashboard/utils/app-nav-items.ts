@@ -1,4 +1,4 @@
-import { Bell, CalendarDays, LayoutDashboard, Settings, type LucideIcon } from 'lucide-react'
+import { CalendarDays, Home, LayoutDashboard, Settings, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useClub } from '@/features/clubs/hooks/club-context'
 
@@ -24,17 +24,12 @@ export function useAppNavItems(): AppNavItem[] {
     {
       label: t('nav.home'),
       to: '/dashboard',
-      icon: LayoutDashboard,
+      icon: Home,
     },
     {
       label: t('nav.matches'),
       to: '/matches',
       icon: CalendarDays,
-    },
-    {
-      label: t('nav.notifications'),
-      to: '/notifications',
-      icon: Bell,
     },
     {
       label: t('nav.settings'),

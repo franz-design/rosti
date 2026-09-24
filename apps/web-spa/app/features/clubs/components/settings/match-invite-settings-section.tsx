@@ -119,7 +119,7 @@ export function MatchInviteSettingsSection() {
         </Select>
       </div>
 
-      <Button onClick={() => save.mutate()} disabled={save.isPending}>
+      <Button onClick={() => save.mutate()} disabled={save.isPending} loading={save.isPending}>
         {t('clubSettings.matchInvite.save')}
       </Button>
     </section>

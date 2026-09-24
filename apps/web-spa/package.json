@@ -25,6 +25,9 @@
     "@lonestone/nzoth": "^1.2.0",
     "@react-router/node": "catalog:frontend",
     "@react-router/serve": "catalog:frontend",
+    "@rosti/i18n": "workspace:*",
+    "@rosti/openapi-generator": "workspace:*",
+    "@rosti/ui": "workspace:*",
     "@tanstack/react-query": "catalog:frontend",
     "better-auth": "catalog:auth",
     "i18next": "catalog:frontend",
@@ -34,11 +37,9 @@
     "react-dom": "catalog:frontend",
     "react-hook-form": "catalog:frontend",
     "react-i18next": "catalog:frontend",
+    "react-mentions": "^4.4.10",
     "react-router": "catalog:frontend",
-    "zod": "catalog:validation",
-    "@rosti/i18n": "workspace:*",
-    "@rosti/openapi-generator": "workspace:*",
-    "@rosti/ui": "workspace:*"
+    "zod": "catalog:validation"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.2.0",
@@ -47,6 +48,7 @@
     "@types/node": "catalog:build",
     "@types/react": "catalog:frontend",
     "@types/react-dom": "catalog:frontend",
+    "@types/react-mentions": "^4.4.1",
     "tailwindcss": "catalog:frontend",
     "typescript": "catalog:build",
     "vite": "catalog:build",

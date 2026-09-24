@@ -1,6 +1,5 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import { Toaster as Sonner, type ToasterProps } from 'sonner'
 import {
   CircleCheckIcon,
@@ -9,13 +8,11 @@ import {
   OctagonXIcon,
   Loader2Icon,
 } from 'lucide-react'
+import { cn } from '@rosti/ui/lib/utils'
 
-const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = 'system' } = useTheme()
-
+const Toaster = ({ toastOptions, ...props }: ToasterProps) => {
   return (
     <Sonner
-      theme={theme as ToasterProps['theme']}
       className="toaster group"
       icons={{
         success: <CircleCheckIcon className="size-4" />,
@@ -28,16 +25,18 @@ const Toaster = ({ ...props }: ToasterProps) => {
         {
           '--normal-bg': 'var(--popover)',
           '--normal-text': 'var(--popover-foreground)',
-          '--normal-border': 'var(--border)',
-          '--border-radius': 'var(--radius)',
+          '--normal-border': 'transparent',
+          '--border-radius': 'var(--radius-xl)',
         } as React.CSSProperties
       }
+      {...props}
       toastOptions={{
+        ...toastOptions,
         classNames: {
-          toast: 'cn-toast',
+          ...toastOptions?.classNames,
+          toast: cn('cn-toast', toastOptions?.classNames?.toast),
         },
       }}
-      {...props}
     />
   )
 }

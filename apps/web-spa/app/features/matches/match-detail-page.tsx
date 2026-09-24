@@ -16,6 +16,7 @@ import { MatchDetailTabsList } from './components/match-detail/match-detail-tabs
 import type { PlayerStatDraft } from './components/match-detail/player-stat-draft'
 import { StatsTab } from './components/match-detail/stats/stats-tab'
 import { SummaryTab } from './components/match-detail/summary-tab'
+import { extractMentionIds, toPlainMentionBody } from './utils/chat-mentions'
 import { shouldPromptEnterScore, shouldShowMatchResult } from './utils/match-filters'
 
 type MatchTab = 'summary' | 'attendance' | 'chat' | 'stats'
@@ -220,7 +221,15 @@ export default function MatchDetailPage() {
   )
 
   const postMsg = useMutation({
-    mutationFn: () => rostiApi.postMessage(orgId!, matchId!, message.trim()),
+    mutationFn: () => {
+      const markup = message.trim()
+      return rostiApi.postMessage(
+        orgId!,
+        matchId!,
+        toPlainMentionBody(markup),
+        extractMentionIds(markup),
+      )
+    },
     onSuccess: () => {
       setMessage('')
       invalidate()
@@ -278,7 +287,7 @@ export default function MatchDetailPage() {
       className={cn(
         'flex flex-col',
         isChat &&
-          '-m-6 h-dvh max-md:-mb-[calc(1.5rem+var(--bottom-nav-height))] max-md:h-[calc(100dvh-var(--bottom-nav-height))]',
+          '-m-6 h-dvh max-md:-mb-[calc(1.5rem+var(--bottom-nav-height))] max-md:h-[calc(100dvh-var(--bottom-nav-height)-var(--header-height))]',
       )}
     >
       <Tabs

@@ -45,6 +45,7 @@ export function ClubStep({
       <Button
         className="w-full"
         disabled={isPending || !clubName.trim() || !venue.trim()}
+        loading={isPending}
         onClick={onNext}
       >
         {t('onboarding.next')}

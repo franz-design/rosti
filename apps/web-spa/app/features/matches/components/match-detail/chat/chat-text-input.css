@@ -1,0 +1,3 @@
+.chat-mentions__input::placeholder {
+  color: var(--muted-foreground);
+}

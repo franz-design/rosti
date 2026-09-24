@@ -107,7 +107,12 @@ export function LineupDialog({
             <DialogTitle className="flex-1 text-center">
               {t('matches.detail.lineupEditor.title')}
             </DialogTitle>
-            <Button size="sm" onClick={handleSave} disabled={!isDirty || isPending}>
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={!isDirty || isPending}
+              loading={isPending}
+            >
               {t('matches.detail.lineupEditor.save')}
             </Button>
           </div>

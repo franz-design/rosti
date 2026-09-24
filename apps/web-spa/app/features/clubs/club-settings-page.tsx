@@ -5,15 +5,20 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router'
+import { useTabSearchParam } from '@/common/hooks/use-tab-search-param'
+import { authClient } from '@/lib/auth-client'
+import { rostiApi } from '@/lib/rosti-api'
 import { ClubPlayersSection } from './components/players/club-players-section'
-import { ClubSettingsTabsList } from './components/settings/club-settings-tabs'
+import {
+  CLUB_SETTINGS_TABS,
+  ClubSettingsTabsList,
+  DEFAULT_CLUB_SETTINGS_TAB,
+} from './components/settings/club-settings-tabs'
 import { InviteMembersSection } from './components/settings/invite-members-section'
 import { MatchInviteSettingsSection } from './components/settings/match-invite-settings-section'
 import { PaymentLinkSection } from './components/settings/payment-link-section'
 import { SeasonsSettingsSection } from './components/settings/seasons-settings-section'
 import { useClub } from './hooks/club-context'
-import { authClient } from '@/lib/auth-client'
-import { rostiApi } from '@/lib/rosti-api'
 
 export default function ClubSettingsPage() {
   const { t } = useTranslation()
@@ -22,7 +27,10 @@ export default function ClubSettingsPage() {
   const queryClient = useQueryClient()
   const [link, setLink] = useState('')
   const [emails, setEmails] = useState<string[]>([])
-  const [settingsTab, setSettingsTab] = useState('players')
+  const [settingsTab, setSettingsTab] = useTabSearchParam(
+    CLUB_SETTINGS_TABS,
+    DEFAULT_CLUB_SETTINGS_TAB,
+  )
 
   const { data } = useQuery({
     queryKey: ['payment-link', activeClub?.id],
@@ -102,6 +110,7 @@ export default function ClubSettingsPage() {
           <PaymentLinkSection
             value={link}
             placeholder={data?.paymentLink ?? undefined}
+            isPending={save.isPending}
             onChange={setLink}
             onSave={() => save.mutate()}
           />

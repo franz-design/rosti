@@ -27,7 +27,6 @@ export class NotificationController {
       notifyNewMatch: prefs.notifyNewMatch,
       notifyRsvpReminder: prefs.notifyRsvpReminder,
       notifyMatchCancelled: prefs.notifyMatchCancelled,
-      chatMentionsOnly: prefs.chatMentionsOnly,
       notifyChatMention: prefs.notifyChatMention,
       notifyAllChatMessages: prefs.notifyAllChatMessages,
     }
@@ -46,7 +45,6 @@ export class NotificationController {
       notifyNewMatch: prefs.notifyNewMatch,
       notifyRsvpReminder: prefs.notifyRsvpReminder,
       notifyMatchCancelled: prefs.notifyMatchCancelled,
-      chatMentionsOnly: prefs.chatMentionsOnly,
       notifyChatMention: prefs.notifyChatMention,
       notifyAllChatMessages: prefs.notifyAllChatMessages,
     }

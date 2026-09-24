@@ -148,8 +148,8 @@ export function SeasonFormDialog({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 {t('seasons.form.cancel')}
               </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? t('seasons.form.saving') : t('seasons.form.save')}
+              <Button type="submit" disabled={isPending} loading={isPending}>
+                {t('seasons.form.save')}
               </Button>
             </DialogFooter>
           </form>

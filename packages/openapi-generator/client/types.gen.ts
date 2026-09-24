@@ -13,7 +13,6 @@ export type UpdateNotificationPreferenceSchema = {
     notifyNewMatch?: boolean;
     notifyRsvpReminder?: boolean;
     notifyMatchCancelled?: boolean;
-    chatMentionsOnly?: boolean;
     notifyChatMention?: boolean;
     notifyAllChatMessages?: boolean;
 };
@@ -182,7 +181,6 @@ export type NotificationPreferenceSchema = {
     notifyNewMatch: boolean;
     notifyRsvpReminder: boolean;
     notifyMatchCancelled: boolean;
-    chatMentionsOnly: boolean;
     notifyChatMention: boolean;
     notifyAllChatMessages: boolean;
 };
@@ -944,7 +942,6 @@ export type NotificationControllerUpdatePreferencesData = {
         notifyNewMatch?: boolean;
         notifyRsvpReminder?: boolean;
         notifyMatchCancelled?: boolean;
-        chatMentionsOnly?: boolean;
         notifyChatMention?: boolean;
         notifyAllChatMessages?: boolean;
     };

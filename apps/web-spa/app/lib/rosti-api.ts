@@ -345,7 +345,6 @@ export interface NotificationPreference {
   notifyNewMatch: boolean
   notifyRsvpReminder: boolean
   notifyMatchCancelled: boolean
-  chatMentionsOnly: boolean
   notifyChatMention: boolean
   notifyAllChatMessages: boolean
 }

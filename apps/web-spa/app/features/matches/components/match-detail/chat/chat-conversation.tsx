@@ -7,9 +7,15 @@ interface ChatConversationProps {
   messages: MatchMessage[]
   currentUserId?: string
   endRef: RefObject<HTMLDivElement | null>
+  mentionNameById: Record<string, string>
 }
 
-export function ChatConversation({ messages, currentUserId, endRef }: ChatConversationProps) {
+export function ChatConversation({
+  messages,
+  currentUserId,
+  endRef,
+  mentionNameById,
+}: ChatConversationProps) {
   const { t } = useTranslation()
 
   return (
@@ -18,7 +24,12 @@ export function ChatConversation({ messages, currentUserId, endRef }: ChatConver
         <p className="text-sm text-muted-foreground">{t('matches.detail.chat.empty')}</p>
       ) : (
         messages.map((msg) => (
-          <ChatBubble key={msg.id} message={msg} isMine={msg.authorId === currentUserId} />
+          <ChatBubble
+            key={msg.id}
+            message={msg}
+            isMine={msg.authorId === currentUserId}
+            mentionNameById={mentionNameById}
+          />
         ))
       )}
       <div ref={endRef} />

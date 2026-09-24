@@ -48,7 +48,7 @@ export class ChatService {
     message.body = data.body
     this.em.persist(message)
 
-    const mentionedIds = data.mentionedUserIds ?? this.extractMentions(data.body)
+    const mentionedIds = [...new Set(data.mentionedUserIds ?? [])]
     for (const mentionedId of mentionedIds) {
       const mentioned = await this.em.findOne(User, { id: mentionedId })
       if (!mentioned) continue
@@ -92,10 +92,5 @@ export class ChatService {
       mentionedUserIds: byMessage.get(m.id) ?? [],
       createdAt: m.createdAt,
     }))
-  }
-
-  private extractMentions(body: string): string[] {
-    const matches = body.match(/@([0-9a-f-]{36})/gi) ?? []
-    return [...new Set(matches.map((m) => m.slice(1)))]
   }
 }

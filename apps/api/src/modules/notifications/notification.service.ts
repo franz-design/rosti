@@ -72,7 +72,6 @@ export class NotificationService {
       notifyNewMatch: data.notifyNewMatch ?? prefs.notifyNewMatch,
       notifyRsvpReminder: data.notifyRsvpReminder ?? prefs.notifyRsvpReminder,
       notifyMatchCancelled: data.notifyMatchCancelled ?? prefs.notifyMatchCancelled,
-      chatMentionsOnly: data.chatMentionsOnly ?? prefs.chatMentionsOnly,
       notifyChatMention: data.notifyChatMention ?? prefs.notifyChatMention,
       notifyAllChatMessages: data.notifyAllChatMessages ?? prefs.notifyAllChatMessages,
     })
@@ -232,7 +231,7 @@ export class NotificationService {
         )
         continue
       }
-      if (!prefs.chatMentionsOnly && prefs.notifyAllChatMessages) {
+      if (prefs.notifyAllChatMessages) {
         await this.deliver(
           member.user,
           prefs,

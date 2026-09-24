@@ -1,10 +1,11 @@
 import { AppLayout, AppLoader } from '@rosti/ui/components/app'
-import { Toaster } from '@rosti/ui/components/primitives/sonner'
 import { useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router'
+import { AppToaster } from '@/common/components/app-toaster'
 import { ClubProvider } from '@/features/clubs/hooks/club-context'
 import { authClient } from '@/lib/auth-client'
 import { AppBottomNav } from './components/app-bottom-nav'
+import { AppMobileHeader } from './components/app-mobile-header'
 import { CommandPalette } from './components/command-palette'
 import { AppSidebar } from './components/sidebar/app-sidebar'
 
@@ -41,6 +42,7 @@ export default function DashboardPage() {
   return (
     <ClubProvider>
       <AppLayout sidebar={<AppSidebar />}>
+        <AppMobileHeader />
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-auto p-6 max-md:pb-[calc(1.5rem+var(--bottom-nav-height))]">
           <Outlet />
         </main>
@@ -50,11 +52,7 @@ export default function DashboardPage() {
 
       <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
 
-      <Toaster
-        position="bottom-right"
-        richColors
-        className="max-md:!bottom-[calc(var(--bottom-nav-height)+0.75rem)]"
-      />
+      <AppToaster className="max-md:bottom-[calc(var(--bottom-nav-height)+0.75rem)]!" />
     </ClubProvider>
   )
 }

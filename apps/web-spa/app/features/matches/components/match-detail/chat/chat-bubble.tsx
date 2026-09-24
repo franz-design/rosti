@@ -1,12 +1,19 @@
 import { cn } from '@rosti/ui/lib/utils'
 import type { MatchMessage } from '@/lib/rosti-api'
+import { splitMentionedBody } from '@/features/matches/utils/chat-mentions'
 
 interface ChatBubbleProps {
   message: MatchMessage
   isMine: boolean
+  mentionNameById: Record<string, string>
 }
 
-export function ChatBubble({ message, isMine }: ChatBubbleProps) {
+export function ChatBubble({ message, isMine, mentionNameById }: ChatBubbleProps) {
+  const mentionedNames = message.mentionedUserIds
+    .map((id) => mentionNameById[id])
+    .filter((name): name is string => Boolean(name))
+  const parts = splitMentionedBody(message.body, mentionedNames)
+
   return (
     <div className={cn('flex flex-col gap-0.5', isMine ? 'items-end' : 'items-start')}>
       {!isMine ? (
@@ -18,7 +25,15 @@ export function ChatBubble({ message, isMine }: ChatBubbleProps) {
           isMine ? 'bg-primary text-primary-foreground' : 'bg-muted',
         )}
       >
-        {message.body}
+        {parts.map((part, index) =>
+          part.type === 'mention' ? (
+            <strong key={`${part.value}-${index}`} className="font-bold">
+              {part.value}
+            </strong>
+          ) : (
+            <span key={`${part.value}-${index}`}>{part.value}</span>
+          ),
+        )}
       </div>
     </div>
   )

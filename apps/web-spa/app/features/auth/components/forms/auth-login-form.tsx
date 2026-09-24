@@ -80,7 +80,7 @@ export const AuthLoginForm: React.FC<AuthLoginFormProps> = ({ onSubmit, isPendin
           )}
         />
 
-        <Button className="w-full" type="submit" disabled={isPending}>
+        <Button className="w-full" type="submit" disabled={isPending} loading={isPending}>
           {t('auth.login.signIn')}
         </Button>
       </form>

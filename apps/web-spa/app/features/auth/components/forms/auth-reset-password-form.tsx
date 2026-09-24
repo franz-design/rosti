@@ -87,7 +87,7 @@ export const AuthResetPasswordForm: React.FC<AuthResetPasswordFormProps> = ({
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isPending}>
+        <Button type="submit" className="w-full" disabled={isPending} loading={isPending}>
           {t('auth.resetPassword.reset')}
         </Button>
       </form>

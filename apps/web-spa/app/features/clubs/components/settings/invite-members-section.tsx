@@ -26,7 +26,7 @@ export function InviteMembersSection({
         onChange={onEmailsChange}
         placeholder={t('clubSettings.invite.placeholder')}
       />
-      <Button disabled={isPending || emails.length === 0} onClick={onSubmit}>
+      <Button disabled={isPending || emails.length === 0} loading={isPending} onClick={onSubmit}>
         {t('clubSettings.invite.send')}
       </Button>
     </section>

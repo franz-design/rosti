@@ -11,10 +11,7 @@ import {
 } from '@rosti/ui/components/primitives/select'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
-import {
-  TIME_OPTIONS,
-  type RecurrenceChoice,
-} from '@/features/matches/utils/match-schedule-utils'
+import { TIME_OPTIONS, type RecurrenceChoice } from '@/features/matches/utils/match-schedule-utils'
 import { RecurrencePicker } from './recurrence-picker'
 
 interface CreateMatchFormValues {
@@ -133,9 +130,10 @@ export function CreateMatchForm({
         <Button
           className="flex-1"
           disabled={isPending || !values.matchDate || !values.title.trim() || values.maxPlayers < 2}
+          loading={isPending}
           onClick={onSubmit}
         >
-          {isPending ? t('createMatch.submitting') : t('createMatch.submit')}
+          {t('createMatch.submit')}
         </Button>
       </div>
     </div>

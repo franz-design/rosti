@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 interface PaymentLinkSectionProps {
   value: string
   placeholder?: string
+  isPending: boolean
   onChange: (value: string) => void
   onSave: () => void
 }
@@ -12,6 +13,7 @@ interface PaymentLinkSectionProps {
 export function PaymentLinkSection({
   value,
   placeholder,
+  isPending,
   onChange,
   onSave,
 }: PaymentLinkSectionProps) {
@@ -26,7 +28,9 @@ export function PaymentLinkSection({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder ?? 'https://…'}
       />
-      <Button onClick={onSave}>{t('clubSettings.paymentLink.save')}</Button>
+      <Button onClick={onSave} loading={isPending}>
+        {t('clubSettings.paymentLink.save')}
+      </Button>
     </section>
   )
 }

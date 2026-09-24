@@ -1,10 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
-import { useTranslation } from 'react-i18next'
-import { Navigate } from 'react-router'
-import { HomeActions } from './components/home/home-actions'
-import { HomeHeader } from './components/home/home-header'
-import { HomeMatchSection } from './components/home/home-match-section'
-import { useClub } from './hooks/club-context'
 import {
   getLastMatch,
   getNextMatch,
@@ -12,6 +5,12 @@ import {
 } from '@/features/matches/utils/match-filters'
 import HomeStatsSection from '@/features/stats/components/home/home-stats-section'
 import { rostiApi } from '@/lib/rosti-api'
+import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
+import { Navigate } from 'react-router'
+import { HomeHeader } from './components/home/home-header'
+import { HomeMatchSection } from './components/home/home-match-section'
+import { useClub } from './hooks/club-context'
 
 export default function ClubsPage() {
   const { t, i18n } = useTranslation()
@@ -37,10 +36,7 @@ export default function ClubsPage() {
 
   return (
     <div className="min-w-0 space-y-8">
-      <HomeHeader
-        clubName={activeClub?.name ?? t('home.fallbackClub')}
-        venue={activeClub?.venue}
-      />
+      <HomeHeader clubName={activeClub?.name ?? t('home.fallbackClub')} venue={activeClub?.venue} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <HomeMatchSection
@@ -64,7 +60,6 @@ export default function ClubsPage() {
       </div>
 
       <HomeStatsSection />
-      <HomeActions isClubAdmin={isClubAdmin} />
     </div>
   )
 }

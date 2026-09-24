@@ -1,11 +1,21 @@
 import { TabsList, TabsTrigger } from '@rosti/ui/components/primitives/tabs'
 import { useTranslation } from 'react-i18next'
 
+export const CLUB_SETTINGS_TABS = [
+  'players',
+  'invite',
+  'seasons',
+  'notifications',
+  'payment',
+] as const
+export type ClubSettingsTab = (typeof CLUB_SETTINGS_TABS)[number]
+export const DEFAULT_CLUB_SETTINGS_TAB: ClubSettingsTab = 'players'
+
 export function ClubSettingsTabsList() {
   const { t } = useTranslation()
 
   return (
-    <TabsList className="h-auto w-full flex-wrap justify-start gap-1 rounded-lg border border-border bg-muted p-1">
+    <TabsList className="no-scrollbar h-auto min-w-0 max-w-full justify-start gap-1 overflow-x-auto rounded-lg border border-border bg-muted p-1">
       <TabsTrigger value="players" className="flex-none px-3">
         {t('clubSettings.tabs.players')}
       </TabsTrigger>

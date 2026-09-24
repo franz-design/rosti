@@ -27,7 +27,6 @@ export const notificationPreferenceSchema = z
     notifyNewMatch: z.boolean(),
     notifyRsvpReminder: z.boolean(),
     notifyMatchCancelled: z.boolean(),
-    chatMentionsOnly: z.boolean(),
     notifyChatMention: z.boolean(),
     notifyAllChatMessages: z.boolean(),
   })

@@ -47,7 +47,12 @@ export function SportStep({
         <Button variant="outline" className="flex-1" onClick={onBack}>
           {t('onboarding.back')}
         </Button>
-        <Button className="flex-1" disabled={isPending || maxPlayers < 2} onClick={onNext}>
+        <Button
+          className="flex-1"
+          disabled={isPending || maxPlayers < 2}
+          loading={isPending}
+          onClick={onNext}
+        >
           {t('onboarding.next')}
         </Button>
       </div>

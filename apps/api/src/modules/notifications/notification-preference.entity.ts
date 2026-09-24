@@ -25,10 +25,6 @@ export class NotificationPreference {
   @Property({ default: true })
   notifyMatchCancelled: boolean = true
 
-  /** If true, only notify on @mentions; if false, notify on all match chat messages */
-  @Property({ default: true })
-  chatMentionsOnly: boolean = true
-
   @Property({ default: true })
   notifyChatMention: boolean = true
 

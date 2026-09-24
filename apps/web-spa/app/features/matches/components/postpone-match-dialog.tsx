@@ -89,6 +89,7 @@ export function PostponeMatchDialog({
           </Button>
           <Button
             disabled={!date || isPending}
+            loading={isPending}
             onClick={() => {
               if (!date) return
               onConfirm(combineDateAndTime(date, time))

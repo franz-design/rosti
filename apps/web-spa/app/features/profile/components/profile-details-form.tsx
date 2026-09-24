@@ -69,8 +69,8 @@ export function ProfileDetailsForm({ form, email, isPending, onSubmit }: Profile
             readOnly
           />
         </div>
-        <Button type="submit" disabled={isPending || !form.formState.isDirty}>
-          {isPending ? t('profile.saving') : t('profile.save')}
+        <Button type="submit" disabled={isPending || !form.formState.isDirty} loading={isPending}>
+          {t('profile.save')}
         </Button>
       </form>
     </Form>

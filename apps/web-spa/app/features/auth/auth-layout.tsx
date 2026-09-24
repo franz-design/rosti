@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router'
-import { Toaster } from '@rosti/ui/components/primitives/sonner'
+import { AppToaster } from '@/common/components/app-toaster'
 import { AuthBrand } from './components/auth-brand'
 import { CourtSlideshow } from './components/court-slideshow'
 
@@ -17,7 +17,7 @@ export default function AuthLayout() {
         </div>
         <CourtSlideshow />
       </div>
-      <Toaster position="bottom-right" richColors />
+      <AppToaster />
     </>
   )
 }

@@ -57,7 +57,7 @@ export const AuthForgotPasswordForm: React.FC<AuthForgotPasswordFormProps> = ({
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isPending}>
+        <Button type="submit" className="w-full" disabled={isPending} loading={isPending}>
           {t('auth.forgotPassword.sendResetLink')}
         </Button>
       </form>
