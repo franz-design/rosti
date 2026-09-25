@@ -19,6 +19,7 @@ export interface HomeStatsPlayerRow {
   matchId: string
   userId: string
   userName: string
+  image?: string | null
 }
 
 export interface HomeStatsLineupRow extends HomeStatsPlayerRow {
@@ -41,15 +42,22 @@ export interface ComputeSeasonHomeStatsInput {
 interface PlayerTotals {
   userId: string
   userName: string
+  image: string | null
   matchesPlayed: number
   goals: number
   wins: number
   losses: number
 }
 
+interface NamedPlayer {
+  userId: string
+  userName: string
+  image: string | null
+}
+
 interface TeammatePair {
-  playerA: { userId: string; userName: string }
-  playerB: { userId: string; userName: string }
+  playerA: NamedPlayer
+  playerB: NamedPlayer
   matchesTogether: number
 }
 
@@ -107,14 +115,18 @@ export function createEmptyHomeStats(season: HomeStatsSeason | null): SeasonHome
 
 function ensurePlayer(
   players: Map<string, PlayerTotals>,
-  row: { userId: string; userName: string },
+  row: { userId: string; userName: string; image?: string | null },
 ): PlayerTotals {
   const existing = players.get(row.userId)
-  if (existing) return existing
+  if (existing) {
+    if (!existing.image && row.image) existing.image = row.image
+    return existing
+  }
 
   const created: PlayerTotals = {
     userId: row.userId,
     userName: row.userName,
+    image: row.image ?? null,
     matchesPlayed: 0,
     goals: 0,
     wins: 0,
@@ -157,14 +169,20 @@ function applyMatchResults(input: {
 function pickLeader(
   players: Map<string, PlayerTotals>,
   getValue: (player: PlayerTotals) => number,
-): { userId: string; userName: string; value: number } | null {
-  let leader: { userId: string; userName: string; value: number } | null = null
+): { userId: string; userName: string; image: string | null; value: number } | null {
+  let leader: { userId: string; userName: string; image: string | null; value: number } | null =
+    null
 
   for (const player of players.values()) {
     const value = getValue(player)
     if (value <= 0) continue
     if (isBetterLeader(leader, player, value)) {
-      leader = { userId: player.userId, userName: player.userName, value }
+      leader = {
+        userId: player.userId,
+        userName: player.userName,
+        image: player.image,
+        value,
+      }
     }
   }
 
@@ -218,20 +236,20 @@ function addTeamPairs(pairs: Map<string, TeammatePair>, teammates: HomeStatsLine
   }
 }
 
-function uniquePlayers(rows: HomeStatsLineupRow[]): Array<{ userId: string; userName: string }> {
-  const seen = new Map<string, { userId: string; userName: string }>()
+function uniquePlayers(rows: HomeStatsLineupRow[]): NamedPlayer[] {
+  const seen = new Map<string, NamedPlayer>()
   for (const row of rows) {
     if (!seen.has(row.userId)) {
-      seen.set(row.userId, { userId: row.userId, userName: row.userName })
+      seen.set(row.userId, { userId: row.userId, userName: row.userName, image: row.image ?? null })
     }
   }
   return Array.from(seen.values())
 }
 
 function orderPlayers(
-  left: { userId: string; userName: string },
-  right: { userId: string; userName: string },
-): { playerA: { userId: string; userName: string }; playerB: { userId: string; userName: string } } {
+  left: NamedPlayer,
+  right: NamedPlayer,
+): { playerA: NamedPlayer; playerB: NamedPlayer } {
   if (left.userName.localeCompare(right.userName) <= 0) {
     return { playerA: left, playerB: right }
   }

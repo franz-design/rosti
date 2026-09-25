@@ -31,6 +31,7 @@ API:
 - `CLIENTS_WEB_APP_URL`, `API_BASE_URL`
 - `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASSWORD`, `EMAIL_FROM`
 - `SENTRY_DSN` (recommended)
+- Mount a volume at `/data/avatars` on `api` before avatars are used. `AVATAR_STORAGE_DIR` defaults to that path. `API_BASE_URL` must be `https://rosti-api.lesk.fr` so stored photo URLs stay valid.
 
 SPA (Dokploy **runtime** env on the `web-spa` service — CI images embed `__VITE_*__` placeholders):
 

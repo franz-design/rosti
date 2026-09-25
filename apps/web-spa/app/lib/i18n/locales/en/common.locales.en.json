@@ -512,7 +512,12 @@
     "save": "Save",
     "saving": "Saving…",
     "saved": "Profile updated",
-    "saveError": "Could not update profile"
+    "saveError": "Could not update profile",
+    "changeAvatar": "Change photo",
+    "removeAvatar": "Remove photo",
+    "avatarSaved": "Photo updated",
+    "avatarRemoved": "Photo removed",
+    "avatarError": "Could not update the photo"
   },
   "errorCodes": {
     "PASSWORDS_DO_NOT_MATCH": "Passwords do not match"

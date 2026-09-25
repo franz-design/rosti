@@ -4,6 +4,7 @@ import { PlayerBubble } from './player-bubble'
 interface PitchPlayer {
   userId: string
   userName: string
+  image?: string | null
 }
 
 interface LineupPitchProps {
@@ -31,7 +32,7 @@ export function LineupPitch({ courtSrc, team, players, onRemove }: LineupPitchPr
             className="absolute -translate-x-1/2 -translate-y-1/2"
             style={{ left: `${position.x}%`, top: `${position.y}%` }}
           >
-            <PlayerBubble name={player.userName} team={team} />
+            <PlayerBubble name={player.userName} imageUrl={player.image} team={team} />
           </button>
         )
       })}

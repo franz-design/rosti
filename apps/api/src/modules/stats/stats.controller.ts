@@ -25,6 +25,7 @@ export class StatsController {
       matchId: s.match.id,
       userId: s.user.id,
       userName: s.user.name,
+      image: s.user.image,
       goals: s.goals,
       assists: s.assists,
     }

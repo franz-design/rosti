@@ -97,6 +97,7 @@ export const attendanceSchema = z
     matchId: z.string().uuid(),
     userId: z.string().uuid(),
     userName: z.string(),
+    image: z.string().nullish(),
     status: z.nativeEnum(AttendanceStatus),
     respondedAt: z.coerce.date().nullish(),
   })
@@ -127,6 +128,7 @@ export const lineupSchema = z
     matchId: z.string().uuid(),
     userId: z.string().uuid(),
     userName: z.string(),
+    image: z.string().nullish(),
     team: z.nativeEnum(TeamSide),
   })
   .meta({ title: 'LineupSchema' })

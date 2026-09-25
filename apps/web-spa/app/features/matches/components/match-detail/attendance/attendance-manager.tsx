@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { PlayerAvatar } from '@/common/components/player-avatar'
 import type { Attendance } from '@/lib/rosti-api'
 import { ToggleChip } from './toggle-chip'
 
@@ -28,7 +29,8 @@ export function AttendanceManager({ players, busyUserId, onSetStatus }: Attendan
               key={player.id}
               className="flex flex-col gap-3 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div className="min-w-0">
+              <div className="flex min-w-0 items-center gap-2">
+                <PlayerAvatar name={player.userName} imageUrl={player.image} size="sm" />
                 <p className="truncate text-sm font-medium">{player.userName}</p>
               </div>
               <div className="flex flex-wrap gap-1 sm:justify-end">

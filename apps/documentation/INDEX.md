@@ -13,7 +13,7 @@
 - [0_env-file.mdx](./src/content/docs/core-features/0_env-file.mdx) - Guide to manage .env files
 - [1_auth.mdx](./src/content/docs/core-features/1_auth.mdx) - How the authentication system works, how to use it. Better Auth explanation.
 - [2_monitoring.mdx](./src/content/docs/core-features/2_monitoring.mdx) - How to report errors, log traces and monitor your project with Sentry
-- [3_filestorage.mdx](./src/content/docs/core-features/3_filestorage.mdx) - File storage explanation
+- [3_filestorage.mdx](./src/content/docs/core-features/3_filestorage.mdx) - How Rösti stores avatar images on the server disk
 - [5_email.mdx](./src/content/docs/core-features/5_email.mdx) - Email explanation
 
 ## Explanations

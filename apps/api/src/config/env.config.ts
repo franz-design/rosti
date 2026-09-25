@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import dotenvx from '@dotenvx/dotenvx'
 import { z } from 'zod'
@@ -61,6 +62,12 @@ export const configValidationSchema = z.object({
 
   // Sentry
   SENTRY_DSN: z.string().optional(),
+
+  // Avatar files. Empty means the default for the current environment.
+  AVATAR_STORAGE_DIR: z.preprocess(
+    (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+    z.string().min(1).optional(),
+  ),
 })
 
 export type ConfigSchema = z.infer<typeof configValidationSchema>
@@ -108,4 +115,17 @@ export const config = {
   sentry: {
     dsn: configParsed.data.SENTRY_DSN,
   },
+  avatars: {
+    storageDir: resolveAvatarStorageDir(
+      configParsed.data.NODE_ENV,
+      configParsed.data.AVATAR_STORAGE_DIR,
+    ),
+  },
 } as const
+
+function resolveAvatarStorageDir(nodeEnv: ConfigSchema['NODE_ENV'], configured?: string): string {
+  if (configured) return configured
+  if (nodeEnv === 'production') return '/data/avatars'
+  if (nodeEnv === 'test') return join(tmpdir(), 'rosti-avatars')
+  return join(process.cwd(), 'data', 'avatars')
+}

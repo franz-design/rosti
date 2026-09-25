@@ -17,6 +17,29 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return response.json() as Promise<T>
 }
 
+async function uploadAvatar(file: File): Promise<{ image: string | null }> {
+  const body = new FormData()
+  body.append('file', file)
+  const response = await fetch(`${API_URL}/api/me/avatar`, {
+    method: 'PUT',
+    credentials: 'include',
+    body,
+  })
+  if (!response.ok) {
+    const text = await response.text()
+    let message = text || response.statusText
+    try {
+      const parsed = JSON.parse(text) as { message?: string | string[] }
+      if (typeof parsed.message === 'string') message = parsed.message
+      if (Array.isArray(parsed.message)) message = parsed.message.join(', ')
+    } catch {
+      // Keep the raw response text.
+    }
+    throw new Error(message)
+  }
+  return response.json() as Promise<{ image: string | null }>
+}
+
 export const rostiApi = {
   listClubs: () => request<Club[]>('/clubs'),
   getClub: (orgId: string) => request<Club>(`/clubs/${orgId}`),
@@ -146,6 +169,9 @@ export const rostiApi = {
       body: JSON.stringify({ body, mentionedUserIds }),
     }),
 
+  uploadAvatar: (file: File) => uploadAvatar(file),
+  deleteAvatar: () => request<{ image: string | null }>('/me/avatar', { method: 'DELETE' }),
+
   getNotificationPreferences: () => request<NotificationPreference>('/notifications/preferences'),
   updateNotificationPreferences: (body: Partial<NotificationPreference>) =>
     request<NotificationPreference>('/notifications/preferences', {
@@ -217,6 +243,7 @@ export interface ClubMember {
   firstName?: string | null
   lastName?: string | null
   phone?: string | null
+  image?: string | null
   role: 'owner' | 'admin' | 'member'
   createdAt: string
 }
@@ -270,6 +297,7 @@ export interface Attendance {
   matchId: string
   userId: string
   userName: string
+  image?: string | null
   status: 'present' | 'absent' | 'pending'
   respondedAt?: string | null
 }
@@ -279,6 +307,7 @@ export interface Lineup {
   matchId: string
   userId: string
   userName: string
+  image?: string | null
   team: 'blue' | 'red'
 }
 
@@ -287,6 +316,7 @@ export interface MatchStat {
   matchId: string
   userId: string
   userName: string
+  image?: string | null
   goals: number
   assists: number
 }
@@ -294,6 +324,7 @@ export interface MatchStat {
 export interface SeasonPlayerStat {
   userId: string
   userName: string
+  image?: string | null
   goals: number
   assists: number
   matchesPlayed: number
@@ -302,12 +333,13 @@ export interface SeasonPlayerStat {
 export interface PlayerHighlight {
   userId: string
   userName: string
+  image?: string | null
   value: number
 }
 
 export interface PlayedTogether {
-  playerA: { userId: string; userName: string }
-  playerB: { userId: string; userName: string }
+  playerA: { userId: string; userName: string; image?: string | null }
+  playerB: { userId: string; userName: string; image?: string | null }
   matchesTogether: number
 }
 
@@ -333,6 +365,7 @@ export interface MatchMessage {
   matchId: string
   authorId: string
   authorName: string
+  authorImage?: string | null
   body: string
   mentionedUserIds: string[]
   createdAt: string

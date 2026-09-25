@@ -18,6 +18,7 @@ import { DEFAULT_MATCH_INVITE_LEAD_DAYS } from '../modules/notifications/match-i
 import { SeasonStatus } from '../modules/seasons/contracts/season.contract'
 import { Season } from '../modules/seasons/season.entity'
 import { MatchStat } from '../modules/stats/match-stat.entity'
+import { assignSeedAvatar } from './seed-avatars'
 
 const DEV_PASSWORD = 'password123!'
 const PAST_MATCH_COUNT = 10
@@ -63,6 +64,7 @@ const PLAYERS: Array<{ firstName: string; lastName: string }> = [
 
 /**
  * Development seeder: one club owner, one club, 15 players, a season, and past matches.
+ * Each of those 16 users gets a portrait from src/seeders/avatars.
  *
  * Login: admin@admin.fr / password123!
  * Players: player01@rosti.dev … player15@rosti.dev / password123!
@@ -80,6 +82,7 @@ export class RostiSeeder extends Seeder {
       },
       ADMIN.password,
     )
+    await assignSeedAvatar(em, admin, 0)
 
     const organization = em.create(Organization, {
       name: CLUB.name,
@@ -118,6 +121,7 @@ export class RostiSeeder extends Seeder {
         },
         DEV_PASSWORD,
       )
+      await assignSeedAvatar(em, user, index + 1)
 
       const membership = em.create(Member, {
         user,

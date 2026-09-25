@@ -1,16 +1,14 @@
-import { Avatar, AvatarFallback } from '@rosti/ui/components/primitives/avatar'
-import { getPlayerInitials } from '@/features/matches/utils/lineup-positions'
+import { PlayerAvatar } from '@/common/components/player-avatar'
 
 interface PlayerIdentityProps {
   name: string
+  imageUrl?: string | null
 }
 
-export function PlayerIdentity({ name }: PlayerIdentityProps) {
+export function PlayerIdentity({ name, imageUrl }: PlayerIdentityProps) {
   return (
     <div className="flex items-center gap-3 min-w-0">
-      <Avatar>
-        <AvatarFallback>{getPlayerInitials(name)}</AvatarFallback>
-      </Avatar>
+      <PlayerAvatar name={name} imageUrl={imageUrl} />
       <p className="font-display text-base font-medium truncate">{name}</p>
     </div>
   )

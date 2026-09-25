@@ -1,7 +1,8 @@
 import { cn } from '@rosti/ui/lib/utils'
 import { useTranslation } from 'react-i18next'
+import { PlayerAvatar } from '@/common/components/player-avatar'
 import type { Attendance } from '@/lib/rosti-api'
-import { getPlayerFirstName, getPlayerInitials } from '@/features/matches/utils/lineup-positions'
+import { getPlayerFirstName } from '@/features/matches/utils/lineup-positions'
 
 type TeamSide = 'blue' | 'red'
 
@@ -38,14 +39,15 @@ export function AvailablePlayersList({
                   onClick={() => onAssign(player.userId)}
                   className="flex w-full items-center gap-2 rounded-lg border px-2 py-2 text-left hover:bg-muted"
                 >
-                  <span
-                    className={cn(
-                      'flex size-8 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold text-white',
+                  <PlayerAvatar
+                    name={player.userName}
+                    imageUrl={player.image}
+                    size="sm"
+                    fallbackClassName={cn(
+                      'text-[10px] font-semibold text-white',
                       isOnOtherTeam ? 'bg-muted-foreground' : 'bg-primary',
                     )}
-                  >
-                    {getPlayerInitials(player.userName)}
-                  </span>
+                  />
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-medium">
                       {getPlayerFirstName(player.userName)}

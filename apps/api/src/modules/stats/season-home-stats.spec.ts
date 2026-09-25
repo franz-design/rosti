@@ -8,10 +8,10 @@ import {
 
 const SEASON = { id: '11111111-1111-4111-8111-111111111111', name: 'Saison 2026' }
 const VIEWER_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
-const LUCAS = { userId: VIEWER_ID, userName: 'Lucas Martin' }
-const HUGO = { userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', userName: 'Hugo Bernard' }
-const ADAM = { userId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc', userName: 'Adam Petit' }
-const LEO = { userId: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', userName: 'Leo Durand' }
+const LUCAS = { userId: VIEWER_ID, userName: 'Lucas Martin', image: null }
+const HUGO = { userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', userName: 'Hugo Bernard', image: null }
+const ADAM = { userId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc', userName: 'Adam Petit', image: null }
+const LEO = { userId: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', userName: 'Leo Durand', image: null }
 
 describe('createEmptyHomeStats', () => {
   it('returns zeros and null highlights', () => {

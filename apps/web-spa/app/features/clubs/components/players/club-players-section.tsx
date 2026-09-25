@@ -54,6 +54,7 @@ export function ClubPlayersSection({ organizationId, currentUserId }: ClubPlayer
         id: member.id,
         email: member.email,
         name: member.name || member.email,
+        image: member.image,
         role: member.role,
         canRemove: member.role !== 'owner' && member.userId !== currentUserId,
         canChangeRole: member.role !== 'owner',

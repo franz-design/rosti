@@ -1,14 +1,28 @@
 ---
 title: File Storage
-description: File storage explanation
+description: How Rösti stores avatar images on the server disk
 ---
 
-🚧 TODO
+Avatars are the only files Rösti stores. Each one is a square WebP, written on the disk of the machine that runs the API. There is no object-storage service.
 
-# File Storage
+## What gets stored
 
-## S3 module
+A player uploads a JPEG, PNG, or WebP of at most 2 MB. The API crops it to a 256 pixel square, encodes it as WebP, and writes one file:
 
-## MinIO
+`{AVATAR_STORAGE_DIR}/{userId}.webp`
 
-## Production setup
+The public URL is saved on `user.image`. It looks like `https://rosti-api.lesk.fr/api/avatars/{userId}?v={timestamp}`. The timestamp changes on each upload so browsers fetch the new file. The file itself is served with a long cache.
+
+Anyone can read an avatar. Only the signed-in player can replace or delete their own.
+
+## Where the files live
+
+| Environment | Directory |
+|---|---|
+| Development | `apps/api/data/avatars` (gitignored). The dev seeder writes one portrait there for each of the 16 seeded users, from `apps/api/src/seeders/avatars`. |
+| Tests | A folder under the system temp directory |
+| Production | `/data/avatars` on the API container |
+
+In production that path must be a Docker volume on the `api` service. A deploy recreates the container. Without the volume, the photos disappear. See [Production infrastructure](/lonestone-boilerplate/references/rosti-infrastructure).
+
+Set `AVATAR_STORAGE_DIR` only when the directory should be somewhere else. `API_BASE_URL` is the origin used in the stored URL. It must be the public API origin, with no trailing slash.

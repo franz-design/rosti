@@ -20,6 +20,7 @@ export const clubMemberSchema = z
     firstName: z.string().nullish(),
     lastName: z.string().nullish(),
     phone: z.string().nullish(),
+    image: z.string().nullish(),
     role: z.enum(['owner', 'admin', 'member']),
     createdAt: z.coerce.date(),
   })

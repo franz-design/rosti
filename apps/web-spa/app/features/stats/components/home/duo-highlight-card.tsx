@@ -1,7 +1,7 @@
-import { Avatar, AvatarFallback, AvatarGroup } from '@rosti/ui/components/primitives/avatar'
+import { AvatarGroup } from '@rosti/ui/components/primitives/avatar'
 import { UsersRound } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
-import { getPlayerInitials } from '@/features/matches/utils/lineup-positions'
+import { PlayerAvatar } from '@/common/components/player-avatar'
 import type { PlayedTogether } from '@/lib/rosti-api'
 import { HighlightLabel } from './highlight-label'
 import { HighlightShell } from './highlight-shell'
@@ -19,16 +19,18 @@ export function DuoHighlightCard({ duo }: DuoHighlightCardProps) {
       {duo ? (
         <div className="mt-4 flex min-w-0 items-start gap-3">
           <AvatarGroup className="shrink-0">
-            <Avatar size="lg">
-              <AvatarFallback className="bg-team-blue/15 text-team-blue">
-                {getPlayerInitials(duo.playerA.userName)}
-              </AvatarFallback>
-            </Avatar>
-            <Avatar size="lg">
-              <AvatarFallback className="bg-primary/15 text-primary">
-                {getPlayerInitials(duo.playerB.userName)}
-              </AvatarFallback>
-            </Avatar>
+            <PlayerAvatar
+              name={duo.playerA.userName}
+              imageUrl={duo.playerA.image}
+              size="lg"
+              fallbackClassName="bg-team-blue/15 text-team-blue"
+            />
+            <PlayerAvatar
+              name={duo.playerB.userName}
+              imageUrl={duo.playerB.image}
+              size="lg"
+              fallbackClassName="bg-primary/15 text-primary"
+            />
           </AvatarGroup>
           <div className="min-w-0">
             <p className="font-display text-lg font-medium wrap-break-word">

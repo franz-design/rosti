@@ -1,6 +1,6 @@
 import type { SupportedLocale } from '@rosti/i18n/config'
 import { SUPPORTED_LOCALES } from '@rosti/i18n/config'
-import { Avatar, AvatarFallback } from '@rosti/ui/components/primitives/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@rosti/ui/components/primitives/avatar'
 import { Button } from '@rosti/ui/components/primitives/button'
 import {
   DropdownMenu,
@@ -60,6 +60,7 @@ export function AppUserMenu({ variant = 'sidebar' }: AppUserMenuProps) {
           }
         >
           <Avatar size="sm">
+            {sessionData?.user?.image ? <AvatarImage src={sessionData.user.image} alt="" /> : null}
             <AvatarFallback>{userInitials}</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
@@ -74,6 +75,7 @@ export function AppUserMenu({ variant = 'sidebar' }: AppUserMenuProps) {
           className="cursor-pointer"
         >
           <Avatar size="sm">
+            {sessionData?.user?.image ? <AvatarImage src={sessionData.user.image} alt="" /> : null}
             <AvatarFallback>{userInitials}</AvatarFallback>
           </Avatar>
           <div className="flex flex-1 flex-col items-start overflow-hidden leading-none">

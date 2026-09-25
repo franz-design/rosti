@@ -6,6 +6,7 @@ export const matchStatSchema = z
     matchId: z.string().uuid(),
     userId: z.string().uuid(),
     userName: z.string(),
+    image: z.string().nullish(),
     goals: z.number().int().nonnegative(),
     assists: z.number().int().nonnegative(),
   })
@@ -32,6 +33,7 @@ export const seasonPlayerStatSchema = z
   .object({
     userId: z.string().uuid(),
     userName: z.string(),
+    image: z.string().nullish(),
     goals: z.number().int(),
     assists: z.number().int(),
     matchesPlayed: z.number().int(),
@@ -45,6 +47,7 @@ export const playerRefSchema = z
   .object({
     userId: z.string().uuid(),
     userName: z.string(),
+    image: z.string().nullish(),
   })
   .meta({ title: 'PlayerRefSchema' })
 
@@ -54,6 +57,7 @@ export const playerHighlightSchema = z
   .object({
     userId: z.string().uuid(),
     userName: z.string(),
+    image: z.string().nullish(),
     value: z.number().int().nonnegative(),
   })
   .meta({ title: 'PlayerHighlightSchema' })

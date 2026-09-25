@@ -25,7 +25,7 @@ export class User {
   emailVerified: boolean = false
 
   @Property({ nullable: true })
-  image?: string
+  image: string | null = null
 
   @Property()
   createdAt: Date = new Date()

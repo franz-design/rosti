@@ -6,6 +6,7 @@ export const matchMessageSchema = z
     matchId: z.string().uuid(),
     authorId: z.string().uuid(),
     authorName: z.string(),
+    authorImage: z.string().nullish(),
     body: z.string(),
     mentionedUserIds: z.array(z.string().uuid()),
     createdAt: z.coerce.date(),

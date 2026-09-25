@@ -1,4 +1,5 @@
 import { cn } from '@rosti/ui/lib/utils'
+import { PlayerAvatar } from '@/common/components/player-avatar'
 import type { MatchMessage } from '@/lib/rosti-api'
 import { splitMentionedBody } from '@/features/matches/utils/chat-mentions'
 
@@ -17,7 +18,10 @@ export function ChatBubble({ message, isMine, mentionNameById }: ChatBubbleProps
   return (
     <div className={cn('flex flex-col gap-0.5', isMine ? 'items-end' : 'items-start')}>
       {!isMine ? (
-        <span className="px-1 text-xs font-medium text-muted-foreground">{message.authorName}</span>
+        <span className="flex items-center gap-1.5 px-1">
+          <PlayerAvatar name={message.authorName} imageUrl={message.authorImage} size="sm" />
+          <span className="text-xs font-medium text-muted-foreground">{message.authorName}</span>
+        </span>
       ) : null}
       <div
         className={cn(

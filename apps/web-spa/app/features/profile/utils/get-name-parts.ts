@@ -4,6 +4,7 @@ interface ProfileUser {
   email?: string | null
   firstName?: string | null
   lastName?: string | null
+  image?: string | null
 }
 
 export interface ProfileNameParts {

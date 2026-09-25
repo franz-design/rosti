@@ -37,6 +37,10 @@ async function bootstrap() {
     if (req.originalUrl.startsWith(`${PREFIX}/auth`)) {
       return next()
     }
+    const contentType = req.headers['content-type']
+    if (typeof contentType === 'string' && contentType.includes('multipart/form-data')) {
+      return next()
+    }
     // If is stripe webhook, we need the raw body
     if (req.originalUrl.startsWith(`${PREFIX}/stripe/webhook`)) {
       return express.raw({ type: 'application/json' })(req, res, next)

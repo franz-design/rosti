@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { PlayerAvatar } from '@/common/components/player-avatar'
 import type { Attendance } from '@/lib/rosti-api'
 import { QuantityStepper } from '../quantity-stepper'
 import type { PlayerStatDraft } from '../player-stat-draft'
@@ -62,7 +63,10 @@ export function PlayerStatsList({
               key={player.userId}
               className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2"
             >
-              <span className="truncate text-sm">{player.userName}</span>
+              <span className="flex min-w-0 items-center gap-2">
+                <PlayerAvatar name={player.userName} imageUrl={player.image} size="sm" />
+                <span className="truncate text-sm">{player.userName}</span>
+              </span>
               {canEdit ? (
                 <>
                   <QuantityStepper

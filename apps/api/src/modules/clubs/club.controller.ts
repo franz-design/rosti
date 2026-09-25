@@ -91,6 +91,7 @@ export class ClubController {
       firstName: m.user.firstName,
       lastName: m.user.lastName,
       phone: m.user.phone,
+      image: m.user.image,
       role: m.role,
       createdAt: m.createdAt,
     }))
@@ -112,6 +113,7 @@ export class ClubController {
       firstName: m.user.firstName,
       lastName: m.user.lastName,
       phone: m.user.phone,
+      image: m.user.image,
       role: m.role,
       createdAt: m.createdAt,
     }

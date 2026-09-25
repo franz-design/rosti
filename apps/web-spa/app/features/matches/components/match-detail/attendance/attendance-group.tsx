@@ -1,4 +1,5 @@
 import { cn } from '@rosti/ui/lib/utils'
+import { PlayerAvatar } from '@/common/components/player-avatar'
 import type { Attendance } from '@/lib/rosti-api'
 import type { PlayerStatDraft } from '../player-stat-draft'
 import { StatValue } from './stat-value'
@@ -49,7 +50,10 @@ export function AttendanceGroup({
                     showStats && 'grid grid-cols-[minmax(0,1fr)_3.5rem_4.5rem] items-center gap-2',
                   )}
                 >
-                  <span className="truncate">{player.userName}</span>
+                  <span className="flex min-w-0 items-center gap-2">
+                    <PlayerAvatar name={player.userName} imageUrl={player.image} size="sm" />
+                    <span className="truncate">{player.userName}</span>
+                  </span>
                   {showStats ? (
                     <>
                       <StatValue label={goalsLabel ?? ''} value={playerStats?.goals ?? 0} />

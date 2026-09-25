@@ -512,7 +512,12 @@
     "save": "Enregistrer",
     "saving": "Enregistrement…",
     "saved": "Profil mis à jour",
-    "saveError": "Impossible de mettre à jour le profil"
+    "saveError": "Impossible de mettre à jour le profil",
+    "changeAvatar": "Changer la photo",
+    "removeAvatar": "Retirer la photo",
+    "avatarSaved": "Photo mise à jour",
+    "avatarRemoved": "Photo retirée",
+    "avatarError": "Impossible de mettre à jour la photo"
   },
   "errorCodes": {
     "PASSWORDS_DO_NOT_MATCH": "Les mots de passe ne correspondent pas"

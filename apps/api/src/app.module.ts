@@ -8,6 +8,7 @@ import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup'
 import { LoggerModule } from 'nestjs-pino'
 import { AppController } from './app.controller'
 import { AuthModule } from './modules/auth/auth.module'
+import { AvatarModule } from './modules/avatars/avatar.module'
 import { ChatModule } from './modules/chat/chat.module'
 import { ClubModule } from './modules/clubs/club.module'
 import { DbModule } from './modules/db/db.module'
@@ -98,6 +99,7 @@ interface ExpressResponse extends ServerResponse<IncomingMessage> {
     ScheduleModule.forRoot(),
     DbModule,
     AuthModule,
+    AvatarModule,
     EmailModule,
     NestConfigModule,
     ClubModule,

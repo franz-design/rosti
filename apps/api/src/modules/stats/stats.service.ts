@@ -80,7 +80,14 @@ export class StatsService {
     userId: string,
     seasonId: string,
   ): Promise<
-    Array<{ userId: string; userName: string; goals: number; assists: number; matchesPlayed: number }>
+    Array<{
+      userId: string
+      userName: string
+      image: string | null
+      goals: number
+      assists: number
+      matchesPlayed: number
+    }>
   > {
     await this.organizationService.requireMember(organizationId, userId)
     const stats = await this.em.find(
@@ -97,12 +104,20 @@ export class StatsService {
 
     const map = new Map<
       string,
-      { userId: string; userName: string; goals: number; assists: number; matchesPlayed: number }
+      {
+        userId: string
+        userName: string
+        image: string | null
+        goals: number
+        assists: number
+        matchesPlayed: number
+      }
     >()
     for (const s of stats) {
       const current = map.get(s.user.id) ?? {
         userId: s.user.id,
         userName: s.user.name,
+        image: s.user.image,
         goals: 0,
         assists: 0,
         matchesPlayed: 0,
@@ -167,6 +182,7 @@ function toPlayerRow(row: MatchAttendance): HomeStatsPlayerRow {
     matchId: row.match.id,
     userId: row.user.id,
     userName: row.user.name,
+    image: row.user.image,
   }
 }
 
@@ -175,6 +191,7 @@ function toLineupRow(row: MatchLineup): HomeStatsLineupRow {
     matchId: row.match.id,
     userId: row.user.id,
     userName: row.user.name,
+    image: row.user.image,
     team: row.team,
   }
 }
@@ -184,6 +201,7 @@ function toGoalRow(row: MatchStat): HomeStatsGoalRow {
     matchId: row.match.id,
     userId: row.user.id,
     userName: row.user.name,
+    image: row.user.image,
     goals: row.goals,
   }
 }

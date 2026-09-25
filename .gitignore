@@ -70,6 +70,9 @@ ios/
 # Local experiments / scratch notes
 .lab/
 
+# Avatar files written by the API in development
+apps/api/data/
+
 # Claude Code personal settings (the skills/ folder is shared and committed)
 .claude/settings.local.json
 .worktrees/

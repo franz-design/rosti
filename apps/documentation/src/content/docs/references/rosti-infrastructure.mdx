@@ -63,3 +63,7 @@ The database is not a GitHub image. Promote does not touch it.
 `promote-on-release.yml` can dispatch Promote after a release tag, and only if the repository variable `PROMOTE_ON_RELEASE` is set. Leave it unset to keep the deploy as a separate click.
 
 Runtime config (`DATABASE_*`, `VITE_API_URL`, Resend SMTP, and the rest) lives on the Dokploy services, not in the image. `VITE_API_URL` for this environment is `https://rosti-api.lesk.fr`.
+
+## Avatar files
+
+Player photos are files on the `api` service, not rows in Postgres and not a separate host. Mount a persistent volume at `/data/avatars` on `api`. The API writes one WebP per user there. See [File storage](/lonestone-boilerplate/core-features/3_filestorage).

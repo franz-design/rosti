@@ -27,7 +27,7 @@ export function PlayerHighlightCard({
       <HighlightLabel icon={icon} tone={tone} label={label} />
       {player ? (
         <div className="mt-4 space-y-3">
-          <PlayerIdentity name={player.userName} />
+          <PlayerIdentity name={player.userName} imageUrl={player.image} />
           <p className="flex items-baseline gap-1.5">
             <span className="font-display text-2xl font-semibold tabular-nums">{player.value}</span>
             <span className="text-sm text-muted-foreground">{unit}</span>

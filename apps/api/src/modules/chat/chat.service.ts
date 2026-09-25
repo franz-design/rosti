@@ -88,6 +88,7 @@ export class ChatService {
       matchId: m.match.id,
       authorId: m.author.id,
       authorName: m.author.name,
+      authorImage: m.author.image,
       body: m.body,
       mentionedUserIds: byMessage.get(m.id) ?? [],
       createdAt: m.createdAt,

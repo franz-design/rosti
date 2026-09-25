@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { useTabSearchParam } from '@/common/hooks/use-tab-search-param'
 import { NotificationPreferencesSection } from '@/features/notifications/components/notification-preferences-section'
 import { authClient } from '@/lib/auth-client'
+import { rostiApi } from '@/lib/rosti-api'
 import { ProfileDetailsForm } from './components/profile-details-form'
 import { ProfileHeader } from './components/profile-header'
 import { ProfileIdentity } from './components/profile-identity'
@@ -72,8 +73,31 @@ export default function ProfilePage() {
     },
   })
 
+  const { mutate: uploadAvatar, isPending: isUploadingAvatar } = useMutation({
+    mutationFn: (file: File) => rostiApi.uploadAvatar(file),
+    onSuccess: async () => {
+      await refetch()
+      toast.success(t('profile.avatarSaved'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('profile.avatarError'))
+    },
+  })
+
+  const { mutate: removeAvatar, isPending: isRemovingAvatar } = useMutation({
+    mutationFn: () => rostiApi.deleteAvatar(),
+    onSuccess: async () => {
+      await refetch()
+      toast.success(t('profile.avatarRemoved'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('profile.avatarError'))
+    },
+  })
+
   const displayName = getProfileDisplayName(user, t('common.user'))
   const initials = getProfileInitials(displayName)
+  const isAvatarPending = isUploadingAvatar || isRemovingAvatar
 
   return (
     <div className="space-y-8">
@@ -84,7 +108,15 @@ export default function ProfilePage() {
 
         <TabsContent value="info" className="outline-none">
           <div className="space-y-8">
-            <ProfileIdentity displayName={displayName} initials={initials} email={user?.email} />
+            <ProfileIdentity
+              displayName={displayName}
+              initials={initials}
+              email={user?.email}
+              imageUrl={user?.image}
+              isUploading={isAvatarPending}
+              onSelectFile={(file) => uploadAvatar(file)}
+              onRemove={() => removeAvatar()}
+            />
             <ProfileDetailsForm
               form={form}
               email={user?.email}

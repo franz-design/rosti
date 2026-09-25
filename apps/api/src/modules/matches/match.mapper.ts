@@ -52,6 +52,7 @@ export class MatchMapper {
       matchId: a.match.id,
       userId: a.user.id,
       userName: a.user.name,
+      image: a.user.image,
       status: a.status,
       respondedAt: a.respondedAt,
     }
@@ -63,6 +64,7 @@ export class MatchMapper {
       matchId: l.match.id,
       userId: l.user.id,
       userName: l.user.name,
+      image: l.user.image,
       team: l.team,
     }
   }

@@ -3,10 +3,11 @@ import { getPlayerFirstName, getPlayerInitials } from '@/features/matches/utils/
 
 interface PlayerBubbleProps {
   name: string
+  imageUrl?: string | null
   team: 'blue' | 'red'
 }
 
-export function PlayerBubble({ name, team }: PlayerBubbleProps) {
+export function PlayerBubble({ name, imageUrl, team }: PlayerBubbleProps) {
   const firstName = getPlayerFirstName(name)
   const initials = getPlayerInitials(name)
 
@@ -14,13 +15,13 @@ export function PlayerBubble({ name, team }: PlayerBubbleProps) {
     <span className="flex flex-col items-center gap-1">
       <span
         className={cn(
-          'flex size-12 items-center justify-center rounded-full border-2 text-xs font-semibold text-white shadow-md',
+          'flex size-12 items-center justify-center overflow-hidden rounded-full border-2 text-xs font-semibold text-white shadow-md',
           team === 'blue'
             ? 'border-team-blue-dark bg-team-blue'
             : 'border-primary-dark bg-primary',
         )}
       >
-        {initials}
+        {imageUrl ? <img src={imageUrl} alt="" className="size-full object-cover" /> : initials}
       </span>
       <span className="max-w-16 truncate text-[10px] font-semibold tracking-wide text-white uppercase drop-shadow">
         {firstName}

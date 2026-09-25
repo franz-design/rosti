@@ -6,6 +6,7 @@ export type PlayerRow =
       id: string
       email: string
       name: string
+      image?: string | null
       role: ClubMember['role']
       canRemove: boolean
       canChangeRole: boolean

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { PlayerAvatar } from '@/common/components/player-avatar'
 import type { Lineup } from '@/lib/rosti-api'
 
 interface LineupSectionProps {
@@ -30,7 +31,10 @@ export function LineupSection({ lineups, title }: LineupSectionProps) {
           </h3>
           <ul className="space-y-1 text-sm">
             {blue.map((l) => (
-              <li key={l.id}>{l.userName}</li>
+              <li key={l.id} className="flex items-center gap-2">
+                <PlayerAvatar name={l.userName} imageUrl={l.image} size="sm" />
+                <span className="truncate">{l.userName}</span>
+              </li>
             ))}
           </ul>
         </div>
@@ -40,7 +44,10 @@ export function LineupSection({ lineups, title }: LineupSectionProps) {
           </h3>
           <ul className="space-y-1 text-sm">
             {red.map((l) => (
-              <li key={l.id}>{l.userName}</li>
+              <li key={l.id} className="flex items-center gap-2">
+                <PlayerAvatar name={l.userName} imageUrl={l.image} size="sm" />
+                <span className="truncate">{l.userName}</span>
+              </li>
             ))}
           </ul>
         </div>
