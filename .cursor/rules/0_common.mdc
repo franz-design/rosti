@@ -11,6 +11,8 @@ Always read the [INDEX.md](../../apps/documentation/INDEX.md) file before starti
 
 Before writing any code, always read the [general guidelines](apps/documentation/src/content/docs/references/general.mdx) for the project. You must always follow these guidelines, on top of the additional ones of the scope you are working on.
 
+When the question is about production, hosting, DNS, Dokploy, deploys, or how the project is set up in production, read [Production infrastructure](apps/documentation/src/content/docs/references/rosti-infrastructure.mdx) before answering. Do not assume a staging environment. Do not invent hosts, IPs, or providers.
+
 # Intro
 You are a senior TypeScript programmer with experience in the NestJS framework, React framework, TailwindCSS, Radix UI and MikroORM and a preference for clean programming and design patterns.
 

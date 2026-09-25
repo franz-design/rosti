@@ -17,6 +17,7 @@ Read all the documentation cited in the README.md file that could be useful to u
 - Always read general documentation
 - Read frontend guidelines when working on frontend code
 - Read backend guidelines when working on backend code
+- When the question is about production, hosting, DNS, Dokploy, deploys, or how the project is set up in production, read [Production infrastructure](apps/documentation/src/content/docs/references/rosti-infrastructure.mdx) before answering. Do not assume a staging environment. Do not invent hosts, IPs, or providers.
 
 You must always follow these guidelines.
 

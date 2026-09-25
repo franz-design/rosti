@@ -40,7 +40,7 @@
 - [encrypt-env.mdx](./src/content/docs/guides/encrypt-env.mdx) - Setup env file encryption
 - [feature-flags.mdx](./src/content/docs/guides/feature-flags.mdx) - Ship a merged change dark with a single env-var check
 - [generating-types.mdx](./src/content/docs/guides/generating-types.mdx) - Generate types and SDKs from the OpenAPI schema
-- [rosti-production.mdx](./src/content/docs/guides/rosti-production.mdx) - How to deploy Rösti (API, SPA, mobile) to staging and production
+- [rosti-production.mdx](./src/content/docs/guides/rosti-production.mdx) - How to deploy Rösti (API, SPA, mobile) to production
 
 ## References
 
@@ -49,6 +49,7 @@
 - [backend.mdx](./src/content/docs/references/backend.mdx) - Guidelines for the backend of the Lonestone project.
 - [frontend.mdx](./src/content/docs/references/frontend.mdx) - Guidelines for the front-end of the Lonestone project.
 - [general.mdx](./src/content/docs/references/general.mdx) - Common guidelines for development on the project
+- [rosti-infrastructure.mdx](./src/content/docs/references/rosti-infrastructure.mdx) - Where Rösti runs in production — VPS, DNS, Dokploy services, and how a deploy reaches the server
 
 ## Releases
 

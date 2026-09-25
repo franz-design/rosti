@@ -1,26 +1,27 @@
 ---
 title: Rösti production runbook
-description: How to deploy Rösti (API, SPA, mobile) to staging and production
+description: How to deploy Rösti (API, SPA, mobile) to production
 ---
 
 # Rösti production
+
+Hosts, DNS, and the three Dokploy services are described in [Production infrastructure](/lonestone-boilerplate/references/rosti-infrastructure). This page is the deploy checklist.
 
 ## Architecture
 
 | Service | Image / artifact | Role |
 |---------|------------------|------|
-| `api` | GHCR `@rosti/api` | NestJS API + Better Auth + jobs |
-| `web-spa` | GHCR `@rosti/web-spa` | Authenticated app (desktop + Capacitor web asset) |
-| PostgreSQL | Dokploy / managed | Primary data store |
-| SMTP | Brevo or Resend | Transactional email |
+| `api` | `ghcr.io/fan17-design/rosti-api` | NestJS API + Better Auth + jobs |
+| `web-spa` | `ghcr.io/fan17-design/rosti-web-spa` | Authenticated app (desktop + Capacitor web asset) |
+| `db` | PostgreSQL in Dokploy | Primary data store, internal only |
+| SMTP | Resend | Transactional email |
 | Redis (optional) | Dokploy | Future BullMQ; current jobs use `@nestjs/schedule` + `scheduled_job` table |
 
-Pipeline: push → CI → `push-to-ghcr.yml` → Dokploy **Promote** (see release/versioning docs).
+Pipeline: merge to `main` builds a SHA image (`push-to-ghcr.yml`). Production moves when you run **Promote**. There is no staging environment.
 
-## Environments
+## Environment
 
-1. **Staging** — follow `main` (SHA images). Validate invites, RSVP, push tokens.
-2. **Production** — pin the same released version for `api` and `web-spa`.
+**Production** only — the Dokploy project Rösti / production. Pin the same released version for `api` and `web-spa`.
 
 ## Required secrets / env
 
@@ -33,7 +34,7 @@ API:
 
 SPA (Dokploy **runtime** env on the `web-spa` service — CI images embed `__VITE_*__` placeholders):
 
-- `VITE_API_URL` (e.g. `https://rosti-api.example.com` — no trailing `/api`)
+- `VITE_API_URL` = `https://rosti-api.lesk.fr` (no trailing `/api`)
 - `VITE_APP_STORE_URL`, `VITE_PLAY_STORE_URL` (invite deep links)
 
 Mobile (Capacitor):
@@ -47,7 +48,7 @@ Mobile (Capacitor):
 1. Provision Postgres + SMTP on Dokploy
 2. Deploy `api`, run migrations (`pnpm --filter=@rosti/api db:migrate:up` or schema sync in first bring-up)
 3. Deploy `web-spa` with correct `VITE_*` URLs
-4. Point DNS: `api.`, `app.`
+4. DNS is already pointed: `rosti.lesk.fr` (app) and `rosti-api.lesk.fr` (API)
 5. Create first owner account, create a club, send a test invite
 6. Build Capacitor (`pnpm --filter=@rosti/web-spa build && pnpm --filter=@rosti/web-spa cap:sync`) and ship TestFlight / internal Play track
 7. Soft launch with one real club

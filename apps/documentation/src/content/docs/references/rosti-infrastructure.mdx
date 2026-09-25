@@ -1,0 +1,65 @@
+---
+title: Production infrastructure
+description: Where Rösti runs in production — VPS, DNS, Dokploy services, and how a deploy reaches the server
+---
+
+This page is the current production setup. Read it before answering questions about hosting, DNS, Dokploy, or deploys.
+
+There is one environment. It is production. There is no staging.
+
+## Host
+
+One OVH VPS runs everything.
+
+| | |
+|---|---|
+| Name | `vps-4196f155.vps.ovh.net` |
+| IPv4 | `146.59.199.200` |
+| IPv6 | `2001:41d0:305:2100::1:7394` |
+| OS | Ubuntu 24.04 |
+| Region | Gravelines (GRA), France |
+| Size | VPS-1 — 2 vCores, 4 GB RAM, 40 GB disk |
+| OVH backup | Standard automatic backup, on |
+| Snapshot | Off |
+| Secondary DNS | None |
+
+## Domain
+
+`lesk.fr` is registered at OVH. DNS is the OVH zone (`dns102.ovh.net`, `ns102.ovh.net`). Transfer lock is on. DNSSEC is off. DNS Anycast is off.
+
+The app does not use OVH web hosting. Dokploy on the VPS serves the hostnames below.
+
+| Hostname | Role |
+|---|---|
+| `https://rosti.lesk.fr` | Web app (`web-spa`) |
+| `https://rosti-api.lesk.fr` | API |
+| `https://dokploy.lesk.fr` | Dokploy |
+
+Each of those names has an A record in the OVH zone.
+
+Transactional email goes through Resend only. The zone has the Resend records: `resend._domainkey` (TXT), `rsend` (CNAME), `send` (CNAME), and `_dmarc` (TXT). The API sends mail with the `EMAIL_*` variables set on the `api` service in Dokploy.
+
+## What runs
+
+Dokploy project **Rösti**, environment **production**, three services:
+
+| Service | What it is | Who can reach it |
+|---|---|---|
+| `db` | PostgreSQL | The Dokploy network only. Not exposed on the internet. |
+| `api` | Image `ghcr.io/fan17-design/rosti-api` | `https://rosti-api.lesk.fr` |
+| `web-spa` | Image `ghcr.io/fan17-design/rosti-web-spa` | `https://rosti.lesk.fr` |
+
+`api` and `web-spa` use the Docker provider and pull from `ghcr.io`. The registry user is `fan17-design`. The registry password stays in Dokploy. Do not copy it into the repo or into docs.
+
+The database is not a GitHub image. Promote does not touch it.
+
+## How a change reaches production
+
+1. A merge to `main` runs `.github/workflows/push-to-ghcr.yml`. It builds `api` and `web-spa` and pushes a SHA-tagged image to GHCR. That merge does not move `latest`, and it does not by itself change what Dokploy is running.
+2. A `v*` tag also publishes version tags and `latest`. `latest` means the last release, not the last merge to `main`.
+3. The Promote workflow (`.github/workflows/promote.yml`) is what updates Dokploy. It sets the Docker image on `api` and `web-spa`, then deploys them. Run it from GitHub Actions. Pick the `production` environment and the version to ship.
+4. Promote reads three secrets on the GitHub Environment `production`: `DOKPLOY_URL` (`https://dokploy.lesk.fr`), `DOKPLOY_API_KEY`, and `DOKPLOY_APPLICATIONS` (the `api` and `web-spa` application ids). See [Release and versioning](/lonestone-boilerplate/references/1_release_and_versionning) for the secret format.
+
+`promote-on-release.yml` can dispatch Promote after a release tag, and only if the repository variable `PROMOTE_ON_RELEASE` is set. Leave it unset to keep the deploy as a separate click.
+
+Runtime config (`DATABASE_*`, `VITE_API_URL`, Resend SMTP, and the rest) lives on the Dokploy services, not in the image. `VITE_API_URL` for this environment is `https://rosti-api.lesk.fr`.

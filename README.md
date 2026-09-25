@@ -110,7 +110,8 @@ packages/
 ### Product
 
 - [rosti product overview](apps/documentation/src/content/docs/explanations/rosti-product.mdx) — domain model and features
-- [Production runbook](apps/documentation/src/content/docs/guides/rosti-production.mdx) — staging, Dokploy, secrets, soft launch
+- [Production infrastructure](apps/documentation/src/content/docs/references/rosti-infrastructure.mdx) — VPS, DNS, Dokploy services, how a deploy reaches production
+- [Production runbook](apps/documentation/src/content/docs/guides/rosti-production.mdx) — Dokploy, secrets, soft launch
 - [Full docs index](apps/documentation/INDEX.md)
 
 ### Apps
@@ -146,6 +147,6 @@ Defined in `docker-compose.yml`:
 
 ## Deployment
 
-Images are built and pushed to GHCR by CI; environments are promoted via Dokploy. Follow the [production runbook](apps/documentation/src/content/docs/guides/rosti-production.mdx) and [release and versioning](apps/documentation/src/content/docs/references/1_release_and_versionning.mdx).
+Images are built and pushed to GHCR by CI. The Promote workflow updates the production Dokploy apps. See [Production infrastructure](apps/documentation/src/content/docs/references/rosti-infrastructure.mdx), the [production runbook](apps/documentation/src/content/docs/guides/rosti-production.mdx), and [release and versioning](apps/documentation/src/content/docs/references/1_release_and_versionning.mdx).
 
 Workflow notes: [`.github/ACTIONS.md`](.github/ACTIONS.md).
