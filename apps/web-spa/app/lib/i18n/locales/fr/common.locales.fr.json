@@ -136,6 +136,11 @@
     "emptyPastDescription": "Les matchs déjà joués apparaîtront ici.",
     "noScore": "Score non renseigné",
     "enterScore": "Renseigne le score",
+    "result": {
+      "win": "Victoire",
+      "loss": "Défaite",
+      "draw": "Égalité"
+    },
     "selectClub": "Sélectionne ou crée un club d’abord.",
     "capacity": "{{present}} / {{max}} joueurs",
     "menuOpen": "Actions du match",
@@ -310,7 +315,12 @@
     },
     "players": {
       "title": "Joueurs",
-      "hint": "Membres du club et invitations en attente.",
+      "hint": "Membres du club et invitations en attente. Clique sur la photo d'un joueur pour la changer.",
+      "changeAvatar": "Changer la photo de {{name}}",
+      "removeAvatar": "Retirer la photo de {{name}}",
+      "avatarSaved": "Photo mise à jour",
+      "avatarRemoved": "Photo retirée",
+      "avatarError": "Impossible de mettre à jour la photo",
       "searchLabel": "Rechercher un joueur",
       "searchPlaceholder": "Nom ou prénom",
       "empty": "Aucun joueur pour le moment.",

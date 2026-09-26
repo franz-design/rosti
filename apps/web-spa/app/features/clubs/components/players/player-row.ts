@@ -4,6 +4,7 @@ export type PlayerRow =
   | {
       kind: 'member'
       id: string
+      userId: string
       email: string
       name: string
       image?: string | null

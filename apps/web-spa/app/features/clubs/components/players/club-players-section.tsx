@@ -52,6 +52,7 @@ export function ClubPlayersSection({ organizationId, currentUserId }: ClubPlayer
       const memberRows: PlayerRow[] = members.map((member) => ({
         kind: 'member' as const,
         id: member.id,
+        userId: member.userId,
         email: member.email,
         name: member.name || member.email,
         image: member.image,
@@ -132,7 +133,43 @@ export function ClubPlayersSection({ organizationId, currentUserId }: ClubPlayer
     onError: (err: Error) => toast.error(err.message),
   })
 
-  const isBusy = resend.isPending || remove.isPending || changeRole.isPending
+  const { refetch: refetchSession } = authClient.useSession()
+
+  const uploadAvatar = useMutation({
+    mutationFn: async ({ memberId, file }: { memberId: string; userId: string; file: File }) => {
+      await rostiApi.uploadMemberAvatar(organizationId, memberId, file)
+    },
+    onSuccess: async (_data, variables) => {
+      toast.success(t('clubSettings.players.avatarSaved'))
+      invalidatePlayers()
+      if (variables.userId === currentUserId) await refetchSession()
+    },
+    onError: (err: Error) => toast.error(err.message || t('clubSettings.players.avatarError')),
+  })
+
+  const removeAvatar = useMutation({
+    mutationFn: async ({ memberId }: { memberId: string; userId: string }) => {
+      await rostiApi.deleteMemberAvatar(organizationId, memberId)
+    },
+    onSuccess: async (_data, variables) => {
+      toast.success(t('clubSettings.players.avatarRemoved'))
+      invalidatePlayers()
+      if (variables.userId === currentUserId) await refetchSession()
+    },
+    onError: (err: Error) => toast.error(err.message || t('clubSettings.players.avatarError')),
+  })
+
+  const isBusy =
+    resend.isPending ||
+    remove.isPending ||
+    changeRole.isPending ||
+    uploadAvatar.isPending ||
+    removeAvatar.isPending
+  const avatarPendingMemberId = uploadAvatar.isPending
+    ? uploadAvatar.variables?.memberId
+    : removeAvatar.isPending
+      ? removeAvatar.variables?.memberId
+      : undefined
   const visibleRows = filterPlayersByName(rows, search)
 
   function handleSearchChange(event: ChangeEvent<HTMLInputElement>): void {
@@ -176,9 +213,14 @@ export function ClubPlayersSection({ organizationId, currentUserId }: ClubPlayer
                   key={`${row.kind}-${row.id}`}
                   row={row}
                   isBusy={isBusy}
+                  isAvatarPending={avatarPendingMemberId === row.id}
                   onResend={(email) => resend.mutate(email)}
                   onChangeRole={(memberId, role) => changeRole.mutate({ memberId, role })}
                   onRemove={(player) => remove.mutate(player)}
+                  onChangeAvatar={(memberId, userId, file) =>
+                    uploadAvatar.mutate({ memberId, userId, file })
+                  }
+                  onRemoveAvatar={(memberId, userId) => removeAvatar.mutate({ memberId, userId })}
                 />
               ))}
             </ul>

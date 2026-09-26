@@ -17,10 +17,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return response.json() as Promise<T>
 }
 
-async function uploadAvatar(file: File): Promise<{ image: string | null }> {
+async function uploadAvatarFile(path: string, file: File): Promise<{ image: string | null }> {
   const body = new FormData()
   body.append('file', file)
-  const response = await fetch(`${API_URL}/api/me/avatar`, {
+  const response = await fetch(`${API_URL}/api${path}`, {
     method: 'PUT',
     credentials: 'include',
     body,
@@ -169,8 +169,14 @@ export const rostiApi = {
       body: JSON.stringify({ body, mentionedUserIds }),
     }),
 
-  uploadAvatar: (file: File) => uploadAvatar(file),
+  uploadAvatar: (file: File) => uploadAvatarFile('/me/avatar', file),
   deleteAvatar: () => request<{ image: string | null }>('/me/avatar', { method: 'DELETE' }),
+  uploadMemberAvatar: (orgId: string, memberId: string, file: File) =>
+    uploadAvatarFile(`/clubs/${orgId}/members/${memberId}/avatar`, file),
+  deleteMemberAvatar: (orgId: string, memberId: string) =>
+    request<{ image: string | null }>(`/clubs/${orgId}/members/${memberId}/avatar`, {
+      method: 'DELETE',
+    }),
 
   getNotificationPreferences: () => request<NotificationPreference>('/notifications/preferences'),
   updateNotificationPreferences: (body: Partial<NotificationPreference>) =>

@@ -93,16 +93,24 @@ export function getViewerMatchResult(match: Match): ViewerMatchResult | undefine
   return (viewerScore ?? 0) > (opponentScore ?? 0) ? 'win' : 'loss'
 }
 
-const RESULT_BORDER_CLASS: Record<ViewerMatchResult, string> = {
-  win: 'border border-success',
-  loss: 'border border-destructive',
-  draw: 'border border-warning',
+const CARD_RESULT_CLASS: Record<ViewerMatchResult, string> = {
+  win: 'border-success',
+  loss: 'border-destructive',
+  draw: 'border-foreground/20',
 }
 
-/**
- * Colored outline class for a recorded result from the viewer's team.
- */
-export function getViewerMatchResultStripeClass(match: Match): string | undefined {
+const RESULT_CLASS: Record<ViewerMatchResult, string> = {
+  win: 'bg-success text-white',
+  loss: 'bg-destructive text-white',
+  draw: 'bg-sidebar text-foreground',
+}
+
+export function getResultClass(match: Match): string | undefined {
   const result = getViewerMatchResult(match)
-  return result ? RESULT_BORDER_CLASS[result] : undefined
+  return result ? RESULT_CLASS[result] : undefined
+}
+
+export function getCardResultClass(match: Match): string | undefined {
+  const result = getViewerMatchResult(match)
+  return result ? CARD_RESULT_CLASS[result] : 'p-0'
 }

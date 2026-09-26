@@ -1,10 +1,41 @@
 import { cn } from '@rosti/ui/lib/utils'
-import { CalendarDays, MapPin, Users } from '@rosti/ui/icons'
+import {
+  CalendarDays,
+  Confetti,
+  ConfoundedCircle,
+  Gps,
+  MapPin,
+  Users,
+  type SolarIcon,
+} from '@rosti/ui/icons'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import type { Match } from '@/lib/rosti-api'
-import { getViewerMatchResultStripeClass, hasMatchScore } from '@/features/matches/utils/match-filters'
+import {
+  getCardResultClass,
+  getResultClass,
+  getViewerMatchResult,
+  hasMatchScore,
+  type ViewerMatchResult,
+} from '@/features/matches/utils/match-filters'
+
+const RESULT_ICON: Record<ViewerMatchResult, SolarIcon> = {
+  win: Confetti,
+  loss: ConfoundedCircle,
+  draw: Gps,
+}
+
+const RESULT_ICON_CLASS: Record<ViewerMatchResult, string> = {
+  win: 'text-success',
+  loss: 'text-destructive',
+  draw: 'text-muted-foreground',
+}
+
+function MatchResultIcon({ result, label }: { result: ViewerMatchResult; label: string }) {
+  const Icon = RESULT_ICON[result]
+  return <Icon className="size-5 shrink-0" alt={label} />
+}
 
 interface MatchCardProps {
   match: Match
@@ -33,56 +64,80 @@ export default function MatchCard({
   const isFull = (match.presentCount ?? 0) >= match.maxCapacity
   const showScore = variant === 'past'
   const recordedScore = showScore && hasMatchScore(match)
-  const cardClassName = cn(
-    'rounded-xl border bg-card p-5 shadow-sm transition-colors hover:bg-accent/40',
-    recordedScore ? getViewerMatchResultStripeClass(match) : undefined,
-  )
+  const viewerResult = showScore ? getViewerMatchResult(match) : undefined
+  const resultClass = getCardResultClass(match)
+  const cardClassName = cn('rounded-xl border bg-card p-2 shadow-sm overflow-hidden', resultClass)
+  const scoreClassName = cn(recordedScore ? getResultClass(match) : undefined)
 
   const body = (
-    <div className="space-y-2 min-w-0">
-      <p className="font-medium text-lg truncate">{match.title}</p>
-      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-        <CalendarDays className="size-4 shrink-0" />
-        {dateLabel}
-      </p>
-      {match.location ? (
-        <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <MapPin className="size-4 shrink-0" />
-          {match.location}
-        </p>
-      ) : null}
-      {variant === 'upcoming' ? (
-        <p
-          className={`flex items-center gap-2 text-sm ${
-            isFull ? 'text-success' : 'text-muted-foreground'
-          }`}
+    <div className="flex items-center justify-between gap-2">
+      <div className="space-y-2 min-w-0 p-4">
+        <div
+          className={cn(
+            'flex min-w-0 items-center gap-1.5',
+            viewerResult && RESULT_ICON_CLASS[viewerResult],
+          )}
         >
-          <Users className="size-4 shrink-0" />
-          {t('matches.capacity', {
-            present: match.presentCount ?? 0,
-            max: match.maxCapacity,
-          })}
+          <p className="min-w-0 truncate font-medium text-lg">{match.title}</p>
+          {viewerResult ? (
+            <MatchResultIcon result={viewerResult} label={t(`matches.result.${viewerResult}`)} />
+          ) : null}
+        </div>
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <CalendarDays className="size-4 shrink-0" />
+          {dateLabel}
         </p>
-      ) : null}
+        {match.location ? (
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <MapPin className="size-4 shrink-0" />
+            {match.location}
+          </p>
+        ) : null}
+        {variant === 'upcoming' ? (
+          <p
+            className={`flex items-center gap-2 text-sm ${
+              isFull ? 'text-success' : 'text-muted-foreground'
+            }`}
+          >
+            <Users className="size-4 shrink-0" />
+            {t('matches.capacity', {
+              present: match.presentCount ?? 0,
+              max: match.maxCapacity,
+            })}
+          </p>
+        ) : null}
+        {match.status === 'cancelled' ? (
+          <p className="text-sm text-destructive">{t('matches.detail.status.cancelled')}</p>
+        ) : null}
+      </div>
+
       {showScore ? (
         recordedScore ? (
-          <p className="flex items-center gap-2 text-sm">
-            <span className="font-medium text-team-blue">
-              {t('matches.detail.summary.teamBlue')}
-            </span>
-            <span className="tabular-nums font-semibold">
-              {match.blueScore} – {match.redScore}
-            </span>
-            <span className="font-medium text-primary">{t('matches.detail.summary.teamRed')}</span>
-          </p>
+          <div
+            className={cn(
+              'flex rounded-lg items-center justify-end gap-2 p-4 px-6 self-stretch',
+              scoreClassName,
+            )}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-xs font-medium">{t('matches.detail.summary.teamBlue')}</span>
+              <span className="tabular-nums font-semibold text-3xl sm:text-7xl">
+                {match.blueScore}
+              </span>
+            </div>
+            <div className="font-logo text-4xl font-semibold pt-2">:</div>
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-xs font-medium">{t('matches.detail.summary.teamRed')}</span>
+              <span className="tabular-nums font-semibold text-3xl sm:text-7xl">
+                {match.redScore}
+              </span>
+            </div>
+          </div>
         ) : promptEnterScore ? (
           <p className="text-sm font-semibold text-primary">{t('matches.enterScore')}</p>
         ) : (
           <p className="text-sm text-muted-foreground">{t('matches.noScore')}</p>
         )
-      ) : null}
-      {match.status === 'cancelled' ? (
-        <p className="text-sm text-destructive">{t('matches.detail.status.cancelled')}</p>
       ) : null}
     </div>
   )
@@ -104,7 +159,7 @@ export default function MatchCard({
       />
       <div className="relative z-10 flex items-start justify-between gap-3 pointer-events-none">
         {body}
-        <div className="pointer-events-auto shrink-0">{actions}</div>
+        <div className="pointer-events-auto shrink-0 m-2">{actions}</div>
       </div>
     </div>
   )

@@ -61,6 +61,16 @@ export class OrganizationService {
     }
   }
 
+  async requireClubMember(organizationId: string, memberId: string): Promise<Member> {
+    const member = await this.em.findOne(
+      Member,
+      { id: memberId, organization: { id: organizationId } },
+      { populate: ['user', 'organization'] },
+    )
+    if (!member) throw new NotFoundException('Member not found')
+    return member
+  }
+
   async listMembers(organizationId: string): Promise<Member[]> {
     return this.em.find(
       Member,

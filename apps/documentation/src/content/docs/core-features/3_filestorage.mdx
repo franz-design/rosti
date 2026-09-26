@@ -13,7 +13,7 @@ A player uploads a JPEG, PNG, or WebP of at most 2 MB. The API crops it to a 256
 
 The public URL is saved on `user.image`. It looks like `https://rosti-api.lesk.fr/api/avatars/{userId}?v={timestamp}`. The timestamp changes on each upload so browsers fetch the new file. The file itself is served with a long cache.
 
-Anyone can read an avatar. Only the signed-in player can replace or delete their own.
+Anyone can read an avatar. The signed-in player can replace or delete their own. A club owner or admin can replace or delete the avatar of any member of that club.
 
 ## Where the files live
 

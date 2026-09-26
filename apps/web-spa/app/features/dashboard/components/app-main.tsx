@@ -15,7 +15,7 @@ export function AppMain({ children }: { children: ReactNode }) {
         'flex min-h-0 min-w-0 flex-1 flex-col',
         isFullBleed
           ? 'overflow-hidden max-md:pb-(--bottom-nav-inset)'
-          : 'overflow-auto p-6 max-md:pb-[calc(1.5rem+var(--bottom-nav-inset))]',
+          : 'overflow-auto p-3 sm:p-6 max-md:pb-[calc(1.5rem+var(--bottom-nav-inset))]',
       )}
     >
       {children}
