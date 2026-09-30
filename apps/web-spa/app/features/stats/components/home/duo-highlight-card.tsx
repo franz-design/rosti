@@ -1,5 +1,6 @@
 import { AvatarGroup } from '@rosti/ui/components/primitives/avatar'
 import { UsersRound } from '@rosti/ui/icons'
+import { cn } from '@rosti/ui/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { PlayerAvatar } from '@/common/components/player-avatar'
 import type { PlayedTogether } from '@/lib/rosti-api'
@@ -8,13 +9,14 @@ import { HighlightShell } from './highlight-shell'
 
 interface DuoHighlightCardProps {
   duo: PlayedTogether | null
+  className?: string
 }
 
-export function DuoHighlightCard({ duo }: DuoHighlightCardProps) {
+export function DuoHighlightCard({ duo, className }: DuoHighlightCardProps) {
   const { t } = useTranslation()
 
   return (
-    <HighlightShell className="sm:col-span-2 xl:col-span-4">
+    <HighlightShell className={cn(className)}>
       <HighlightLabel icon={UsersRound} tone="team" label={t('home.stats.duo')} />
       {duo ? (
         <div className="mt-4 flex min-w-0 items-start gap-3">

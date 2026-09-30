@@ -119,7 +119,15 @@
       "emptyScorer": "Pas encore de buts cette saison.",
       "emptyWins": "Pas encore de victoire enregistrée.",
       "emptyLosses": "Pas encore de défaite enregistrée.",
-      "emptyDuo": "Pas encore assez de compos communes."
+      "emptyDuo": "Pas encore assez de compos communes.",
+      "card": {
+        "title": "Meilleur buteur",
+        "subtitle": "De la saison",
+        "attack": "Attaque",
+        "defense": "Défense",
+        "technique": "Technique",
+        "mental": "Mental"
+      }
     }
   },
   "matches": {

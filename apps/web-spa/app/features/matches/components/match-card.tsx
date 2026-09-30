@@ -134,9 +134,9 @@ export default function MatchCard({
             </div>
           </div>
         ) : promptEnterScore ? (
-          <p className="text-sm font-semibold text-primary">{t('matches.enterScore')}</p>
+          <p className="text-sm font-semibold text-primary p-4">{t('matches.enterScore')}</p>
         ) : (
-          <p className="text-sm text-muted-foreground">{t('matches.noScore')}</p>
+          <p className="text-sm text-muted-foreground p-4">{t('matches.noScore')}</p>
         )
       ) : null}
     </div>

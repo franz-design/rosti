@@ -119,7 +119,15 @@
       "emptyScorer": "No goals recorded this season yet.",
       "emptyWins": "No wins recorded yet.",
       "emptyLosses": "No losses recorded yet.",
-      "emptyDuo": "Not enough shared lineups yet."
+      "emptyDuo": "Not enough shared lineups yet.",
+      "card": {
+        "title": "Top scorer",
+        "subtitle": "Of the season",
+        "attack": "Attack",
+        "defense": "Defense",
+        "technique": "Technique",
+        "mental": "Mental"
+      }
     }
   },
   "matches": {
