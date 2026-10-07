@@ -5,14 +5,15 @@ export function HomeStatsSkeleton() {
     <div className="space-y-8">
       <div className="space-y-3">
         <Skeleton className="h-6 w-40" />
-        <div className="flex flex-col items-center gap-4 lg:flex-row lg:items-start">
-          <Skeleton className="aspect-[656/1023] w-full max-w-80 rounded-[2rem] lg:w-80" />
-          <div className="grid w-full min-w-0 flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Skeleton className="h-36 rounded-xl" />
-            <Skeleton className="h-36 rounded-xl" />
-            <Skeleton className="h-36 rounded-xl" />
-            <Skeleton className="h-24 rounded-xl sm:col-span-2 lg:col-span-3" />
-          </div>
+        <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,15.5rem),18rem))] justify-center gap-4">
+          <Skeleton className="aspect-[668/1024] w-full rounded-[1.75rem]" />
+          <Skeleton className="aspect-[668/1024] w-full rounded-[1.75rem]" />
+          <Skeleton className="aspect-[668/1024] w-full rounded-[1.75rem]" />
+          <Skeleton className="aspect-[668/1024] w-full rounded-[1.75rem]" />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Skeleton className="h-28 rounded-xl" />
+          <Skeleton className="h-28 rounded-xl" />
         </div>
       </div>
       <div className="space-y-3">
