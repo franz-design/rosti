@@ -309,12 +309,16 @@
   "invite": {
     "title": "Tu es invité·e à {{club}}",
     "fallbackClub": "un club Rösti",
-    "description": "Installe l'app mobile ou continue sur ordinateur pour créer ton compte.",
-    "descriptionWithEmail": "Tu as été invité·e avec {{email}}. Installe l'app ou continue sur ordinateur.",
-    "appStore": "Télécharger sur l'App Store",
-    "playStore": "Disponible sur Google Play",
-    "openApp": "Ouvrir l'app Rösti",
-    "continueDesktop": "Continuer sur ordinateur"
+    "description": "Ajoute Rösti à l'écran d'accueil, ou continue dans le navigateur pour créer ton compte.",
+    "descriptionWithEmail": "Tu as été invité·e avec {{email}}. Ajoute Rösti à l'écran d'accueil, ou continue dans le navigateur.",
+    "install": {
+      "iosTitle": "Sur iPhone et iPad, ajoute Rösti depuis Safari.",
+      "iosShare": "Appuie sur Partager.",
+      "iosAdd": "Appuie sur Sur l'écran d'accueil.",
+      "button": "Installer Rösti",
+      "browserMenu": "Dans le menu du navigateur, choisis Installer l'application ou Ajouter à l'écran d'accueil."
+    },
+    "continueBrowser": "Continuer dans le navigateur"
   },
   "clubSettings": {
     "title": "Paramètres du club",

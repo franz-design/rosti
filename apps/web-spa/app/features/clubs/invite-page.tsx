@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useSearchParams } from 'react-router'
 import { storePendingInvitationId } from '@/features/auth/utils/pending-invitation'
-import { InviteStoreLinks } from './components/invite/invite-store-links'
+import { InviteInstallInstructions } from './components/invite/invite-install-instructions'
 
 export default function InvitePage() {
   const { t } = useTranslation()
@@ -36,7 +36,7 @@ export default function InvitePage() {
         <p className="text-muted-foreground">
           {email ? t('invite.descriptionWithEmail', { email }) : t('invite.description')}
         </p>
-        <InviteStoreLinks invitationId={invitationId} email={email} club={club} />
+        <InviteInstallInstructions invitationId={invitationId} email={email} club={club} />
       </div>
     </div>
   )

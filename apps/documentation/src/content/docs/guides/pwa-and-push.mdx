@@ -31,15 +31,17 @@ Do not cache club, match, chat, or profile data in the service worker. The first
 
 Goal: a phone can add Rösti to the home screen and open it without the browser toolbar.
 
-- [ ] Add `vite-plugin-pwa` in `injectManifest` mode, so the push handler is our code
-- [ ] Add a web app manifest: name, short name, `standalone`, theme color, background color, and icons, including a maskable icon
-- [ ] Link the manifest and the Apple web-app meta tags from `apps/web-spa/app/root.tsx`
-- [ ] Precache the app shell and the hashed static files. Do not precache API responses
-- [ ] Register the service worker in production builds. Keep it off during `pnpm dev` unless a task is explicitly testing push on localhost
-- [ ] Stop Nginx from caching the service worker and the manifest for a year. `apps/web-spa/nginx.conf` currently caches every `.js` file that way. A stale worker would keep an old notification handler
-- [ ] Replace the App Store and Play Store buttons on the invite screen with install instructions. Those buttons point at store listings that do not exist yet
+- [x] Add `vite-plugin-pwa` in `injectManifest` mode, so the push handler is our code
+- [x] Add a web app manifest: name, short name, `standalone`, theme color, background color, and icons, including a maskable icon
+- [x] Link the manifest and the Apple web-app meta tags from `apps/web-spa/app/root.tsx`
+- [x] Precache the app shell and the hashed static files. Do not precache API responses
+- [x] Register the service worker in production builds. Keep it off during `pnpm dev` unless a task is explicitly testing push on localhost
+- [x] Stop Nginx from caching the service worker and the manifest for a year. `apps/web-spa/nginx.conf` currently caches every `.js` file that way. A stale worker would keep an old notification handler
+- [x] Replace the App Store and Play Store buttons on the invite screen with install instructions. Those buttons point at store listings that do not exist yet
 
 On iPhone and iPad, installation is manual: Share, then Add to Home Screen. Chrome on Android can show an install prompt. Desktop Chrome can do the same. The app should explain the iOS steps. It should not pretend a button can install the app there.
+
+React Router writes `index.html` after Vite finishes, so the service worker build cannot see the shell. `apps/web-spa/scripts/precache-app-shell.mjs` adds that file to the precache. Without it, an installed app has no shell to open. API responses stay out of the precache.
 
 ## Phase 2 — Permission and subscription
 

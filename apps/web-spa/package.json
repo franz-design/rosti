@@ -6,9 +6,9 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "react-router build",
+    "build": "react-router build && node ./scripts/precache-app-shell.mjs",
     "dev": "react-router dev",
-    "typecheck": "react-router typegen && tsc",
+    "typecheck": "react-router typegen && tsc && tsc -p worker/tsconfig.json",
     "test": "vitest run --config=vitest.config.ts",
     "cap:sync": "cap sync",
     "cap:ios": "cap open ios",
@@ -52,7 +52,10 @@
     "typescript": "catalog:build",
     "vite": "catalog:build",
     "vite-plugin-devtools-json": "^1.1.0",
+    "vite-plugin-pwa": "^2.0.0",
     "vite-tsconfig-paths": "catalog:build",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "workbox-precaching": "^7.4.1",
+    "workbox-routing": "^7.4.1"
   }
 }
