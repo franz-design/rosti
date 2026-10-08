@@ -11,6 +11,7 @@ import {
   RespondAttendanceInput,
   SetAttendanceInput,
   SetLineupInput,
+  SetMatchStatusInput,
   UpdateMatchInput,
 } from './contracts/match.contract'
 import {
@@ -442,10 +443,44 @@ export class MatchService {
   }
 
   async markPlayed(organizationId: string, userId: string, matchId: string): Promise<Match> {
+    return this.setStatus(organizationId, userId, matchId, { status: MatchStatus.Played })
+  }
+
+  /**
+   * Admin status change. A cancelled or finished match can go back to scheduled,
+   * with the same date or another one, including a date in the past.
+   */
+  async setStatus(
+    organizationId: string,
+    userId: string,
+    matchId: string,
+    data: SetMatchStatusInput,
+  ): Promise<Match> {
     await this.organizationService.requireRole(organizationId, userId, ['owner', 'admin'])
     const match = await this.get(organizationId, userId, matchId)
-    match.status = MatchStatus.Played
+    const previousStatus = match.status
+    if (data.startsAt !== undefined) match.startsAt = data.startsAt
+    match.status = data.status
+    match.cancellationReason = null
     await this.em.flush()
+    await this.applyStatusChangeEffects(match, previousStatus)
     return match
+  }
+
+  private async applyStatusChangeEffects(match: Match, previousStatus: MatchStatus): Promise<void> {
+    const isFutureScheduled =
+      match.status === MatchStatus.Scheduled && match.startsAt.getTime() > Date.now()
+
+    if (isFutureScheduled) {
+      await this.notificationService.cancelMatchJobs(match.id)
+      await this.notificationService.scheduleMatchReminders(match)
+      return
+    }
+
+    await this.notificationService.cancelMatchJobs(match.id, ScheduledJobType.MatchInvite)
+    await this.notificationService.cancelMatchJobs(match.id, ScheduledJobType.RsvpReminder)
+    if (previousStatus === MatchStatus.Scheduled || match.status === MatchStatus.Scheduled) {
+      await this.notificationService.syncUpcomingMatchInvites(match.organization.id)
+    }
   }
 }

@@ -62,7 +62,8 @@ export default function MatchCard({
     minute: '2-digit',
   })
   const isFull = (match.presentCount ?? 0) >= match.maxCapacity
-  const showScore = variant === 'past'
+  const isCancelled = match.status === 'cancelled'
+  const showScore = variant === 'past' && !isCancelled
   const recordedScore = showScore && hasMatchScore(match)
   const viewerResult = showScore ? getViewerMatchResult(match) : undefined
   const resultClass = getCardResultClass(match)
@@ -106,12 +107,13 @@ export default function MatchCard({
             })}
           </p>
         ) : null}
-        {match.status === 'cancelled' ? (
-          <p className="text-sm text-destructive">{t('matches.detail.status.cancelled')}</p>
-        ) : null}
       </div>
 
-      {showScore ? (
+      {isCancelled ? (
+        <p className="self-start p-4 text-sm text-destructive">
+          {t('matches.detail.status.cancelled')}
+        </p>
+      ) : showScore ? (
         recordedScore ? (
           <div
             className={cn(

@@ -91,6 +91,15 @@ export const cancelMatchSchema = z
 
 export type CancelMatchInput = z.infer<typeof cancelMatchSchema>
 
+export const setMatchStatusSchema = z
+  .object({
+    status: z.enum([MatchStatus.Scheduled, MatchStatus.Played]),
+    startsAt: z.coerce.date().optional(),
+  })
+  .meta({ title: 'SetMatchStatusSchema' })
+
+export type SetMatchStatusInput = z.infer<typeof setMatchStatusSchema>
+
 export const attendanceSchema = z
   .object({
     id: z.string().uuid(),

@@ -29,6 +29,9 @@ type PostponeMatchDialogProps = {
   onOpenChange: (open: boolean) => void
   currentStartsAt: string
   isPending?: boolean
+  title?: string
+  description?: string
+  confirmLabel?: string
   onConfirm: (startsAt: Date) => void
 }
 
@@ -37,6 +40,9 @@ export function PostponeMatchDialog({
   onOpenChange,
   currentStartsAt,
   isPending,
+  title,
+  description,
+  confirmLabel,
   onConfirm,
 }: PostponeMatchDialogProps) {
   const { t } = useTranslation()
@@ -54,8 +60,8 @@ export function PostponeMatchDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{t('matches.postponeTitle')}</DialogTitle>
-          <DialogDescription>{t('matches.postponeDescription')}</DialogDescription>
+          <DialogTitle>{title ?? t('matches.postponeTitle')}</DialogTitle>
+          <DialogDescription>{description ?? t('matches.postponeDescription')}</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
@@ -95,7 +101,7 @@ export function PostponeMatchDialog({
               onConfirm(combineDateAndTime(date, time))
             }}
           >
-            {t('matches.postponeConfirm')}
+            {confirmLabel ?? t('matches.postponeConfirm')}
           </Button>
         </DialogFooter>
       </DialogContent>

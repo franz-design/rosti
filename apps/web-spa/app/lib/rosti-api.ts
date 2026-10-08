@@ -112,6 +112,15 @@ export const rostiApi = {
       method: 'POST',
       body: JSON.stringify({ reason }),
     }),
+  setMatchStatus: (
+    orgId: string,
+    matchId: string,
+    body: { status: 'scheduled' | 'played'; startsAt?: string },
+  ) =>
+    request<Match>(`/clubs/${orgId}/matches/${matchId}/status`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
   listAttendances: (orgId: string, matchId: string) =>
     request<Attendance[]>(`/clubs/${orgId}/matches/${matchId}/attendances`),
   respondAttendance: (orgId: string, matchId: string, status: 'present' | 'absent') =>

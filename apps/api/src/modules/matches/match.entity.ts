@@ -57,7 +57,7 @@ export class Match {
   createdBy!: User
 
   @Property({ nullable: true, type: 'text' })
-  cancellationReason?: string
+  cancellationReason?: string | null
 
   @Property()
   createdAt: Date = new Date()

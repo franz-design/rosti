@@ -22,6 +22,7 @@ import {
 import type { PlayerStatDraft } from './components/match-detail/player-stat-draft'
 import { StatsTab } from './components/match-detail/stats/stats-tab'
 import { SummaryTab } from './components/match-detail/summary-tab'
+import { PostponeMatchDialog } from './components/postpone-match-dialog'
 import { extractMentionIds, toPlainMentionBody } from './utils/chat-mentions'
 import { shouldPromptEnterScore, shouldShowMatchResult } from './utils/match-filters'
 
@@ -53,6 +54,7 @@ export default function MatchDetailPage() {
   const pendingStatSave = useRef<Record<string, PlayerStatDraft> | null>(null)
   const [busyUserId, setBusyUserId] = useState<string | null>(null)
   const [isLineupOpen, setIsLineupOpen] = useState(false)
+  const [isReopenOpen, setIsReopenOpen] = useState(false)
   const [unreadMessageCount, setUnreadMessageCount] = useState(0)
   const chatScrollRef = useRef<HTMLDivElement>(null)
   const knownMessageIds = useRef<Set<string> | null>(null)
@@ -233,6 +235,19 @@ export default function MatchDetailPage() {
     onError: (e: Error) => toast.error(e.message),
   })
 
+  const setStatus = useMutation({
+    mutationFn: (body: { status: 'scheduled' | 'played'; startsAt?: string }) =>
+      rostiApi.setMatchStatus(orgId!, matchId!, body),
+    onSuccess: (_match, body) => {
+      toast.success(
+        t(body.status === 'played' ? 'matches.markPlayedSuccess' : 'matches.reopenSuccess'),
+      )
+      setIsReopenOpen(false)
+      invalidate()
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
+
   const saveLineup = useMutation({
     mutationFn: (assignments: Array<{ userId: string; team: 'blue' | 'red' }>) =>
       rostiApi.setLineup(orgId!, matchId!, assignments),
@@ -335,7 +350,14 @@ export default function MatchDetailPage() {
         className={cn('w-full min-h-0 flex-col gap-0', isChat && 'flex-1')}
       >
         <div className={cn('shrink-0 space-y-4', isChat && 'border-b px-6 pt-6 pb-3')}>
-          <MatchDetailHeader match={match} onCancel={() => cancel.mutate()} />
+          <MatchDetailHeader
+            match={match}
+            canManage={isClubAdmin}
+            isStatusPending={cancel.isPending || setStatus.isPending}
+            onReopen={() => setIsReopenOpen(true)}
+            onMarkPlayed={() => setStatus.mutate({ status: 'played' })}
+            onCancel={() => cancel.mutate()}
+          />
           <MatchDetailTabsList unreadMessageCount={unreadMessageCount} />
         </div>
 
@@ -428,6 +450,18 @@ export default function MatchDetailPage() {
           />
         </TabsContent>
       </Tabs>
+      <PostponeMatchDialog
+        open={isReopenOpen}
+        onOpenChange={setIsReopenOpen}
+        currentStartsAt={match.startsAt}
+        isPending={setStatus.isPending}
+        title={t('matches.reopenTitle')}
+        description={t('matches.reopenDescription')}
+        confirmLabel={t('matches.reopenConfirm')}
+        onConfirm={(startsAt) =>
+          setStatus.mutate({ status: 'scheduled', startsAt: startsAt.toISOString() })
+        }
+      />
       <LineupDialog
         open={isLineupOpen}
         onOpenChange={setIsLineupOpen}

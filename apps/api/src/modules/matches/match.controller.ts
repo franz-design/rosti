@@ -20,6 +20,8 @@ import {
   setAttendanceSchema,
   SetLineupInput,
   setLineupSchema,
+  SetMatchStatusInput,
+  setMatchStatusSchema,
   SetPlayerTeamInput,
   setPlayerTeamSchema,
   UpdateMatchInput,
@@ -86,6 +88,17 @@ export class MatchController {
     @TypedBody(cancelMatchSchema) body: CancelMatchInput,
   ): Promise<MatchDto> {
     const match = await this.matchService.cancel(organizationId, session.user.id, matchId, body)
+    return this.mapMatch(match, session.user.id)
+  }
+
+  @TypedRoute.Post(':matchId/status', matchSchema)
+  async setStatus(
+    @Session() session: LoggedInBetterAuthSession,
+    @TypedParam('organizationId', z.string().uuid()) organizationId: string,
+    @TypedParam('matchId', z.string().uuid()) matchId: string,
+    @TypedBody(setMatchStatusSchema) body: SetMatchStatusInput,
+  ): Promise<MatchDto> {
+    const match = await this.matchService.setStatus(organizationId, session.user.id, matchId, body)
     return this.mapMatch(match, session.user.id)
   }
 
