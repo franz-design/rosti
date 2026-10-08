@@ -20,7 +20,7 @@ client.setConfig({
 
 export const links: Route.LinksFunction = () => [
   { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
-  { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' },
+  { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon-v2.png' },
   { rel: 'manifest', href: '/manifest.webmanifest' },
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
