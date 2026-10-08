@@ -1,6 +1,6 @@
 import { cn } from '@rosti/ui/lib/utils'
 import type { ReactNode } from 'react'
-import { useAppShell } from '../hooks/app-shell-context'
+import { useAppShell } from '../../hooks/app-shell-context'
 
 /**
  * Scrollable content area of the app shell. It is the only scroller on regular pages;

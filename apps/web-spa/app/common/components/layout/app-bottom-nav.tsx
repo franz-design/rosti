@@ -1,7 +1,7 @@
 import { cn } from '@rosti/ui/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router'
-import { isAppNavItemActive, useAppNavItems } from '../utils/app-nav-items'
+import { isAppNavItemActive, useAppNavItems } from '@/common/utils/app-nav-items'
 
 export function AppBottomNav() {
   const { t } = useTranslation()
@@ -11,7 +11,7 @@ export function AppBottomNav() {
   return (
     <nav
       aria-label={t('dashboard.navigation')}
-      className="absolute inset-x-0 bottom-0 z-50 border-t bg-background/95 backdrop-blur-sm md:hidden"
+      className="absolute inset-x-0 bottom-0 z-50 border-t bg-background backdrop-blur-sm md:hidden"
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 3px)' }}
     >
       <ul className="grid h-14 grid-cols-3">

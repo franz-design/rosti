@@ -6,7 +6,7 @@ import {
   SidebarMenuItem,
 } from '@rosti/ui/components/primitives/sidebar'
 import { Link, useLocation } from 'react-router'
-import { isAppNavItemActive, useAppNavItems } from '../../utils/app-nav-items'
+import { isAppNavItemActive, useAppNavItems } from '@/common/utils/app-nav-items'
 
 export function AppSidebarNav() {
   const navItems = useAppNavItems()
