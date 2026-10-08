@@ -8,6 +8,7 @@ import {
   FormMessage,
 } from '@rosti/ui/components/primitives/form'
 import { Input } from '@rosti/ui/components/primitives/input'
+import { PasswordInput } from '@/common/components/password-input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
@@ -67,12 +68,11 @@ export const AuthLoginForm: React.FC<AuthLoginFormProps> = ({ onSubmit, isPendin
                 </Link>
               </div>
               <FormControl>
-                <Input
+                <PasswordInput
                   id="password"
                   {...field}
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  type="password"
                 />
               </FormControl>
               <FormMessage />

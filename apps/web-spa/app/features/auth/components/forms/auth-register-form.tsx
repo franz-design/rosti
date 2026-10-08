@@ -8,6 +8,7 @@ import {
   FormMessage,
 } from '@rosti/ui/components/primitives/form'
 import { Input } from '@rosti/ui/components/primitives/input'
+import { PasswordInput } from '@/common/components/password-input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
@@ -128,10 +129,9 @@ export const AuthRegisterForm: React.FC<AuthRegisterFormProps> = ({
             <FormItem>
               <FormLabel htmlFor="password">{t('auth.register.password')}</FormLabel>
               <FormControl>
-                <Input
+                <PasswordInput
                   id="password"
                   {...field}
-                  type="password"
                   autoComplete="new-password"
                   placeholder="••••••••"
                 />
@@ -147,10 +147,9 @@ export const AuthRegisterForm: React.FC<AuthRegisterFormProps> = ({
             <FormItem>
               <FormLabel htmlFor="confirmPassword">{t('auth.register.confirmPassword')}</FormLabel>
               <FormControl>
-                <Input
+                <PasswordInput
                   id="confirmPassword"
                   {...field}
-                  type="password"
                   autoComplete="new-password"
                   placeholder="••••••••"
                 />

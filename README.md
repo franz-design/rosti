@@ -5,7 +5,7 @@ Multi-club team manager: seasons, recurring matches, RSVP, blue/red lineups, goa
 | App | Role |
 |-----|------|
 | `apps/api` | NestJS REST API (auth, clubs, matches, stats, chat, payments stub) |
-| `apps/web-spa` | Authenticated web app (desktop + Capacitor mobile shell) |
+| `apps/web-spa` | Authenticated web app (desktop and installable PWA) |
 | `apps/documentation` | Product and engineering docs |
 
 ## Prerequisites
@@ -90,14 +90,14 @@ See [Env files](apps/documentation/src/content/docs/core-features/0_env-file.mdx
 | `pnpm test` | Run tests |
 | `pnpm build` | Build all packages and apps |
 
-Mobile (Capacitor): after a SPA build, see [CAPACITOR.md](apps/web-spa/CAPACITOR.md).
+Mobile is the installable PWA. Plan: [PWA and push notifications](apps/documentation/src/content/docs/guides/pwa-and-push.mdx). The Capacitor store apps are on standby: [CAPACITOR.md](apps/web-spa/CAPACITOR.md).
 
 ## Project structure
 
 ```
 apps/
   api/             NestJS API + MikroORM + Better Auth
-  web-spa/         React authenticated app (+ Capacitor)
+  web-spa/         React authenticated app (installable PWA; Capacitor later)
   documentation/   Starlight docs
 packages/
   ui/              Shared UI (shadcn / Radix)
@@ -118,7 +118,8 @@ packages/
 
 - [API README](apps/api/README.md)
 - [Web SPA README](apps/web-spa/README.md)
-- [Capacitor / mobile](apps/web-spa/CAPACITOR.md)
+- [PWA and push notifications](apps/documentation/src/content/docs/guides/pwa-and-push.mdx)
+- [Capacitor / store apps (on standby)](apps/web-spa/CAPACITOR.md)
 - [Documentation app README](apps/documentation/README.md)
 
 ### Engineering guidelines

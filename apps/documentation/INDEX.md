@@ -40,7 +40,9 @@
 - [encrypt-env.mdx](./src/content/docs/guides/encrypt-env.mdx) - Setup env file encryption
 - [feature-flags.mdx](./src/content/docs/guides/feature-flags.mdx) - Ship a merged change dark with a single env-var check
 - [generating-types.mdx](./src/content/docs/guides/generating-types.mdx) - Generate types and SDKs from the OpenAPI schema
-- [rosti-production.mdx](./src/content/docs/guides/rosti-production.mdx) - How to deploy Rösti (API, SPA, mobile) to production
+- [mobile-store.mdx](./src/content/docs/guides/mobile-store.mdx) - Plan and task list to ship the Capacitor app on the App Store and Google Play
+- [pwa-and-push.mdx](./src/content/docs/guides/pwa-and-push.mdx) - Plan to make the web app installable and deliver mobile notifications with Web Push
+- [rosti-production.mdx](./src/content/docs/guides/rosti-production.mdx) - How to deploy Rösti (API and SPA) to production
 
 ## References
 

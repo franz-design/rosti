@@ -170,7 +170,7 @@ export function AwardCard({
           />
           <div
             className={cn(
-              'absolute z-[2] right-[8%] left-[8%] flex flex-col items-center gap-[0.7cqi] text-center text-[#fffdf8] uppercase',
+              'absolute z-2 right-[8%] left-[8%] flex flex-col items-center gap-[0.7cqi] text-center text-[#fffdf8] uppercase',
               '[text-shadow:0_1px_1px_rgba(0,0,0,0.7),0_0_10px_rgba(0,16,32,0.45)]',
               skin.heading,
             )}
@@ -183,7 +183,7 @@ export function AwardCard({
             </p>
           </div>
           {showStat && player ? (
-            <div className="absolute top-[29%] left-[67.2%] z-[4] isolate flex h-[25%] w-[20.8%] flex-col overflow-hidden rounded-full">
+            <div className="absolute top-[29%] left-[67.2%] z-4 isolate flex h-[25%] w-[20.8%] flex-col overflow-hidden rounded-full">
               <div
                 className={cn(
                   'flex flex-[1.1] items-center justify-center text-[#fff8f2]',
@@ -204,7 +204,7 @@ export function AwardCard({
           ) : null}
           <p
             className={cn(
-              'absolute left-[11%] z-[4] isolate flex h-[10%] w-[78%] items-center justify-center overflow-hidden rounded-full border-[0.75cqi] border-transparent px-[9%] text-[#fff8f2]',
+              'absolute left-[11%] z-4 isolate flex h-[10%] w-[78%] items-center justify-center overflow-hidden rounded-lg border-[0.75cqi] border-transparent px-[9%] text-[#fff8f2]',
               'bg-origin-border shadow-[0_0.7cqi_1.6cqi_rgba(0,0,0,0.34)] [background-clip:padding-box,border-box]',
               skin.ribbon,
             )}

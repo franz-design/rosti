@@ -7,7 +7,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@rosti/ui/components/primitives/form'
-import { Input } from '@rosti/ui/components/primitives/input'
+import { PasswordInput } from '@/common/components/password-input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
@@ -54,10 +54,9 @@ export const AuthResetPasswordForm: React.FC<AuthResetPasswordFormProps> = ({
             <FormItem>
               <FormLabel htmlFor="password">{t('auth.resetPassword.password')}</FormLabel>
               <FormControl>
-                <Input
+                <PasswordInput
                   id="password"
                   {...field}
-                  type="password"
                   autoComplete="new-password"
                   placeholder="••••••••"
                 />
@@ -75,10 +74,9 @@ export const AuthResetPasswordForm: React.FC<AuthResetPasswordFormProps> = ({
                 {t('auth.resetPassword.confirmPassword')}
               </FormLabel>
               <FormControl>
-                <Input
+                <PasswordInput
                   id="confirmPassword"
                   {...field}
-                  type="password"
                   autoComplete="new-password"
                   placeholder="••••••••"
                 />

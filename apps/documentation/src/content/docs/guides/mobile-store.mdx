@@ -1,0 +1,144 @@
+---
+title: Mobile store release
+description: Plan and task list to ship the Capacitor app on the App Store and Google Play
+---
+
+# Mobile store release
+
+**On standby.** Phones use the installable web app. Do not generate store binaries, and do not wire APNs or FCM, until that decision changes. Current work lives in [PWA and push notifications](/lonestone-boilerplate/guides/pwa-and-push).
+
+The rest of this page is the later plan for a downloadable iOS and Android app. The store binary would wrap the existing `web-spa`. There is no second frontend.
+
+Update this page as work lands. Tick a box in the same change that finishes the task.
+
+## Decision
+
+Use Capacitor around `apps/web-spa`. The SPA already runs with `ssr: false`, so the production build can live inside the native WebView.
+
+Do not rewrite the app in React Native or Expo. Rösti is forms, lists, chat, and stats. A second UI would duplicate clubs, matches, lineups, and fees for little gain.
+
+Do not ship a PWA as the store app. A PWA is not an App Store binary.
+
+Do not add live updates (Capgo, Ionic Appflow) in the first store version. Each user-visible web change ships as a new store build. Add remote updates only after the signing flow is boring.
+
+Bundle id and Android package: `com.rosti.app` (`apps/web-spa/capacitor.config.json`). Ignore `app.json` at the repo root. It still says `com.lonestone.app` and is leftover boilerplate.
+
+## Already in the repo
+
+- [x] Capacitor 7 dependencies and scripts in `apps/web-spa/package.json` (`cap:sync`, `cap:add:ios`, `cap:add:android`)
+- [x] App origin `https://app.rosti.local` and push presentation options in `capacitor.config.json`
+- [x] Native bootstrap in `apps/web-spa/app/lib/capacitor.ts` (invite scheme `rosti://invite`, push token registration)
+- [x] Bootstrap called from `apps/web-spa/app/root.tsx`
+- [x] `device_token` table and API registration for `ios` / `android` / `web`
+- [x] Invite screen links in `invite-store-links.tsx` (`VITE_APP_STORE_URL`, `VITE_PLAY_STORE_URL`, `rosti://` deep link)
+- [x] Viewport `viewport-fit=cover` and a safe-area padding on the bottom nav
+
+## Not done yet
+
+The `ios/` and `android/` projects are not generated. Nothing is signed. Nothing has been uploaded. Push tokens are stored. The API does not send them to APNs or FCM.
+
+## Open choices
+
+These two choices change the order of the later phases. Leave them open until answered, then tick them and write the answer on the line.
+
+- [ ] Apple Developer account exists (99 USD / year), and a Mac is available to archive iOS
+- [ ] Google Play Console account exists (25 USD, one time)
+- [ ] First public binary includes push, or TestFlight / Play internal testing is enough with login, RSVP, and chat only
+
+Answer recorded here:
+
+- Apple account:
+- Google account:
+- First binary scope:
+
+## Phase 1 — Shell on a real phone
+
+Goal: install a debug build on one iPhone and one Android phone, log in, and open a match.
+
+- [ ] Generate `apps/web-spa/ios` and `apps/web-spa/android` (`pnpm --filter=@rosti/web-spa cap:add:ios` and `cap:add:android`)
+- [ ] Decide whether those native projects are committed. Default: commit them, ignore build outputs
+- [ ] Production SPA build with `VITE_API_URL=https://rosti-api.lesk.fr` (no trailing `/api`). The value is baked into the binary
+- [ ] `pnpm --filter=@rosti/web-spa cap:sync` and open the projects (`cap:ios`, `cap:android`)
+- [ ] App icon and launch screen
+- [ ] Embed fonts used by the UI. The web app currently loads Lexend from Google Fonts. The store build should not depend on that network call for the first screen
+- [ ] Status bar and keyboard behavior on both platforms. Android back button returns inside the WebView history
+- [ ] Confirm avatar file inputs work (`member-avatar-control.tsx`, `profile-identity.tsx`). If iOS blocks `<input type="file">`, add a Capacitor camera / file-picker plugin before store submission
+
+### Session cookie
+
+The WebView origin is `https://app.rosti.local`. The API is `https://rosti-api.lesk.fr`. Calls use `credentials: 'include'`. Login on the website does not prove login in the app.
+
+- [ ] Better Auth session cookie is `SameSite=None` and `Secure` for this origin pair
+- [ ] `https://app.rosti.local` is in API `TRUSTED_ORIGINS`
+- [ ] Log in, kill the app, reopen it, and still be logged in, on iOS and Android
+
+Do not continue to store listing work until this box is ticked. A broken session makes every later build useless.
+
+## Phase 2 — Store rules
+
+Goal: a binary a reviewer can accept. No purchase flow.
+
+Session fees stay personal links (Lydia, PayPal.me, Revolut). Do not add in-app purchase.
+
+There is no Google or Apple social login today, so Sign in with Apple is not required. If a social login is added later, Apple sign-in has to ship in the same version.
+
+- [ ] Account deletion inside the app, reachable without emailing support. Apple requires this when the app creates accounts
+- [ ] Privacy policy URL and support email
+- [ ] Age rating and App Privacy / Play Data safety forms (account, email, photos, push token)
+- [ ] Permission copy for notifications and photos, in French and English, matching the in-app strings
+
+## Phase 3 — Invite links
+
+Goal: an invitation opens the installed app, and the store buttons go to the real listings.
+
+The custom scheme `rosti://invite?token=…&email=…` is already handled in `capacitor.ts`. Https links need the platform files.
+
+- [ ] iOS associated domains and `apple-app-site-association` for `https://rosti.lesk.fr/invite/…`
+- [ ] Android App Links and `assetlinks.json` for the same path
+- [ ] Set real `VITE_APP_STORE_URL` and `VITE_PLAY_STORE_URL` on the web-spa service (see the production runbook). Rebuild the store binary after the URLs exist, because they are compile-time
+- [ ] Cold start from an invite link lands on register with the invitation id and email
+- [ ] Link opened while the app is already running does the same
+
+## Phase 4 — Push
+
+Not required for the first internal build. Required before a launch where RSVP and mentions matter.
+
+Tokens already land in `device_token`. Sending does not exist yet.
+
+- [ ] Apple APNs key (`.p8`) stored as an API secret, not in the repo
+- [ ] Firebase project and FCM credentials stored as an API secret
+- [ ] API sends a push only when `notification_preference.pushEnabled` is true, and the matching event flag is true
+- [ ] Tapping a notification opens the related match
+- [ ] Logout or account deletion removes that user's device tokens
+- [ ] A failed token (unregistered device) is deleted instead of retried forever
+
+Email stays the fallback. Do not turn email off when push ships.
+
+## Phase 5 — Release
+
+Goal: TestFlight and a Play internal track, then public review.
+
+CI today builds Docker images. It does not build store binaries. Sign by hand the first time (Xcode and Android Studio). Add Fastlane only after one binary has been accepted on each internal track.
+
+- [ ] iOS distribution certificate, provisioning profile, and an archive uploaded to TestFlight
+- [ ] Play App Signing, an `.aab` uploaded to the internal testing track
+- [ ] Version numbers in the native projects follow the web release that was bundled
+- [ ] Short test notes: login, RSVP, lineup, chat, invite link
+- [ ] Public App Store submission
+- [ ] Public Play production track
+- [ ] Write down who owns the Apple and Google accounts, and where the signing keys live
+
+## Risks
+
+- Apple review rejects the app when account deletion is missing, or when the app is only a wrapped website with no native behavior. Push and invite links are the native behavior to show.
+- A web hotfix does not reach phones until a new store build is released.
+- Cross-site cookies are the most likely reason the first build cannot log in. Phase 1 blocks on that check.
+- `app.json` (`com.lonestone.app`) must not be used as the store id. Changing `com.rosti.app` after the first upload means a new store listing.
+
+## Out of scope for this plan
+
+- React Native or Expo rewrite
+- Live web updates inside an already installed binary
+- In-app purchase for session fees
+- Offline mode
+- A staging environment. Production is the only deployed environment. Internal store tracks point at production.

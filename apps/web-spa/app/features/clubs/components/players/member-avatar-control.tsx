@@ -27,7 +27,7 @@ export function MemberAvatarControl({
     <div className="absolute inset-0">
       <button
         type="button"
-        className="absolute inset-0 overflow-hidden rounded-full disabled:cursor-not-allowed"
+        className="absolute inset-0 overflow-hidden rounded-full disabled:cursor-not-allowed cursor-pointer group"
         disabled={isBusy}
         aria-label={t('clubSettings.players.changeAvatar', { name })}
         onClick={() => inputRef.current?.click()}
@@ -37,7 +37,7 @@ export function MemberAvatarControl({
           imageUrl={imageUrl}
           className="absolute inset-0 size-full! rounded-full"
         />
-        <span className="pointer-events-none absolute inset-x-0 bottom-0 flex h-1/3 items-center justify-center bg-black/50 text-white">
+        <span className="pointer-events-none absolute inset-x-0 flex h-1/3 items-center justify-center bg-black/50 text-white -bottom-full group-hover:bottom-0 transition-all duration-300 ease-in-out">
           {isPending ? (
             <Loader2 className="size-3.5 animate-spin" />
           ) : (
@@ -60,7 +60,7 @@ export function MemberAvatarControl({
       {imageUrl ? (
         <button
           type="button"
-          className="absolute top-0 right-0 z-10 flex size-5 items-center justify-center rounded-full bg-background text-foreground shadow-sm disabled:cursor-not-allowed"
+          className="absolute top-0 right-0 z-10 flex size-5 items-center justify-center rounded-full bg-background text-foreground shadow-sm disabled:cursor-not-allowed cursor-pointer hover:border border-foreground"
           disabled={isBusy}
           aria-label={t('clubSettings.players.removeAvatar', { name })}
           onClick={onRemove}
