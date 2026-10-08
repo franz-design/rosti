@@ -25,6 +25,7 @@
 
 :root {
   --header-height: 3rem;
+  --safe-area-top: env(safe-area-inset-top, 0px);
   --bottom-nav-height: calc(3.5rem + env(safe-area-inset-bottom, 0px));
 
   /* Visible viewport metrics, kept in sync with window.visualViewport by useViewportHeight.

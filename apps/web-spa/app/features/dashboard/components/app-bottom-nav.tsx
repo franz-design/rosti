@@ -11,7 +11,7 @@ export function AppBottomNav() {
   return (
     <nav
       aria-label={t('dashboard.navigation')}
-      className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 backdrop-blur-sm md:hidden"
+      className="absolute inset-x-0 bottom-0 z-50 border-t bg-background/95 backdrop-blur-sm md:hidden"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <ul className="grid h-14 grid-cols-3">

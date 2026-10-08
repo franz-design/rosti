@@ -49,9 +49,8 @@ export default function DashboardPage() {
           <AppMain>
             <Outlet />
           </AppMain>
+          <AppBottomNav />
         </AppLayout>
-
-        <AppBottomNav />
 
         <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
 
