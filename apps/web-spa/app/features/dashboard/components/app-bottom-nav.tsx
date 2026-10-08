@@ -12,7 +12,7 @@ export function AppBottomNav() {
     <nav
       aria-label={t('dashboard.navigation')}
       className="absolute inset-x-0 bottom-0 z-50 border-t bg-background/95 backdrop-blur-sm md:hidden"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 3px)' }}
     >
       <ul className="grid h-14 grid-cols-3">
         {items.map((item) => {

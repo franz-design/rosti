@@ -59,7 +59,7 @@ export function AppUserMenu({ variant = 'sidebar' }: AppUserMenuProps) {
             />
           }
         >
-          <Avatar size="sm">
+          <Avatar>
             {sessionData?.user?.image ? <AvatarImage src={sessionData.user.image} alt="" /> : null}
             <AvatarFallback>{userInitials}</AvatarFallback>
           </Avatar>
