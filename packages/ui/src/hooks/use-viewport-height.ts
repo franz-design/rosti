@@ -6,10 +6,12 @@ import { useLayoutEffect } from 'react'
 const KEYBOARD_MIN_HEIGHT = 150
 
 /**
- * Home-screen iOS reports a short viewport, including `100dvh`, until the first touch.
- * The physical screen size is correct immediately. Use it only when the window spans
- * the screen: split view would make that height too tall.
+ * Home-screen iOS reports a viewport far below the screen until the first touch.
+ * A reported height within this distance is the real visible area. The physical screen
+ * is a little taller than that area, so using it clips the tab labels.
  */
+const LAUNCH_GAP = 40
+
 function isInstalledApp(): boolean {
   if (window.matchMedia('(display-mode: standalone)').matches) return true
 
@@ -30,9 +32,24 @@ function physicalScreenSize(): { width: number; height: number } {
   return swap ? { width: height, height: width } : { width, height }
 }
 
+/** Split view does not span the screen, so the physical height would be too tall there. */
 function fillsScreenWidth(): boolean {
   const { width } = physicalScreenSize()
   return Math.abs(window.innerWidth - width) <= 1
+}
+
+/**
+ * Prefer a reported height once it is close to the screen. Until then iOS is still
+ * short by the launch gap, and the physical height is the best value we have.
+ */
+function installedAppHeight(viewport: VisualViewport): number {
+  const physical = physicalScreenSize().height
+  const visual = viewport.offsetTop + viewport.height
+  const layout = window.innerHeight
+
+  if (physical - visual <= LAUNCH_GAP && physical - visual >= 0) return visual
+  if (physical - layout <= LAUNCH_GAP && physical - layout >= 0) return layout
+  return physical
 }
 
 /**
@@ -56,7 +73,7 @@ export function useViewportHeight() {
     const applyViewportMetrics = () => {
       const hiddenBelow = window.innerHeight - viewport.height - viewport.offsetTop
       const keyboardHeight = hiddenBelow > KEYBOARD_MIN_HEIGHT ? hiddenBelow : 0
-      const { height } = physicalScreenSize()
+      const height = installedAppHeight(viewport)
 
       if (keyboardHeight === 0 && isInstalledApp() && fillsScreenWidth() && height > 0) {
         root.style.setProperty('--app-height', `${height}px`)
