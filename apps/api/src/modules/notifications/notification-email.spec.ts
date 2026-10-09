@@ -1,4 +1,4 @@
-import { newMatchEmail, rsvpReminderEmail } from './notification-email'
+import { newMatchEmail, playerVoteResultEmail, rsvpReminderEmail } from './notification-email'
 
 const APP_URL = 'https://app.lesk.fr'
 const MATCH = {
@@ -26,5 +26,13 @@ describe('notification emails', () => {
       'Le match a lieu lundi 23 novembre à 11h. Est-ce que tu seras présent ?',
     )
     expect(actual.paragraphs.join(' ')).not.toContain('2026-11-23')
+  })
+
+  it('names the elected player', () => {
+    const actual = playerVoteResultEmail(MATCH, APP_URL, 'Hugo Bernard', false)
+
+    expect(actual.subject).toBe('Meilleur joueur : Hugo Bernard')
+    expect(actual.paragraphs[0]).toBe('Hugo Bernard est élu meilleur joueur de Match — FC Gros.')
+    expect(actual.action.url).toBe('https://app.lesk.fr/matches/match-1')
   })
 })

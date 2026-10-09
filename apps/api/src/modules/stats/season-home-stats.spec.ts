@@ -25,6 +25,7 @@ describe('createEmptyHomeStats', () => {
         mostWins: null,
         mostLosses: null,
         mostPlayedTogether: null,
+        lastElectedPlayer: null,
       },
       me: { matchesPlayed: 0, goals: 0, wins: 0, losses: 0 },
     })

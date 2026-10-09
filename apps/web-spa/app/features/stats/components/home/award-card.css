@@ -59,8 +59,50 @@
   }
 }
 
+/* Sweep stays inside the name ribbon and the stat pill. Both clip it with overflow hidden. */
+.award-card-name::after,
+.award-card-stat::after {
+  content: '';
+  position: absolute;
+  inset: -40% -30%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.28) 24%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.28) 76%,
+    transparent 100%
+  );
+  mix-blend-mode: overlay;
+  transform: translateX(-140%);
+  animation: award-card-stat-shine 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.award-card-name::after {
+  animation-delay: 4s;
+}
+
+@keyframes award-card-stat-shine {
+  0%,
+  16% {
+    transform: translateX(-140%);
+  }
+
+  58%,
+  100% {
+    transform: translateX(140%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .award-card-sheen {
     animation: none;
+  }
+
+  .award-card-name::after,
+  .award-card-stat::after {
+    animation: none;
+    opacity: 0;
   }
 }

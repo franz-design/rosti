@@ -11,7 +11,7 @@ export function AppBottomNav() {
   return (
     <nav
       aria-label={t('dashboard.navigation')}
-      className="absolute inset-x-0 bottom-0 z-50 border-t bg-background backdrop-blur-sm md:hidden"
+      className="absolute inset-x-0 -bottom-1 z-50 bg-foreground backdrop-blur-sm md:hidden"
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 3px)' }}
     >
       <ul className="grid h-14 grid-cols-3">
@@ -25,7 +25,7 @@ export function AppBottomNav() {
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
                   'flex h-full flex-col items-center justify-center gap-0.5 px-1 text-xs font-medium',
-                  isActive ? 'text-primary' : 'text-foreground',
+                  isActive ? 'text-white' : 'text-white/80',
                 )}
               >
                 <item.icon className="size-5 shrink-0" />

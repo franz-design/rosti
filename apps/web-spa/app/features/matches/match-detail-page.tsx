@@ -10,7 +10,6 @@ import { useClub } from '@/features/clubs/hooks/club-context'
 import { useFullBleedShell } from '@/common/hooks/app-shell-context'
 import { authClient } from '@/lib/auth-client'
 import { rostiApi } from '@/lib/rosti-api'
-import { AttendanceTab } from './components/match-detail/attendance/attendance-tab'
 import { ChatTab } from './components/match-detail/chat/chat-tab'
 import { LineupDialog } from './components/match-detail/lineup/lineup-dialog'
 import { MatchDetailHeader } from './components/match-detail/match-detail-header'
@@ -109,14 +108,16 @@ export default function MatchDetailPage() {
     [attendances],
   )
 
-  const attendanceGroups = useMemo(
-    () => ({
-      present: attendances.filter((a) => a.status === 'present'),
-      pending: attendances.filter((a) => a.status === 'pending'),
-      absent: attendances.filter((a) => a.status === 'absent'),
-    }),
-    [attendances],
-  )
+  const attendanceGroups = useMemo(() => {
+    const byName = (left: (typeof attendances)[number], right: (typeof attendances)[number]) =>
+      left.userName.localeCompare(right.userName, dateLocale, { sensitivity: 'base' })
+
+    return {
+      present: attendances.filter((attendance) => attendance.status === 'present').sort(byName),
+      pending: attendances.filter((attendance) => attendance.status === 'pending').sort(byName),
+      absent: attendances.filter((attendance) => attendance.status === 'absent').sort(byName),
+    }
+  }, [attendances, dateLocale])
 
   useEffect(() => {
     const next: Record<string, PlayerStatDraft> = {}
@@ -217,6 +218,7 @@ export default function MatchDetailPage() {
     void queryClient.invalidateQueries({ queryKey: ['lineups', orgId, matchId] })
     void queryClient.invalidateQueries({ queryKey: ['messages', orgId, matchId] })
     void queryClient.invalidateQueries({ queryKey: ['match-stats', orgId, matchId] })
+    void queryClient.invalidateQueries({ queryKey: ['player-vote', orgId, matchId] })
   }
 
   const rsvp = useMutation({
@@ -327,18 +329,6 @@ export default function MatchDetailPage() {
     return <div className="text-muted-foreground">{t('matches.detail.loading')}</div>
   }
 
-  const startsAt = new Date(match.startsAt)
-  const dateLabel = startsAt.toLocaleDateString(dateLocale, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-  const timeLabel = startsAt.toLocaleTimeString(dateLocale, {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-  const canRsvp = match.status === 'scheduled'
   const canManageComposition = isClubAdmin && match.status !== 'cancelled'
   const showMatchResult = shouldShowMatchResult(match)
 
@@ -367,34 +357,21 @@ export default function MatchDetailPage() {
         >
           <SummaryTab
             match={match}
-            dateLabel={dateLabel}
-            timeLabel={timeLabel}
             showMatchResult={showMatchResult}
             canEnterScore={shouldPromptEnterScore(match, isClubAdmin)}
             onEnterScore={() => setTab('stats')}
-            canRsvp={canRsvp}
             myAttendance={myAttendance}
             isRsvpPending={rsvp.isPending}
             onPresent={() => rsvp.mutate('present')}
             onAbsent={() => rsvp.mutate('absent')}
-            presentPlayers={presentPlayers}
+            attendanceGroups={attendanceGroups}
+            sortedAttendances={sortedAttendances}
+            busyUserId={busyUserId}
+            onSetStatus={(userId, status) => setAttendance.mutate({ userId, status })}
             statDrafts={statDrafts}
             lineups={lineups}
             canManageComposition={canManageComposition}
             onEditLineup={() => setIsLineupOpen(true)}
-          />
-        </TabsContent>
-
-        <TabsContent
-          value="attendance"
-          className={cn('mt-6 space-y-6 outline-none', isChat && 'px-6')}
-        >
-          <AttendanceTab
-            canManage={canManageComposition}
-            sortedAttendances={sortedAttendances}
-            attendanceGroups={attendanceGroups}
-            busyUserId={busyUserId}
-            onSetStatus={(userId, status) => setAttendance.mutate({ userId, status })}
           />
         </TabsContent>
 

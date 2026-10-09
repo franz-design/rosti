@@ -31,6 +31,9 @@ export class NotificationPreference {
   @Property({ default: false })
   notifyAllChatMessages: boolean = false
 
+  @Property({ default: true })
+  notifyPlayerVote: boolean = true
+
   @Property()
   createdAt: Date = new Date()
 

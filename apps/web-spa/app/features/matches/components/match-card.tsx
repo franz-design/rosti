@@ -42,7 +42,9 @@ interface MatchCardProps {
   dateLocale: string
   variant: 'upcoming' | 'past'
   actions?: ReactNode
+  footer?: ReactNode
   promptEnterScore?: boolean
+  className?: string
 }
 
 export default function MatchCard({
@@ -50,7 +52,9 @@ export default function MatchCard({
   dateLocale,
   variant,
   actions,
+  footer,
   promptEnterScore = false,
+  className,
 }: MatchCardProps) {
   const { t } = useTranslation()
   const startsAt = new Date(match.startsAt)
@@ -67,11 +71,15 @@ export default function MatchCard({
   const recordedScore = showScore && hasMatchScore(match)
   const viewerResult = showScore ? getViewerMatchResult(match) : undefined
   const resultClass = getCardResultClass(match)
-  const cardClassName = cn('rounded-xl border bg-card p-2 shadow-sm overflow-hidden', resultClass)
+  const cardClassName = cn(
+    'rounded-xl border bg-card p-2 shadow-sm overflow-hidden',
+    resultClass,
+    className,
+  )
   const scoreClassName = cn(recordedScore ? getResultClass(match) : undefined)
 
   const body = (
-    <div className="flex items-center justify-between gap-2">
+    <div className="flex h-full items-center justify-between gap-2">
       <div className="space-y-2 min-w-0 p-4">
         <div
           className={cn(
@@ -140,28 +148,30 @@ export default function MatchCard({
         ) : (
           <p className="text-sm text-muted-foreground p-4">{t('matches.noScore')}</p>
         )
+      ) : footer ? (
+        <div className="pointer-events-auto shrink-0 self-center p-4">{footer}</div>
       ) : null}
     </div>
   )
 
-  if (!actions) {
+  if (!actions && !footer) {
     return (
-      <Link to={`/matches/${match.id}`} className={cn('block', cardClassName)}>
+      <Link to={`/matches/${match.id}`} className={cn('block h-full', cardClassName)}>
         {body}
       </Link>
     )
   }
 
   return (
-    <div className={cn('relative', cardClassName)}>
+    <div className={cn('relative h-full', cardClassName)}>
       <Link
         to={`/matches/${match.id}`}
         className="absolute inset-0 rounded-xl"
         aria-label={match.title}
       />
-      <div className="relative z-10 flex items-start justify-between gap-3 pointer-events-none">
-        {body}
-        <div className="pointer-events-auto shrink-0 m-2">{actions}</div>
+      <div className="relative z-10 flex h-full items-start pointer-events-none">
+        <div className="h-full min-w-0 flex-1">{body}</div>
+        {actions ? <div className="pointer-events-auto m-2 shrink-0">{actions}</div> : null}
       </div>
     </div>
   )

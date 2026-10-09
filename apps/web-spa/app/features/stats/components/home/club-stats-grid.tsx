@@ -40,12 +40,11 @@ export function ClubStatsGrid({ stats }: ClubStatsGridProps) {
           player={club?.mostLosses ?? null}
           emptyLabel={t('home.stats.card.emptyLosses')}
         />
-        {/* Voting for the best player of the last match does not exist yet. */}
         <AwardCard
           variant="elected"
           title={t('home.stats.card.electedTitle')}
           subtitle={t('home.stats.card.electedSubtitle')}
-          player={null}
+          player={club?.lastElectedPlayer ? { ...club.lastElectedPlayer, value: 0 } : null}
           emptyLabel={t('home.stats.card.emptyElected')}
           showStat={false}
         />

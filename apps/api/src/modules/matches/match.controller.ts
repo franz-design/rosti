@@ -27,9 +27,16 @@ import {
   UpdateMatchInput,
   updateMatchSchema,
 } from './contracts/match.contract'
+import {
+  CastPlayerVoteInput,
+  castPlayerVoteSchema,
+  PlayerVoteStateDto,
+  playerVoteStateSchema,
+} from './contracts/player-vote.contract'
 import { Match } from './match.entity'
 import { MatchMapper } from './match.mapper'
 import { MatchService } from './match.service'
+import { PlayerVoteService } from './player-vote.service'
 
 @TypedController('clubs/:organizationId/matches', undefined, { tags: ['Matches'] })
 @UseGuards(AuthGuard)
@@ -37,6 +44,7 @@ export class MatchController {
   constructor(
     private readonly matchService: MatchService,
     private readonly matchMapper: MatchMapper,
+    private readonly playerVoteService: PlayerVoteService,
   ) {}
 
   @TypedRoute.Post('', matchesSchema)
@@ -110,6 +118,25 @@ export class MatchController {
   ): Promise<MatchDto> {
     const match = await this.matchService.markPlayed(organizationId, session.user.id, matchId)
     return this.mapMatch(match, session.user.id)
+  }
+
+  @TypedRoute.Get(':matchId/player-vote', playerVoteStateSchema)
+  async getPlayerVote(
+    @Session() session: LoggedInBetterAuthSession,
+    @TypedParam('organizationId', z.string().uuid()) organizationId: string,
+    @TypedParam('matchId', z.string().uuid()) matchId: string,
+  ): Promise<PlayerVoteStateDto> {
+    return this.playerVoteService.getState(organizationId, session.user.id, matchId)
+  }
+
+  @TypedRoute.Put(':matchId/player-vote', playerVoteStateSchema)
+  async castPlayerVote(
+    @Session() session: LoggedInBetterAuthSession,
+    @TypedParam('organizationId', z.string().uuid()) organizationId: string,
+    @TypedParam('matchId', z.string().uuid()) matchId: string,
+    @TypedBody(castPlayerVoteSchema) body: CastPlayerVoteInput,
+  ): Promise<PlayerVoteStateDto> {
+    return this.playerVoteService.castVote(organizationId, session.user.id, matchId, body)
   }
 
   @TypedRoute.Get(':matchId/attendances', attendancesSchema)

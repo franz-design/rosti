@@ -7,6 +7,7 @@ import { MatchAttendance } from '../matches/match-attendance.entity'
 import { MatchLineup } from '../matches/match-lineup.entity'
 import { Match } from '../matches/match.entity'
 import { SeasonStatus } from '../seasons/contracts/season.contract'
+import { PlayerVoteService } from '../matches/player-vote.service'
 import { Season } from '../seasons/season.entity'
 import { SeasonHomeStatsDto, UpsertMatchStatsInput } from './contracts/stats.contract'
 import { MatchStat } from './match-stat.entity'
@@ -23,6 +24,7 @@ export class StatsService {
   constructor(
     private readonly em: EntityManager,
     private readonly organizationService: OrganizationService,
+    private readonly playerVoteService: PlayerVoteService,
   ) {}
 
   async upsertMatchStats(
@@ -59,6 +61,7 @@ export class StatsService {
     }
     match.status = MatchStatus.Played
     await this.em.flush()
+    await this.playerVoteService.sync(match)
     return result
   }
 
@@ -158,11 +161,19 @@ export class StatsService {
         { match: { id: { $in: matchIds } }, status: AttendanceStatus.Present },
         { populate: ['user', 'match'] },
       ),
-      this.em.find(MatchLineup, { match: { id: { $in: matchIds } } }, { populate: ['user', 'match'] }),
-      this.em.find(MatchStat, { match: { id: { $in: matchIds } } }, { populate: ['user', 'match'] }),
+      this.em.find(
+        MatchLineup,
+        { match: { id: { $in: matchIds } } },
+        { populate: ['user', 'match'] },
+      ),
+      this.em.find(
+        MatchStat,
+        { match: { id: { $in: matchIds } } },
+        { populate: ['user', 'match'] },
+      ),
     ])
 
-    return computeSeasonHomeStats({
+    const home = computeSeasonHomeStats({
       season: seasonRef,
       viewerUserId: userId,
       matches: matches.map((match) => ({
@@ -174,6 +185,8 @@ export class StatsService {
       lineups: lineups.map(toLineupRow),
       goals: stats.map(toGoalRow),
     })
+    home.club.lastElectedPlayer = await this.playerVoteService.findLastElectedPlayer(matches)
+    return home
   }
 }
 

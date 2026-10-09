@@ -92,6 +92,7 @@ export function computeSeasonHomeStats(input: ComputeSeasonHomeStatsInput): Seas
       mostWins: pickLeader(players, (player) => player.wins),
       mostLosses: pickLeader(players, (player) => player.losses),
       mostPlayedTogether: pickTeammatePair(lineupsByMatch),
+      lastElectedPlayer: null,
     },
     me: {
       matchesPlayed: viewer?.matchesPlayed ?? 0,
@@ -200,14 +201,18 @@ function isBetterLeader(
   return candidate.userName.localeCompare(current.userName) < 0
 }
 
-function pickTeammatePair(
-  lineupsByMatch: Map<string, HomeStatsLineupRow[]>,
-): TeammatePair | null {
+function pickTeammatePair(lineupsByMatch: Map<string, HomeStatsLineupRow[]>): TeammatePair | null {
   const pairs = new Map<string, TeammatePair>()
 
   for (const lineups of lineupsByMatch.values()) {
-    addTeamPairs(pairs, lineups.filter((row) => row.team === TeamSide.Blue))
-    addTeamPairs(pairs, lineups.filter((row) => row.team === TeamSide.Red))
+    addTeamPairs(
+      pairs,
+      lineups.filter((row) => row.team === TeamSide.Blue),
+    )
+    addTeamPairs(
+      pairs,
+      lineups.filter((row) => row.team === TeamSide.Red),
+    )
   }
 
   let leader: TeammatePair | null = null

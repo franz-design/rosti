@@ -6,21 +6,34 @@ import type { Attendance } from '@/lib/rosti-api'
 interface RsvpButtonsProps {
   status?: Attendance['status']
   disabled?: boolean
+  direction?: 'row' | 'column'
   onPresent: () => void
   onAbsent: () => void
 }
 
-export function RsvpButtons({ status, disabled, onPresent, onAbsent }: RsvpButtonsProps) {
+export function RsvpButtons({
+  status,
+  disabled,
+  direction = 'row',
+  onPresent,
+  onAbsent,
+}: RsvpButtonsProps) {
   const { t } = useTranslation()
   const hasAnswered = status === 'present' || status === 'absent'
+  const isColumn = direction === 'column'
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div
+      className={cn(
+        'flex gap-2 lg:w-full max-w-64 lg:max-w-100',
+        isColumn ? 'w-36 flex-col' : 'flex-wrap',
+      )}
+    >
       <Button
         type="button"
         variant={status === 'present' ? 'default' : 'outline'}
         className={cn(
-          'min-w-36',
+          isColumn ? 'w-full' : 'min-w-36 flex-1',
           hasAnswered && status !== 'present' && 'opacity-40 hover:opacity-70',
         )}
         disabled={disabled}
@@ -32,7 +45,7 @@ export function RsvpButtons({ status, disabled, onPresent, onAbsent }: RsvpButto
         type="button"
         variant={status === 'absent' ? 'default' : 'outline'}
         className={cn(
-          'min-w-36',
+          isColumn ? 'w-full' : 'min-w-36 flex-1',
           hasAnswered && status !== 'absent' && 'opacity-40 hover:opacity-70',
         )}
         disabled={disabled}

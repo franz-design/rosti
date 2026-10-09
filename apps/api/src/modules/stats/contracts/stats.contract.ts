@@ -81,6 +81,7 @@ export const clubHomeStatsSchema = z
     mostWins: playerHighlightSchema.nullable(),
     mostLosses: playerHighlightSchema.nullable(),
     mostPlayedTogether: playedTogetherSchema.nullable(),
+    lastElectedPlayer: playerRefSchema.nullable(),
   })
   .meta({ title: 'ClubHomeStatsSchema' })
 

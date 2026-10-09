@@ -121,6 +121,13 @@ export const rostiApi = {
       method: 'POST',
       body: JSON.stringify(body),
     }),
+  getPlayerVote: (orgId: string, matchId: string) =>
+    request<PlayerVoteState>(`/clubs/${orgId}/matches/${matchId}/player-vote`),
+  castPlayerVote: (orgId: string, matchId: string, nomineeUserId: string) =>
+    request<PlayerVoteState>(`/clubs/${orgId}/matches/${matchId}/player-vote`, {
+      method: 'PUT',
+      body: JSON.stringify({ nomineeUserId }),
+    }),
   listAttendances: (orgId: string, matchId: string) =>
     request<Attendance[]>(`/clubs/${orgId}/matches/${matchId}/attendances`),
   respondAttendance: (orgId: string, matchId: string, status: 'present' | 'absent') =>
@@ -292,6 +299,22 @@ export interface Match {
   createdAt: string
 }
 
+export interface PlayerVotePlayer {
+  userId: string
+  userName: string
+  image?: string | null
+}
+
+export interface PlayerVoteState {
+  phase: 'unavailable' | 'open' | 'closed'
+  closesAt?: string | null
+  canVote: boolean
+  candidates: PlayerVotePlayer[]
+  myNomineeUserId?: string | null
+  winner: PlayerVotePlayer | null
+  isTie: boolean
+}
+
 export interface CreateMatchBody {
   seasonId: string
   title: string
@@ -366,6 +389,11 @@ export interface SeasonHomeStats {
     mostWins: PlayerHighlight | null
     mostLosses: PlayerHighlight | null
     mostPlayedTogether: PlayedTogether | null
+    lastElectedPlayer: {
+      userId: string
+      userName: string
+      image?: string | null
+    } | null
   }
   me: {
     matchesPlayed: number
@@ -395,6 +423,7 @@ export interface NotificationPreference {
   notifyMatchCancelled: boolean
   notifyChatMention: boolean
   notifyAllChatMessages: boolean
+  notifyPlayerVote: boolean
 }
 
 export interface MatchCost {

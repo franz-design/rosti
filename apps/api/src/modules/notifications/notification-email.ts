@@ -48,6 +48,47 @@ export function rsvpReminderEmail(match: MatchEmailSource, appUrl: string): Noti
   }
 }
 
+export function playerVoteOpenedEmail(
+  match: MatchEmailSource,
+  appUrl: string,
+): NotificationEmailCopy {
+  return {
+    subject: oneLine(`Vote pour le meilleur joueur : ${match.title}`),
+    paragraphs: [
+      `Le match ${whenAndWhere(match)} est terminé.`,
+      'Choisis le meilleur joueur parmi ceux qui étaient là. Tu as 2 jours.',
+    ],
+    action: { label: 'Voter', url: matchUrl(appUrl, match.id) },
+  }
+}
+
+export function playerVoteResultEmail(
+  match: MatchEmailSource,
+  appUrl: string,
+  winnerName: string | null,
+  isTie: boolean,
+): NotificationEmailCopy {
+  if (isTie) {
+    return {
+      subject: oneLine(`Égalité : ${match.title}`),
+      paragraphs: [`Égalité pour le meilleur joueur de ${match.title}. Personne n'est élu.`],
+      action: { label: 'Voir le match', url: matchUrl(appUrl, match.id) },
+    }
+  }
+  if (winnerName) {
+    return {
+      subject: oneLine(`Meilleur joueur : ${winnerName}`),
+      paragraphs: [`${winnerName} est élu meilleur joueur de ${match.title}.`],
+      action: { label: 'Voir le match', url: matchUrl(appUrl, match.id) },
+    }
+  }
+  return {
+    subject: oneLine(`Vote terminé : ${match.title}`),
+    paragraphs: [`Aucun meilleur joueur n'a été élu pour ${match.title}.`],
+    action: { label: 'Voir le match', url: matchUrl(appUrl, match.id) },
+  }
+}
+
 export function scoreReminderEmail(match: MatchEmailSource, appUrl: string): NotificationEmailCopy {
   return {
     subject: oneLine(`Renseigne le score de ${match.title}`),

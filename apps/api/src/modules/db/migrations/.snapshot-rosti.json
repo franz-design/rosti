@@ -389,8 +389,7 @@
           "constraint": false,
           "keyName": "device_token_userId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"device_token_userId_index\" ON public.device_token USING btree (\"userId\")"
+          "unique": false
         }
       ],
       "checks": [
@@ -757,6 +756,91 @@
           "enumItems": [],
           "mappedType": "uuid"
         },
+        "playerVoteClosedAt": {
+          "name": "playerVoteClosedAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "playerVoteClosesAt": {
+          "name": "playerVoteClosesAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "playerVoteIsTie": {
+          "name": "playerVoteIsTie",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "playerVoteOpenedAt": {
+          "name": "playerVoteOpenedAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "playerVoteWinnerId": {
+          "name": "playerVoteWinnerId",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
         "redScore": {
           "name": "redScore",
           "type": "int",
@@ -907,8 +991,7 @@
           "constraint": false,
           "keyName": "match_organizationId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"match_organizationId_index\" ON public.match USING btree (\"organizationId\")"
+          "unique": false
         },
         {
           "columnNames": [
@@ -922,14 +1005,23 @@
         },
         {
           "columnNames": [
+            "playerVoteClosesAt"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_playerVoteClosesAt_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "seasonId"
           ],
           "composite": false,
           "constraint": false,
           "keyName": "match_seasonId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"match_seasonId_index\" ON public.match USING btree (\"seasonId\")"
+          "unique": false
         },
         {
           "columnNames": [
@@ -939,8 +1031,7 @@
           "constraint": false,
           "keyName": "match_startsAt_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"match_startsAt_index\" ON public.match USING btree (\"startsAt\")"
+          "unique": false
         }
       ],
       "checks": [
@@ -975,6 +1066,18 @@
           ],
           "referencedTableName": "public.organization",
           "deleteRule": "cascade"
+        },
+        "match_playerVoteWinnerId_foreign": {
+          "columnNames": [
+            "playerVoteWinnerId"
+          ],
+          "constraintName": "match_playerVoteWinnerId_foreign",
+          "localTableName": "public.match",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.user",
+          "deleteRule": "set null"
         },
         "match_seasonId_foreign": {
           "columnNames": [
@@ -1140,8 +1243,7 @@
           "constraint": false,
           "keyName": "match_attendance_matchId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"match_attendance_matchId_index\" ON public.match_attendance USING btree (\"matchId\")"
+          "unique": false
         },
         {
           "columnNames": [
@@ -1152,8 +1254,7 @@
           "constraint": true,
           "keyName": "match_attendance_matchId_userId_unique",
           "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX \"match_attendance_matchId_userId_unique\" ON public.match_attendance USING btree (\"matchId\", \"userId\")"
+          "unique": true
         },
         {
           "columnNames": [
@@ -1173,8 +1274,7 @@
           "constraint": false,
           "keyName": "match_attendance_userId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"match_attendance_userId_index\" ON public.match_attendance USING btree (\"userId\")"
+          "unique": false
         }
       ],
       "checks": [
@@ -1330,8 +1430,7 @@
           "constraint": false,
           "keyName": "match_cost_matchId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"match_cost_matchId_index\" ON public.match_cost USING btree (\"matchId\")"
+          "unique": false
         },
         {
           "columnNames": [
@@ -1341,8 +1440,7 @@
           "constraint": true,
           "keyName": "match_cost_matchId_unique",
           "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX \"match_cost_matchId_unique\" ON public.match_cost USING btree (\"matchId\")"
+          "unique": true
         },
         {
           "columnNames": [
@@ -1492,8 +1590,7 @@
           "constraint": false,
           "keyName": "match_lineup_matchId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"match_lineup_matchId_index\" ON public.match_lineup USING btree (\"matchId\")"
+          "unique": false
         },
         {
           "columnNames": [
@@ -1504,8 +1601,7 @@
           "constraint": true,
           "keyName": "match_lineup_matchId_userId_unique",
           "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX \"match_lineup_matchId_userId_unique\" ON public.match_lineup USING btree (\"matchId\", \"userId\")"
+          "unique": true
         },
         {
           "columnNames": [
@@ -1671,8 +1767,7 @@
           "constraint": false,
           "keyName": "match_message_matchId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"match_message_matchId_index\" ON public.match_message USING btree (\"matchId\")"
+          "unique": false
         },
         {
           "columnNames": [
@@ -1710,6 +1805,208 @@
             "id"
           ],
           "referencedTableName": "public.match",
+          "deleteRule": "cascade"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "match_player_vote",
+      "schema": "public",
+      "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "gen_random_uuid()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "matchId": {
+          "name": "matchId",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "nomineeId": {
+          "name": "nomineeId",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "voterId": {
+          "name": "voterId",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "matchId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_player_vote_matchId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "matchId",
+            "voterId"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "match_player_vote_matchId_voterId_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "nomineeId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_player_vote_nomineeId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "match_player_vote_pkey",
+          "primary": true,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "voterId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_player_vote_voterId_index",
+          "primary": false,
+          "unique": false
+        }
+      ],
+      "checks": [],
+      "triggers": [],
+      "foreignKeys": {
+        "match_player_vote_matchId_foreign": {
+          "columnNames": [
+            "matchId"
+          ],
+          "constraintName": "match_player_vote_matchId_foreign",
+          "localTableName": "public.match_player_vote",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.match",
+          "deleteRule": "cascade"
+        },
+        "match_player_vote_nomineeId_foreign": {
+          "columnNames": [
+            "nomineeId"
+          ],
+          "constraintName": "match_player_vote_nomineeId_foreign",
+          "localTableName": "public.match_player_vote",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.user",
+          "deleteRule": "cascade"
+        },
+        "match_player_vote_voterId_foreign": {
+          "columnNames": [
+            "voterId"
+          ],
+          "constraintName": "match_player_vote_voterId_foreign",
+          "localTableName": "public.match_player_vote",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.user",
           "deleteRule": "cascade"
         }
       },
@@ -1955,8 +2252,7 @@
           "constraint": false,
           "keyName": "match_series_organizationId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"match_series_organizationId_index\" ON public.match_series USING btree (\"organizationId\")"
+          "unique": false
         },
         {
           "columnNames": [
@@ -2150,8 +2446,7 @@
           "constraint": false,
           "keyName": "match_stat_matchId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"match_stat_matchId_index\" ON public.match_stat USING btree (\"matchId\")"
+          "unique": false
         },
         {
           "columnNames": [
@@ -2162,8 +2457,7 @@
           "constraint": true,
           "keyName": "match_stat_matchId_userId_unique",
           "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX \"match_stat_matchId_userId_unique\" ON public.match_stat USING btree (\"matchId\", \"userId\")"
+          "unique": true
         },
         {
           "columnNames": [
@@ -2576,6 +2870,23 @@
           "enumItems": [],
           "mappedType": "boolean"
         },
+        "notifyPlayerVote": {
+          "name": "notifyPlayerVote",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
         "notifyRsvpReminder": {
           "name": "notifyRsvpReminder",
           "type": "boolean",
@@ -2664,8 +2975,7 @@
           "constraint": true,
           "keyName": "notification_preference_userId_unique",
           "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX \"notification_preference_userId_unique\" ON public.notification_preference USING btree (\"userId\")"
+          "unique": true
         }
       ],
       "checks": [],
@@ -3097,8 +3407,7 @@
           "constraint": false,
           "keyName": "scheduled_job_matchId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"scheduled_job_matchId_index\" ON public.scheduled_job USING btree (\"matchId\")"
+          "unique": false
         },
         {
           "columnNames": [
@@ -3118,8 +3427,7 @@
           "constraint": false,
           "keyName": "scheduled_job_runAt_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"scheduled_job_runAt_index\" ON public.scheduled_job USING btree (\"runAt\")"
+          "unique": false
         }
       ],
       "checks": [
@@ -3306,8 +3614,7 @@
           "constraint": false,
           "keyName": "season_organizationId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"season_organizationId_index\" ON public.season USING btree (\"organizationId\")"
+          "unique": false
         },
         {
           "columnNames": [
@@ -3696,8 +4003,7 @@
           "constraint": false,
           "keyName": "session_fee_matchId_index",
           "primary": false,
-          "unique": false,
-          "expression": "CREATE INDEX \"session_fee_matchId_index\" ON public.session_fee USING btree (\"matchId\")"
+          "unique": false
         },
         {
           "columnNames": [
@@ -3708,8 +4014,7 @@
           "constraint": true,
           "keyName": "session_fee_matchId_userId_unique",
           "primary": false,
-          "unique": true,
-          "expression": "CREATE UNIQUE INDEX \"session_fee_matchId_userId_unique\" ON public.session_fee USING btree (\"matchId\", \"userId\")"
+          "unique": true
         },
         {
           "columnNames": [

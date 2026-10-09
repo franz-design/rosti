@@ -14,16 +14,13 @@ import {
   SetMatchStatusInput,
   UpdateMatchInput,
 } from './contracts/match.contract'
-import {
-  AttendanceStatus,
-  MatchStatus,
-  TeamSide,
-} from './contracts/match.contract'
+import { AttendanceStatus, MatchStatus, TeamSide } from './contracts/match.contract'
 import { MatchAttendance } from './match-attendance.entity'
 import { MatchLineup } from './match-lineup.entity'
 import { buildOccurrenceDates } from './match-occurrences'
 import { MatchSeries } from './match-series.entity'
 import { Match } from './match.entity'
+import { PlayerVoteService } from './player-vote.service'
 
 @Injectable()
 export class MatchService {
@@ -31,6 +28,7 @@ export class MatchService {
     private readonly em: EntityManager,
     private readonly organizationService: OrganizationService,
     private readonly notificationService: NotificationService,
+    private readonly playerVoteService: PlayerVoteService,
   ) {}
 
   async create(organizationId: string, userId: string, data: CreateMatchInput): Promise<Match[]> {
@@ -216,6 +214,7 @@ export class MatchService {
       await this.notificationService.cancelMatchJobs(match.id, ScheduledJobType.ScoreReminder)
     }
 
+    await this.playerVoteService.sync(match)
     return match
   }
 
@@ -233,6 +232,7 @@ export class MatchService {
     await this.notificationService.cancelMatchJobs(match.id)
     await this.notificationService.notifyMatchCancelled(match)
     await this.notificationService.syncUpcomingMatchInvites(match.organization.id)
+    await this.playerVoteService.sync(match)
     return match
   }
 
@@ -336,6 +336,7 @@ export class MatchService {
     }
 
     await this.em.flush()
+    await this.playerVoteService.sync(match)
     return attendance
   }
 
@@ -370,6 +371,7 @@ export class MatchService {
       lineups.push(lineup)
     }
     await this.em.flush()
+    await this.playerVoteService.sync(match)
     return lineups
   }
 
@@ -426,6 +428,7 @@ export class MatchService {
     }
 
     await this.em.flush()
+    await this.playerVoteService.sync(match)
     return this.listLineups(organizationId, adminUserId, matchId)
   }
 
@@ -474,13 +477,14 @@ export class MatchService {
     if (isFutureScheduled) {
       await this.notificationService.cancelMatchJobs(match.id)
       await this.notificationService.scheduleMatchReminders(match)
-      return
+    } else {
+      await this.notificationService.cancelMatchJobs(match.id, ScheduledJobType.MatchInvite)
+      await this.notificationService.cancelMatchJobs(match.id, ScheduledJobType.RsvpReminder)
+      if (previousStatus === MatchStatus.Scheduled || match.status === MatchStatus.Scheduled) {
+        await this.notificationService.syncUpcomingMatchInvites(match.organization.id)
+      }
     }
 
-    await this.notificationService.cancelMatchJobs(match.id, ScheduledJobType.MatchInvite)
-    await this.notificationService.cancelMatchJobs(match.id, ScheduledJobType.RsvpReminder)
-    if (previousStatus === MatchStatus.Scheduled || match.status === MatchStatus.Scheduled) {
-      await this.notificationService.syncUpcomingMatchInvites(match.organization.id)
-    }
+    await this.playerVoteService.sync(match)
   }
 }

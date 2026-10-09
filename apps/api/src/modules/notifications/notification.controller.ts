@@ -29,6 +29,7 @@ export class NotificationController {
       notifyMatchCancelled: prefs.notifyMatchCancelled,
       notifyChatMention: prefs.notifyChatMention,
       notifyAllChatMessages: prefs.notifyAllChatMessages,
+      notifyPlayerVote: prefs.notifyPlayerVote,
     }
   }
 
@@ -47,6 +48,7 @@ export class NotificationController {
       notifyMatchCancelled: prefs.notifyMatchCancelled,
       notifyChatMention: prefs.notifyChatMention,
       notifyAllChatMessages: prefs.notifyAllChatMessages,
+      notifyPlayerVote: prefs.notifyPlayerVote,
     }
   }
 

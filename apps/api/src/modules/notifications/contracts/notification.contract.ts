@@ -29,6 +29,7 @@ export const notificationPreferenceSchema = z
     notifyMatchCancelled: z.boolean(),
     notifyChatMention: z.boolean(),
     notifyAllChatMessages: z.boolean(),
+    notifyPlayerVote: z.boolean(),
   })
   .meta({ title: 'NotificationPreferenceSchema' })
 

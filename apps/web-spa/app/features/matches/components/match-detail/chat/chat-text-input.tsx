@@ -1,6 +1,6 @@
 import { Button } from '@rosti/ui/components/primitives/button'
 import { cn } from '@rosti/ui/lib/utils'
-import { Send } from '@rosti/ui/icons'
+import { Plane } from '@rosti/ui/icons'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Mention, MentionsInput, type MentionsInputStyle } from 'react-mentions'
@@ -161,7 +161,7 @@ export function ChatTextInput({
         </MentionsInput>
       </div>
       <Button type="submit" disabled={!canSubmit} size="icon" className="size-11 shrink-0">
-        <Send className="size-4" />
+        <Plane className="size-4" />
         <span className="sr-only">{t('matches.detail.chat.send')}</span>
       </Button>
     </form>

@@ -127,9 +127,9 @@
       "card": {
         "title": "Meilleur buteur",
         "subtitle": "De la saison",
-        "winsTitle": "Plus de victoires",
-        "lossesTitle": "Plus de défaites",
-        "electedTitle": "Meilleur joueur",
+        "winsTitle": "Le winner",
+        "lossesTitle": "Abonné aux défaites",
+        "electedTitle": "L'élu",
         "electedSubtitle": "Du dernier match",
         "emptyScorer": "Aucun but",
         "emptyWins": "Aucune victoire",
@@ -186,10 +186,8 @@
     "detail": {
       "back": "Retour",
       "loading": "Chargement du match…",
-      "noLocation": "Lieu non défini",
       "tabs": {
         "summary": "Résumé",
-        "attendance": "Présences",
         "chat": "Chat",
         "stats": "Stats"
       },
@@ -199,22 +197,28 @@
         "played": "Terminé"
       },
       "rsvp": {
-        "present": "Je suis présent",
-        "absent": "Indisponible",
+        "present": "Présent",
+        "absent": "Absent",
         "question": "Tu seras là ?"
       },
       "summary": {
-        "date": "Date",
-        "time": "Heure",
-        "location": "Lieu",
-        "presentPlayers": "Joueurs présents",
         "lineup": "Composition",
         "teamBlue": "Bleu",
         "teamRed": "Rouge",
         "goals": "Buts",
         "assists": "Passes",
-        "noPresent": "Personne n’a encore répondu présent.",
         "noLineup": "Pas encore de composition."
+      },
+      "playerVote": {
+        "title": "Meilleur joueur",
+        "invite": "Vote pour le meilleur joueur du match. Tu as jusqu'au {{date}}.",
+        "inviteOpen": "Vote pour le meilleur joueur du match.",
+        "voteFor": "Voter pour {{name}}",
+        "saved": "Vote enregistré",
+        "winner": "{{name}} est élu meilleur joueur.",
+        "tie": "Égalité. Personne n'est élu.",
+        "none": "Personne n'a été élu.",
+        "noCandidates": "Aucun autre joueur présent."
       },
       "lineupEditor": {
         "title": "Gérer les compos",
@@ -233,7 +237,7 @@
       "attendance": {
         "present": "Présents",
         "pending": "En attente",
-        "absent": "Indisponibles",
+        "absent": "Absents",
         "empty": "Aucun joueur dans cette catégorie.",
         "manageHint": "Définis la présence de chaque joueur, avant ou après le match.",
         "markPresent": "Présent",
@@ -546,7 +550,8 @@
       "notifyRsvpReminder": "Rappels RSVP",
       "notifyMatchCancelled": "Match annulé",
       "notifyChatMention": "Mentions dans le chat",
-      "notifyAllChatMessages": "Tous les messages du chat"
+      "notifyAllChatMessages": "Tous les messages du chat",
+      "notifyPlayerVote": "Vote du meilleur joueur"
     },
     "firstName": "Prénom",
     "lastName": "Nom",

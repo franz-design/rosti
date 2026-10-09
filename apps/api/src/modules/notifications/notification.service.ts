@@ -36,6 +36,8 @@ import {
   newMatchEmail,
   type NotificationEmailCopy,
   rsvpReminderEmail,
+  playerVoteOpenedEmail,
+  playerVoteResultEmail,
   scoreReminderEmail,
 } from './notification-email'
 
@@ -74,6 +76,7 @@ export class NotificationService {
       notifyMatchCancelled: data.notifyMatchCancelled ?? prefs.notifyMatchCancelled,
       notifyChatMention: data.notifyChatMention ?? prefs.notifyChatMention,
       notifyAllChatMessages: data.notifyAllChatMessages ?? prefs.notifyAllChatMessages,
+      notifyPlayerVote: data.notifyPlayerVote ?? prefs.notifyPlayerVote,
     })
     await this.em.flush()
     return prefs
@@ -182,6 +185,34 @@ export class NotificationService {
       const prefs = await this.getOrCreatePreferences(member.user.id)
       if (!prefs.notifyNewMatch) continue
       await this.deliver(member.user, prefs, newMatchEmail(match, config.clients.webApp.url))
+    }
+  }
+
+  async notifyPlayerVoteOpened(match: Match, users: User[]): Promise<void> {
+    const email = playerVoteOpenedEmail(match, config.clients.webApp.url)
+    for (const user of users) {
+      const prefs = await this.getOrCreatePreferences(user.id)
+      if (!prefs.notifyPlayerVote) continue
+      await this.deliver(user, prefs, email)
+    }
+  }
+
+  async notifyPlayerVoteResult(input: {
+    match: Match
+    users: User[]
+    winnerName: string | null
+    isTie: boolean
+  }): Promise<void> {
+    const email = playerVoteResultEmail(
+      input.match,
+      config.clients.webApp.url,
+      input.winnerName,
+      input.isTie,
+    )
+    for (const user of input.users) {
+      const prefs = await this.getOrCreatePreferences(user.id)
+      if (!prefs.notifyPlayerVote) continue
+      await this.deliver(user, prefs, email)
     }
   }
 

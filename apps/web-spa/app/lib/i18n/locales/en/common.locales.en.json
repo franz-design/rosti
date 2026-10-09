@@ -186,10 +186,8 @@
     "detail": {
       "back": "Back",
       "loading": "Loading match…",
-      "noLocation": "No location set",
       "tabs": {
         "summary": "Summary",
-        "attendance": "Attendance",
         "chat": "Chat",
         "stats": "Stats"
       },
@@ -199,22 +197,28 @@
         "played": "Played"
       },
       "rsvp": {
-        "present": "I'm in",
-        "absent": "Unavailable",
+        "present": "Present",
+        "absent": "Absent",
         "question": "Are you coming?"
       },
       "summary": {
-        "date": "Date",
-        "time": "Time",
-        "location": "Location",
-        "presentPlayers": "Present players",
         "lineup": "Lineup",
         "teamBlue": "Blue",
         "teamRed": "Red",
         "goals": "Goals",
         "assists": "Assists",
-        "noPresent": "Nobody has confirmed yet.",
         "noLineup": "No lineup yet."
+      },
+      "playerVote": {
+        "title": "Best player",
+        "invite": "Vote for the best player of the match. You have until {{date}}.",
+        "inviteOpen": "Vote for the best player of the match.",
+        "voteFor": "Vote for {{name}}",
+        "saved": "Vote saved",
+        "winner": "{{name}} is the best player.",
+        "tie": "It's a tie. No one is elected.",
+        "none": "No one was elected.",
+        "noCandidates": "No other player attended."
       },
       "lineupEditor": {
         "title": "Manage lineups",
@@ -233,7 +237,7 @@
       "attendance": {
         "present": "Present",
         "pending": "Pending",
-        "absent": "Unavailable",
+        "absent": "Absent",
         "empty": "No players in this group.",
         "manageHint": "Set each player's attendance, before or after the match.",
         "markPresent": "Present",
@@ -546,7 +550,8 @@
       "notifyRsvpReminder": "RSVP reminders",
       "notifyMatchCancelled": "Match cancelled",
       "notifyChatMention": "Chat mentions",
-      "notifyAllChatMessages": "All chat messages"
+      "notifyAllChatMessages": "All chat messages",
+      "notifyPlayerVote": "Best player vote"
     },
     "firstName": "First name",
     "lastName": "Last name",
