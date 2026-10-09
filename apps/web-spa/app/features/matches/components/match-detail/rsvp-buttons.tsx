@@ -25,7 +25,7 @@ export function RsvpButtons({
   return (
     <div
       className={cn(
-        'flex gap-2 lg:w-full max-w-64 lg:max-w-100',
+        'flex gap-2 w-full lg:max-w-64 lg:max-w-100',
         isColumn ? 'w-36 flex-col' : 'flex-wrap',
       )}
     >

@@ -5,13 +5,6 @@ import { useLayoutEffect } from 'react'
  */
 const KEYBOARD_MIN_HEIGHT = 150
 
-/**
- * Home-screen iOS reports a viewport far below the screen until the first touch.
- * A reported height within this distance is the real visible area. The physical screen
- * is a little taller than that area, so using it clips the tab labels.
- */
-const LAUNCH_GAP = 40
-
 function isInstalledApp(): boolean {
   if (window.matchMedia('(display-mode: standalone)').matches) return true
 
@@ -39,8 +32,18 @@ function fillsScreenWidth(): boolean {
 }
 
 /**
+ * Home-screen iOS reports a viewport far below the screen until the first touch.
+ * A reported height within this distance is the real visible area. Beyond it, the
+ * physical screen is the best value we have.
+ */
+const LAUNCH_GAP = 40
+
+/** Home indicator. Keeps the tab labels visible when iOS reports a zero bottom inset. */
+const STANDALONE_BOTTOM_INSET = 'max(env(safe-area-inset-bottom, 0px), 34px)'
+
+/**
  * Prefer a reported height once it is close to the screen. Until then iOS is still
- * short by the launch gap, and the physical height is the best value we have.
+ * short by the launch gap, and the physical height fills the blank band.
  */
 function installedAppHeight(viewport: VisualViewport): number {
   const physical = physicalScreenSize().height
@@ -60,7 +63,8 @@ function installedAppHeight(viewport: VisualViewport): number {
  * opens and pans the visual viewport instead, which pushes fixed-height shells built on
  * `dvh` off screen.
  *
- * Sets `--app-height`, `--app-viewport-offset` and `--keyboard-height` on `<html>`.
+ * Sets `--app-height`, `--app-viewport-offset`, `--keyboard-height` and
+ * `--safe-area-bottom` on `<html>`.
  */
 export function useViewportHeight() {
   useLayoutEffect(() => {
@@ -79,9 +83,11 @@ export function useViewportHeight() {
         root.style.setProperty('--app-height', `${height}px`)
         root.style.setProperty('--app-viewport-offset', '0px')
         root.style.setProperty('--keyboard-height', '0px')
+        root.style.setProperty('--safe-area-bottom', STANDALONE_BOTTOM_INSET)
         return
       }
 
+      root.style.removeProperty('--safe-area-bottom')
       root.style.setProperty('--app-height', `${viewport.height}px`)
       root.style.setProperty('--app-viewport-offset', `${viewport.offsetTop}px`)
       root.style.setProperty('--keyboard-height', `${keyboardHeight}px`)
@@ -99,6 +105,7 @@ export function useViewportHeight() {
       root.style.removeProperty('--app-height')
       root.style.removeProperty('--app-viewport-offset')
       root.style.removeProperty('--keyboard-height')
+      root.style.removeProperty('--safe-area-bottom')
     }
   }, [])
 }

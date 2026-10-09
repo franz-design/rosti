@@ -112,5 +112,5 @@ export function getResultClass(match: Match): string | undefined {
 
 export function getCardResultClass(match: Match): string | undefined {
   const result = getViewerMatchResult(match)
-  return result ? CARD_RESULT_CLASS[result] : 'p-0'
+  return result ? CARD_RESULT_CLASS[result] : ''
 }

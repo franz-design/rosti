@@ -76,7 +76,7 @@ export function SummaryTab({
 
       {showAttendance ? (
         <div className="flex flex-col items-stretch gap-4">
-          <section className="flex justify-between gap-6 items-center rounded-xl border bg-card p-4">
+          <section className="flex flex-col lg:flex-row justify-between gap-2 lg:gap-6 items-center rounded-xl border bg-card p-4">
             <p className="text-lg font-medium">{t('matches.detail.rsvp.question')}</p>
             <RsvpButtons
               status={myAttendance?.status}
