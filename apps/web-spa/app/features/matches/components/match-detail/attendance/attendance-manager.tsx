@@ -32,7 +32,6 @@ export function AttendanceManager({
 
   return (
     <section className="space-y-4">
-      <p className="text-sm text-muted-foreground">{t('matches.detail.attendance.manageHint')}</p>
       <ul className="divide-y rounded-lg border">
         {players.map((player) => {
           const playerStats =

@@ -1,7 +1,6 @@
 import { CalendarDays, CloudRain, Target, Trophy, Users, type SolarIcon } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
-import type { HighlightTone } from '@/features/stats/components/home/highlight-tone'
 import { StatTile } from '@/features/stats/components/home/stat-tile'
 import type { PlayerDetail } from '@/lib/rosti-api'
 
@@ -15,37 +14,31 @@ export function PlayerSeasonStats({ season, stats }: PlayerSeasonStatsProps) {
 
   const tiles: Array<{
     icon: SolarIcon
-    tone: HighlightTone
     label: string
     value: number
   }> = [
     {
       icon: CalendarDays,
-      tone: 'info',
       label: t('home.stats.matchesPlayed'),
       value: stats.matchesPlayed,
     },
     {
       icon: Target,
-      tone: 'primary',
       label: t('home.stats.goals'),
       value: stats.goals,
     },
     {
       icon: Users,
-      tone: 'info',
       label: t('playerDetail.assists'),
       value: stats.assists,
     },
     {
       icon: Trophy,
-      tone: 'success',
       label: t('home.stats.wins'),
       value: stats.wins,
     },
     {
       icon: CloudRain,
-      tone: 'destructive',
       label: t('home.stats.losses'),
       value: stats.losses,
     },

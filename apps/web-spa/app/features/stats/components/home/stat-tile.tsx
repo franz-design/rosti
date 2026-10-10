@@ -1,16 +1,14 @@
 import { cn } from '@rosti/ui/lib/utils'
 import type { SolarIcon } from '@rosti/ui/icons'
 import { HighlightShell } from './highlight-shell'
-import { HIGHLIGHT_TONE_CLASS, type HighlightTone } from './highlight-tone'
 
 interface StatTileProps {
   icon: SolarIcon
-  tone: HighlightTone
   label: string
   value: number
 }
 
-export function StatTile({ icon: Icon, tone, label, value }: StatTileProps) {
+export function StatTile({ icon: Icon, label, value }: StatTileProps) {
   return (
     <HighlightShell className="flex items-center justify-between gap-3 py-8">
       <div className="flex gap-3 items-center">

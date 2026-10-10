@@ -52,7 +52,7 @@ export function SummaryTab({
   const presentPlayers = attendanceGroups.present
   const showAttendance = match.status === 'scheduled'
   const lineupButton = canManageComposition ? (
-    <Button size="sm" variant="outline" onClick={onEditLineup}>
+    <Button variant="outline" onClick={onEditLineup}>
       {t(
         lineups.length === 0
           ? 'matches.detail.lineupEditor.create'
@@ -73,13 +73,13 @@ export function SummaryTab({
 
       {showAttendance ? (
         <div className="flex flex-col items-stretch gap-4">
-          <section className="flex flex-col lg:flex-row justify-between gap-2 lg:gap-6 items-center rounded-xl border bg-card p-4">
+          <section className="flex flex-col lg:flex-row justify-between gap-2 lg:gap-6 items-center rounded-xl lg:border bg-card lg:p-4">
             <p className="text-lg font-medium">{t('matches.detail.rsvp.question')}</p>
             <RsvpButtons status={myAttendance?.status} onPresent={onPresent} onAbsent={onAbsent} />
           </section>
 
-          <section className="flex flex-col rounded-xl border bg-card p-4">
-            <div className="flex items-start justify-between gap-3">
+          <section className="flex flex-col rounded-xl border bg-card">
+            <div className="flex items-center justify-between gap-3 border-b p-2 pl-4">
               <h2 className="text-base font-medium">
                 <span className="text-primary text-2xl">{presentPlayers.length}</span>{' '}
                 {t('matches.detail.attendance.present')}
@@ -87,11 +87,11 @@ export function SummaryTab({
               {lineupButton}
             </div>
             {presentPlayers.length === 0 ? (
-              <p className="mt-3 text-sm text-muted-foreground">
+              <p className="mt-3 text-sm text-muted-foreground p-4">
                 {t('matches.detail.attendance.empty')}
               </p>
             ) : (
-              <div className="mt-3 flex gap-4 flex-wrap">
+              <div className="mt-3 flex gap-4 flex-wrap p-4">
                 {presentPlayers.map((player) => {
                   const playerStats = showMatchResult ? statDrafts[player.userId] : undefined
                   return (

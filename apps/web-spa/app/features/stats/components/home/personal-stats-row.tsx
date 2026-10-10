@@ -2,7 +2,6 @@ import { CalendarDays, CloudRain, Target, Trophy, type SolarIcon } from '@rosti/
 import { cn } from '@rosti/ui/lib/utils'
 import { useTranslation } from 'react-i18next'
 import type { SeasonHomeStats } from '@/lib/rosti-api'
-import type { HighlightTone } from './highlight-tone'
 import { StatTile } from './stat-tile'
 
 interface PersonalStatsRowProps {
@@ -16,31 +15,26 @@ export function PersonalStatsRow({ stats, stacked = false }: PersonalStatsRowPro
 
   const tiles: Array<{
     icon: SolarIcon
-    tone: HighlightTone
     label: string
     value: number
   }> = [
     {
       icon: CalendarDays,
-      tone: 'info',
       label: t('home.stats.matchesPlayed'),
       value: stats?.matchesPlayed ?? 0,
     },
     {
       icon: Target,
-      tone: 'primary',
       label: t('home.stats.goals'),
       value: stats?.goals ?? 0,
     },
     {
       icon: Trophy,
-      tone: 'success',
       label: t('home.stats.wins'),
       value: stats?.wins ?? 0,
     },
     {
       icon: CloudRain,
-      tone: 'destructive',
       label: t('home.stats.losses'),
       value: stats?.losses ?? 0,
     },
