@@ -394,6 +394,7 @@ export interface SeasonHomeStats {
       userName: string
       image?: string | null
     } | null
+    openPlayerVoteMatchId: string | null
   }
   me: {
     matchesPlayed: number

@@ -19,6 +19,7 @@ import {
   isPlayerVoteReady,
   MIN_PLAYER_VOTE_PLAYERS,
   pickLatestMatch,
+  pickOpenPlayerVoteMatchId,
   PlayerVoteBallot,
   PresentVoter,
   resolvePlayerVote,
@@ -160,6 +161,13 @@ export class PlayerVoteService {
       userName: winner.name,
       image: winner.image,
     }
+  }
+
+  /**
+   * Latest played match while its best-player vote is still open.
+   */
+  findOpenPlayerVoteMatchId(matches: Match[]): string | null {
+    return pickOpenPlayerVoteMatchId(matches, new Date())
   }
 
   private async settle(match: Match): Promise<void> {

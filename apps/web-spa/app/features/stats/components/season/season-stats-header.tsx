@@ -14,9 +14,7 @@ export function SeasonStatsHeader({ seasonName }: SeasonStatsHeaderProps) {
       <Button variant="ghost" size="sm" className="-ml-2" render={<Link to="/seasons" />}>
         ← {t('seasonStats.back')}
       </Button>
-      <h1 className="text-2xl font-black tracking-tight">
-        {seasonName ?? t('seasonStats.title')}
-      </h1>
+      <h1 className="text-2xl font-black tracking-tight">{seasonName ?? t('seasonStats.title')}</h1>
     </div>
   )
 }

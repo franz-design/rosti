@@ -5,6 +5,7 @@ import {
   isPlayerVoteReady,
   MIN_PLAYER_VOTE_PLAYERS,
   pickLatestMatch,
+  pickOpenPlayerVoteMatchId,
   PLAYER_VOTE_WINDOW_MS,
   resolvePlayerVote,
 } from './player-vote'
@@ -114,6 +115,48 @@ describe('hasEveryoneVoted', () => {
         ballots: [],
       }),
     ).toBe(false)
+  })
+})
+
+describe('pickOpenPlayerVoteMatchId', () => {
+  const now = new Date('2026-10-10T12:00:00.000Z')
+  const latest = {
+    id: 'latest',
+    startsAt: new Date('2026-10-09T18:00:00.000Z'),
+    playerVoteOpenedAt: new Date('2026-10-09T20:00:00.000Z'),
+    playerVoteClosedAt: null,
+    playerVoteClosesAt: new Date('2026-10-11T20:00:00.000Z'),
+  }
+
+  it('returns the latest match while its vote is open', () => {
+    expect(pickOpenPlayerVoteMatchId([latest], now)).toBe('latest')
+  })
+
+  it('ignores an older open vote once the latest match is closed', () => {
+    const older = {
+      ...latest,
+      id: 'older',
+      startsAt: new Date('2026-10-02T18:00:00.000Z'),
+    }
+    const closed = {
+      ...latest,
+      playerVoteClosedAt: new Date('2026-10-10T08:00:00.000Z'),
+    }
+
+    expect(pickOpenPlayerVoteMatchId([older, closed], now)).toBeNull()
+  })
+
+  it('hides the prompt once the voting window has ended', () => {
+    const expired = {
+      ...latest,
+      playerVoteClosesAt: new Date('2026-10-10T11:00:00.000Z'),
+    }
+
+    expect(pickOpenPlayerVoteMatchId([expired], now)).toBeNull()
+  })
+
+  it('hides the prompt when the vote has not opened', () => {
+    expect(pickOpenPlayerVoteMatchId([{ ...latest, playerVoteOpenedAt: null }], now)).toBeNull()
   })
 })
 

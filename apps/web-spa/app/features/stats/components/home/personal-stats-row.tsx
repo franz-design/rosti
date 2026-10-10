@@ -1,4 +1,5 @@
 import { CalendarDays, CloudRain, Target, Trophy, type SolarIcon } from '@rosti/ui/icons'
+import { cn } from '@rosti/ui/lib/utils'
 import { useTranslation } from 'react-i18next'
 import type { SeasonHomeStats } from '@/lib/rosti-api'
 import type { HighlightTone } from './highlight-tone'
@@ -6,9 +7,11 @@ import { StatTile } from './stat-tile'
 
 interface PersonalStatsRowProps {
   stats?: SeasonHomeStats['me']
+  /** Two columns beside the award cards. Four columns when the row has the full width. */
+  stacked?: boolean
 }
 
-export function PersonalStatsRow({ stats }: PersonalStatsRowProps) {
+export function PersonalStatsRow({ stats, stacked = false }: PersonalStatsRowProps) {
   const { t } = useTranslation()
 
   const tiles: Array<{
@@ -44,7 +47,7 @@ export function PersonalStatsRow({ stats }: PersonalStatsRowProps) {
   ]
 
   return (
-    <div className="grid min-w-0 grid-cols-2 gap-3 lg:grid-cols-4">
+    <div className={cn('grid min-w-0 grid-cols-2 gap-3', !stacked && 'lg:grid-cols-4')}>
       {tiles.map((tile) => (
         <StatTile key={tile.label} {...tile} />
       ))}

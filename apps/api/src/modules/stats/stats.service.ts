@@ -186,6 +186,7 @@ export class StatsService {
       goals: stats.map(toGoalRow),
     })
     home.club.lastElectedPlayer = await this.playerVoteService.findLastElectedPlayer(matches)
+    home.club.openPlayerVoteMatchId = this.playerVoteService.findOpenPlayerVoteMatchId(matches)
     return home
   }
 }

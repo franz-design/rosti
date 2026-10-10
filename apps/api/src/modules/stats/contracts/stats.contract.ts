@@ -82,6 +82,8 @@ export const clubHomeStatsSchema = z
     mostLosses: playerHighlightSchema.nullable(),
     mostPlayedTogether: playedTogetherSchema.nullable(),
     lastElectedPlayer: playerRefSchema.nullable(),
+    /** Latest played match while its best-player vote is still open. */
+    openPlayerVoteMatchId: z.string().uuid().nullable(),
   })
   .meta({ title: 'ClubHomeStatsSchema' })
 

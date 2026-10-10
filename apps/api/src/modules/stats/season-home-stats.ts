@@ -93,6 +93,7 @@ export function computeSeasonHomeStats(input: ComputeSeasonHomeStatsInput): Seas
       mostLosses: pickLeader(players, (player) => player.losses),
       mostPlayedTogether: pickTeammatePair(lineupsByMatch),
       lastElectedPlayer: null,
+      openPlayerVoteMatchId: null,
     },
     me: {
       matchesPlayed: viewer?.matchesPlayed ?? 0,

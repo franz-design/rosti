@@ -114,6 +114,28 @@ export function hasEveryoneVoted(input: {
   return input.presentUserIds.every((userId) => voted.has(userId))
 }
 
+export interface OpenPlayerVoteMatch {
+  id: string
+  startsAt: Date
+  playerVoteOpenedAt?: Date | null
+  playerVoteClosedAt?: Date | null
+  playerVoteClosesAt?: Date | null
+}
+
+/**
+ * Match id of the latest played match while players can still vote.
+ * A closed vote, a tie, or a window that has already ended leaves this empty.
+ */
+export function pickOpenPlayerVoteMatchId(
+  matches: OpenPlayerVoteMatch[],
+  now: Date,
+): string | null {
+  const last = pickLatestMatch(matches)
+  if (!last?.playerVoteOpenedAt || last.playerVoteClosedAt) return null
+  if (last.playerVoteClosesAt && last.playerVoteClosesAt.getTime() <= now.getTime()) return null
+  return last.id
+}
+
 export function pickLatestMatch<T extends { id: string; startsAt: Date }>(matches: T[]): T | null {
   let latest: T | null = null
   for (const match of matches) {

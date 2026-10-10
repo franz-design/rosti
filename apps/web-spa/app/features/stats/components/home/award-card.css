@@ -1,12 +1,17 @@
 /* The sheen is masked to the card artwork and drifts on its own keyframes.
-   Tailwind can set opacity and blend mode; it cannot own this animation. */
+   Tailwind can set opacity and blend mode; it cannot own this animation.
+   The image url is also set inline: iOS Safari drops a mask-image that only
+   comes from a custom property, and then the foil paints as a rectangle. */
 
 .award-card-mask {
   mask-image: var(--card-art);
   mask-repeat: no-repeat;
+  mask-position: center;
   mask-size: 100% 100%;
+  mask-mode: alpha;
   -webkit-mask-image: var(--card-art);
   -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
   -webkit-mask-size: 100% 100%;
 }
 
@@ -59,7 +64,14 @@
   }
 }
 
-/* Sweep stays inside the name ribbon and the stat pill. Both clip it with overflow hidden. */
+/* Sweep stays inside the name ribbon and the stat pill.
+   iOS ignores overflow and border-radius once this pseudo is transformed,
+   and the shine then draws as a square. clip-path still cuts it to the pill. */
+.award-card-name,
+.award-card-stat {
+  clip-path: inset(0 round 9999px);
+}
+
 .award-card-name::after,
 .award-card-stat::after {
   content: '';

@@ -9,7 +9,11 @@ import {
 const SEASON = { id: '11111111-1111-4111-8111-111111111111', name: 'Saison 2026' }
 const VIEWER_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 const LUCAS = { userId: VIEWER_ID, userName: 'Lucas Martin', image: null }
-const HUGO = { userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', userName: 'Hugo Bernard', image: null }
+const HUGO = {
+  userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+  userName: 'Hugo Bernard',
+  image: null,
+}
 const ADAM = { userId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc', userName: 'Adam Petit', image: null }
 const LEO = { userId: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', userName: 'Leo Durand', image: null }
 
@@ -26,6 +30,7 @@ describe('createEmptyHomeStats', () => {
         mostLosses: null,
         mostPlayedTogether: null,
         lastElectedPlayer: null,
+        openPlayerVoteMatchId: null,
       },
       me: { matchesPlayed: 0, goals: 0, wins: 0, losses: 0 },
     })
@@ -37,7 +42,10 @@ describe('computeSeasonHomeStats', () => {
     const actual = computeSeasonHomeStats({
       season: SEASON,
       viewerUserId: VIEWER_ID,
-      matches: [{ id: 'm1', blueScore: 2, redScore: 1 }, { id: 'm2', blueScore: 0, redScore: 0 }],
+      matches: [
+        { id: 'm1', blueScore: 2, redScore: 1 },
+        { id: 'm2', blueScore: 0, redScore: 0 },
+      ],
       attendances: [
         { matchId: 'm1', ...LUCAS },
         { matchId: 'm1', ...HUGO },
