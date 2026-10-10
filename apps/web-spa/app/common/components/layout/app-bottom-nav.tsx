@@ -11,7 +11,7 @@ export function AppBottomNav() {
   return (
     <nav
       aria-label={t('dashboard.navigation')}
-      className="absolute inset-x-0 bottom-0 z-50 bg-background border-t border-border py-2 shadow-[0_-1px_15px_-3px_rgb(0_0_0/0.1),0_-2px_6px_-4px_rgb(0_0_0/0.1)] md:hidden"
+      className="z-50 shrink-0 border-t border-border bg-background pt-2 pb-[calc(0.5rem+var(--safe-area-bottom))] shadow-[0_-1px_15px_-3px_rgb(0_0_0/0.1),0_-2px_6px_-4px_rgb(0_0_0/0.1)] md:hidden"
     >
       <ul className="grid h-14 grid-cols-3">
         {items.map((item) => {

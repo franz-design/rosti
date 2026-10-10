@@ -27,13 +27,13 @@
   --header-height: 3rem;
   --safe-area-top: env(safe-area-inset-top, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-  --bottom-nav-height: calc(3.5rem + var(--safe-area-bottom));
+  /* h-14 row + py-2, plus the home indicator. */
+  --bottom-nav-height: calc(4.5rem + var(--safe-area-bottom));
 
-  /* Visible viewport metrics, kept in sync with window.visualViewport by useViewportHeight.
-     iOS Safari never shrinks the layout viewport when the on-screen keyboard opens, so any
-     unit based on it (vh, dvh, svh) overshoots the area the user can actually see. */
-  --app-height: 100dvh;
+  /* The shell is anchored to the viewport edges. iOS does not shrink the layout
+     viewport when the keyboard opens, so these offsets track the visual viewport. */
   --app-viewport-offset: 0px;
+  --app-bottom-offset: 0px;
   --keyboard-height: 0px;
 
   /* Space the bottom nav overlays, released once the keyboard hides it. */
@@ -265,14 +265,6 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-}
-
-/* Installed iOS reports a zero bottom inset while the shell still paints past
-   the visible edge, which slices the tab labels. 34px is the home indicator. */
-@media (display-mode: standalone) {
-  :root {
-    --safe-area-bottom: max(env(safe-area-inset-bottom, 0px), 34px);
-  }
 }
 
 @layer base {

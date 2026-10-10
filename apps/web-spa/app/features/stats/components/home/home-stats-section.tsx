@@ -36,7 +36,7 @@ export default function HomeStatsSection() {
       )}
     >
       {showClub ? (
-        <section className="min-w-0 flex-1 space-y-3">
+        <section className="min-w-0 space-y-3 lg:w-max lg:max-w-full lg:shrink">
           <SectionHeading
             title={t('home.stats.clubTitle')}
             subtitle={seasonName ?? t('home.stats.noSeason')}
@@ -47,7 +47,7 @@ export default function HomeStatsSection() {
       ) : null}
 
       {showPersonal ? (
-        <section className={cn('min-w-0 space-y-3', showClub && 'lg:w-80 lg:shrink-0')}>
+        <section className={cn('min-w-0 space-y-3', showClub && 'lg:min-w-72 lg:flex-1')}>
           <SectionHeading title={t('home.stats.personalTitle')} />
           <PersonalStatsRow stats={data.me} stacked={showClub} />
         </section>

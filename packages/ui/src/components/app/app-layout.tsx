@@ -40,7 +40,7 @@ export function AppLayout({
   return (
     <SidebarProvider
       defaultOpen={defaultOpen}
-      className="fixed inset-x-0 top-(--app-viewport-offset) h-(--app-height) min-h-0 overflow-hidden"
+      className="fixed inset-x-0 top-(--app-viewport-offset) bottom-(--app-bottom-offset) min-h-0 overflow-hidden"
     >
       {sidebar}
       <SidebarInset className={cn('flex min-h-0 flex-col overflow-hidden', className)}>
