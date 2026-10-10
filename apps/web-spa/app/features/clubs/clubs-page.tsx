@@ -35,7 +35,7 @@ export default function ClubsPage() {
   const dateLocale = i18n.language?.startsWith('en') ? 'en-GB' : 'fr-FR'
 
   return (
-    <div className="min-w-0 space-y-8">
+    <div className="min-w-0 flex flex-col gap-12">
       <HomeHeader clubName={activeClub?.name ?? t('home.fallbackClub')} venue={activeClub?.venue} />
 
       <div className="grid gap-6 lg:grid-cols-2">

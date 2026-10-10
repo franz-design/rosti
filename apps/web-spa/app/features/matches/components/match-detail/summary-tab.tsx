@@ -17,7 +17,6 @@ interface SummaryTabProps {
   canEnterScore: boolean
   onEnterScore: () => void
   myAttendance?: Attendance
-  isRsvpPending: boolean
   onPresent: () => void
   onAbsent: () => void
   attendanceGroups: {
@@ -26,7 +25,6 @@ interface SummaryTabProps {
     absent: Attendance[]
   }
   sortedAttendances: Attendance[]
-  busyUserId: string | null
   onSetStatus: (userId: string, status: 'present' | 'absent' | 'pending') => void
   statDrafts: Record<string, PlayerStatDraft>
   lineups: Lineup[]
@@ -40,12 +38,10 @@ export function SummaryTab({
   canEnterScore,
   onEnterScore,
   myAttendance,
-  isRsvpPending,
   onPresent,
   onAbsent,
   attendanceGroups,
   sortedAttendances,
-  busyUserId,
   onSetStatus,
   statDrafts,
   lineups,
@@ -79,12 +75,7 @@ export function SummaryTab({
         <div className="flex flex-col items-stretch gap-4">
           <section className="flex flex-col lg:flex-row justify-between gap-2 lg:gap-6 items-center rounded-xl border bg-card p-4">
             <p className="text-lg font-medium">{t('matches.detail.rsvp.question')}</p>
-            <RsvpButtons
-              status={myAttendance?.status}
-              disabled={isRsvpPending}
-              onPresent={onPresent}
-              onAbsent={onAbsent}
-            />
+            <RsvpButtons status={myAttendance?.status} onPresent={onPresent} onAbsent={onAbsent} />
           </section>
 
           <section className="flex flex-col rounded-xl border bg-card p-4">
@@ -143,7 +134,6 @@ export function SummaryTab({
         canManageComposition ? (
           <AttendanceManager
             players={sortedAttendances}
-            busyUserId={busyUserId}
             onSetStatus={onSetStatus}
             statsByUserId={showMatchResult ? statDrafts : undefined}
             goalsLabel={t('matches.detail.summary.goals')}

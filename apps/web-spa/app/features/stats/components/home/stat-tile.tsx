@@ -12,19 +12,18 @@ interface StatTileProps {
 
 export function StatTile({ icon: Icon, tone, label, value }: StatTileProps) {
   return (
-    <HighlightShell className="flex items-center gap-3">
-      <span
-        className={cn(
-          'flex size-10 shrink-0 items-center justify-center rounded-full',
-          HIGHLIGHT_TONE_CLASS[tone],
-        )}
-      >
-        <Icon className="size-4" />
-      </span>
-      <div className="min-w-0">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-        <p className="font-display text-2xl font-semibold tabular-nums">{value}</p>
+    <HighlightShell className="flex items-center justify-between gap-3 py-8">
+      <div className="flex gap-3 items-center">
+        <span
+          className={cn(
+            'flex size-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary',
+          )}
+        >
+          <Icon className="size-5" />
+        </span>
+        <p className="text-sm font-medium tracking-wide text-foreground">{label}</p>
       </div>
+      <p className="font-display text-4xl font-semibold tabular-nums">{value}</p>
     </HighlightShell>
   )
 }

@@ -36,7 +36,7 @@ export default function HomeStatsSection() {
     <div
       className={cn(
         'flex min-w-0 flex-col gap-8',
-        showClub && showPersonal && 'lg:flex-row lg:items-start lg:gap-6',
+        showClub && showPersonal && 'lg:flex-row lg:items-start lg:gap-8',
       )}
     >
       {showClub ? (
@@ -58,7 +58,7 @@ export default function HomeStatsSection() {
               <Link
                 to={`/players/${myUserId}`}
                 state={{ from: '/dashboard' }}
-                className="shrink-0 text-sm text-muted-foreground underline-offset-4 hover:underline"
+                className="shrink-0 text-sm text-foreground underline-offset-4 hover:underline font-medium"
               >
                 {t('playerDetail.open')}
               </Link>

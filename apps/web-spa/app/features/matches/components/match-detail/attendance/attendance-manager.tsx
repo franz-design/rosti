@@ -11,7 +11,6 @@ import { cn } from '@rosti/ui/lib/utils'
 
 interface AttendanceManagerProps {
   players: Attendance[]
-  busyUserId: string | null
   onSetStatus: (userId: string, status: 'present' | 'absent' | 'pending') => void
   statsByUserId?: Record<string, PlayerStatDraft>
   goalsLabel?: string
@@ -20,7 +19,6 @@ interface AttendanceManagerProps {
 
 export function AttendanceManager({
   players,
-  busyUserId,
   onSetStatus,
   statsByUserId,
   goalsLabel,
@@ -37,7 +35,6 @@ export function AttendanceManager({
       <p className="text-sm text-muted-foreground">{t('matches.detail.attendance.manageHint')}</p>
       <ul className="divide-y rounded-lg border">
         {players.map((player) => {
-          const busy = busyUserId === player.userId
           const playerStats =
             player.status === 'present' ? statsByUserId?.[player.userId] : undefined
           return (
@@ -67,21 +64,18 @@ export function AttendanceManager({
               <div className="flex flex-wrap gap-1 sm:justify-end">
                 <ToggleChip
                   active={player.status === 'present'}
-                  disabled={busy}
                   onClick={() => onSetStatus(player.userId, 'present')}
                   label={t('matches.detail.attendance.markPresent')}
                   icon={<LikeIcon className="size-5" aria-hidden />}
                 />
                 <ToggleChip
                   active={player.status === 'absent'}
-                  disabled={busy}
                   onClick={() => onSetStatus(player.userId, 'absent')}
                   label={t('matches.detail.attendance.markAbsent')}
                   icon={<DislikeIcon className="size-5" aria-hidden />}
                 />
                 <ToggleChip
                   active={player.status === 'pending'}
-                  disabled={busy}
                   onClick={() => onSetStatus(player.userId, 'pending')}
                   label={t('matches.detail.attendance.markPending')}
                   icon={<QuestionCircleIcon className="size-5" aria-hidden />}

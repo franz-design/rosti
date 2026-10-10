@@ -47,7 +47,7 @@ export function PersonalStatsRow({ stats, stacked = false }: PersonalStatsRowPro
   ]
 
   return (
-    <div className={cn('grid min-w-0 grid-cols-2 gap-3', !stacked && 'lg:grid-cols-4')}>
+    <div className={cn('grid min-w-0 grid-cols-2 gap-4', !stacked && 'lg:grid-cols-4')}>
       {tiles.map((tile) => (
         <StatTile key={tile.label} {...tile} />
       ))}

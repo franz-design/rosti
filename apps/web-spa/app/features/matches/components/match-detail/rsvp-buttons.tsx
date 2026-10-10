@@ -34,7 +34,7 @@ export function RsvpButtons({
         variant={status === 'present' ? 'default' : 'outline'}
         className={cn(
           isColumn ? 'w-full' : 'min-w-36 flex-1',
-          hasAnswered && status !== 'present' && 'opacity-40 hover:opacity-70',
+          hasAnswered && status !== 'present' && 'bg-white text-muted-foreground/60',
         )}
         disabled={disabled}
         onClick={onPresent}
@@ -46,7 +46,7 @@ export function RsvpButtons({
         variant={status === 'absent' ? 'default' : 'outline'}
         className={cn(
           isColumn ? 'w-full' : 'min-w-36 flex-1',
-          hasAnswered && status !== 'absent' && 'opacity-40 hover:opacity-70',
+          hasAnswered && status !== 'absent' && 'bg-white text-muted-foreground/60',
         )}
         disabled={disabled}
         onClick={onAbsent}

@@ -72,7 +72,8 @@ export default function MatchCard({
   const viewerResult = showScore ? getViewerMatchResult(match) : undefined
   const resultClass = getCardResultClass(match)
   const cardClassName = cn(
-    'rounded-xl border bg-card p-2 shadow-sm overflow-hidden',
+    'rounded-xl border bg-card p-2 overflow-hidden',
+    { 'bg-sidebar border-none': !showScore },
     resultClass,
     className,
   )

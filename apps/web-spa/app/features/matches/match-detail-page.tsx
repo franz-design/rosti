@@ -24,6 +24,11 @@ import { SummaryTab } from './components/match-detail/summary-tab'
 import { PostponeMatchDialog } from './components/postpone-match-dialog'
 import { extractMentionIds, toPlainMentionBody } from './utils/chat-mentions'
 import { shouldPromptEnterScore, shouldShowMatchResult } from './utils/match-filters'
+import {
+  attendancesQueryKey,
+  rollbackOptimisticAttendance,
+  setOptimisticAttendance,
+} from './utils/optimistic-attendance'
 
 function playerStatsMatch(
   left: Record<string, PlayerStatDraft>,
@@ -51,7 +56,6 @@ export default function MatchDetailPage() {
   const savingScore = useRef<{ blue: number; red: number } | null>(null)
   const scoreSyncedForMatch = useRef<string | null>(null)
   const pendingStatSave = useRef<Record<string, PlayerStatDraft> | null>(null)
-  const [busyUserId, setBusyUserId] = useState<string | null>(null)
   const [isLineupOpen, setIsLineupOpen] = useState(false)
   const [isReopenOpen, setIsReopenOpen] = useState(false)
   const [unreadMessageCount, setUnreadMessageCount] = useState(0)
@@ -72,7 +76,7 @@ export default function MatchDetailPage() {
   })
 
   const { data: attendances = [] } = useQuery({
-    queryKey: ['attendances', orgId, matchId],
+    queryKey: attendancesQueryKey(orgId, matchId),
     queryFn: () => rostiApi.listAttendances(orgId!, matchId!),
     enabled,
   })
@@ -212,7 +216,9 @@ export default function MatchDetailPage() {
   }, [isChat, matchId, messagesData, session?.user?.id])
 
   const invalidate = () => {
-    void queryClient.invalidateQueries({ queryKey: ['attendances', orgId, matchId] })
+    void queryClient.invalidateQueries({
+      queryKey: attendancesQueryKey(orgId, matchId),
+    })
     void queryClient.invalidateQueries({ queryKey: ['match', orgId, matchId] })
     void queryClient.invalidateQueries({ queryKey: ['matches', orgId] })
     void queryClient.invalidateQueries({ queryKey: ['lineups', orgId, matchId] })
@@ -224,8 +230,16 @@ export default function MatchDetailPage() {
   const rsvp = useMutation({
     mutationFn: (status: 'present' | 'absent') =>
       rostiApi.respondAttendance(orgId!, matchId!, status),
+    onMutate: (status) => {
+      const userId = session?.user?.id
+      if (!orgId || !matchId || !userId) return
+      return setOptimisticAttendance({ queryClient, orgId, matchId, userId, status })
+    },
     onSuccess: invalidate,
-    onError: (e: Error) => toast.error(e.message),
+    onError: (error: Error, _status, context) => {
+      if (orgId && matchId) rollbackOptimisticAttendance(queryClient, orgId, matchId, context)
+      toast.error(error.message)
+    },
   })
 
   const cancel = useMutation({
@@ -269,10 +283,15 @@ export default function MatchDetailPage() {
       userId: string
       status: 'present' | 'absent' | 'pending'
     }) => rostiApi.setAttendance(orgId!, matchId!, userId, status),
-    onMutate: ({ userId }) => setBusyUserId(userId),
-    onSettled: () => setBusyUserId(null),
+    onMutate: ({ userId, status }) => {
+      if (!orgId || !matchId) return
+      return setOptimisticAttendance({ queryClient, orgId, matchId, userId, status })
+    },
     onSuccess: invalidate,
-    onError: (e: Error) => toast.error(e.message),
+    onError: (error: Error, _variables, context) => {
+      if (orgId && matchId) rollbackOptimisticAttendance(queryClient, orgId, matchId, context)
+      toast.error(error.message)
+    },
   })
 
   const sortedAttendances = useMemo(
@@ -361,13 +380,21 @@ export default function MatchDetailPage() {
             canEnterScore={shouldPromptEnterScore(match, isClubAdmin)}
             onEnterScore={() => setTab('stats')}
             myAttendance={myAttendance}
-            isRsvpPending={rsvp.isPending}
-            onPresent={() => rsvp.mutate('present')}
-            onAbsent={() => rsvp.mutate('absent')}
+            onPresent={() => {
+              if (myAttendance?.status === 'present') return
+              rsvp.mutate('present')
+            }}
+            onAbsent={() => {
+              if (myAttendance?.status === 'absent') return
+              rsvp.mutate('absent')
+            }}
             attendanceGroups={attendanceGroups}
             sortedAttendances={sortedAttendances}
-            busyUserId={busyUserId}
-            onSetStatus={(userId, status) => setAttendance.mutate({ userId, status })}
+            onSetStatus={(userId, status) => {
+              const current = attendances.find((attendance) => attendance.userId === userId)
+              if (current?.status === status) return
+              setAttendance.mutate({ userId, status })
+            }}
             statDrafts={statDrafts}
             lineups={lineups}
             canManageComposition={canManageComposition}
