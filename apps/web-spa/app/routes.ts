@@ -11,6 +11,7 @@ export default [
     route('matches/:matchId', 'features/matches/match-detail-page.tsx'),
     route('seasons', 'features/seasons/seasons-page.tsx'),
     route('seasons/:seasonId/stats', 'features/stats/season-stats-page.tsx'),
+    route('players/:id', 'features/players/player-detail-page.tsx'),
     route('dashboard/profile', 'features/profile/profile-page.tsx'),
   ]),
   layout('features/auth/auth-layout.tsx', [

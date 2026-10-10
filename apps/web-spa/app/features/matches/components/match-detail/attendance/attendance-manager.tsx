@@ -3,6 +3,7 @@ import { DislikeIcon } from '@solar-icons/react/bold/dislike'
 import { LikeIcon } from '@solar-icons/react/bold/like'
 import { useTranslation } from 'react-i18next'
 import { PlayerAvatar } from '@/common/components/player-avatar'
+import { PlayerLink } from '@/common/components/player-link'
 import type { Attendance } from '@/lib/rosti-api'
 import type { PlayerStatDraft } from '../player-stat-draft'
 import { ToggleChip } from './toggle-chip'
@@ -47,9 +48,14 @@ export function AttendanceManager({
                 player.status === 'absent' && 'opacity-50',
               )}
             >
-              <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2">
+              <PlayerLink
+                userId={player.userId}
+                className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2"
+              >
                 <PlayerAvatar name={player.userName} imageUrl={player.image} size="lg" />
-                <p className="truncate text-sm font-medium">{player.userName}</p>
+                <p className="truncate text-sm font-medium group-hover:underline">
+                  {player.userName}
+                </p>
                 {playerStats ? (
                   <p className="col-start-2 mt-1 text-xs text-muted-foreground">
                     {goalsLabel} {playerStats.goals}
@@ -57,7 +63,7 @@ export function AttendanceManager({
                     {assistsLabel} {playerStats.assists}
                   </p>
                 ) : null}
-              </div>
+              </PlayerLink>
               <div className="flex flex-wrap gap-1 sm:justify-end">
                 <ToggleChip
                   active={player.status === 'present'}

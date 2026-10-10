@@ -1,11 +1,11 @@
 import { Button } from '@rosti/ui/components/primitives/button'
 import { toast } from '@rosti/ui/components/primitives/sonner'
 import { CheckIcon } from '@rosti/ui/icons'
-import { cn } from '@rosti/ui/lib/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router'
 import { PlayerAvatar } from '@/common/components/player-avatar'
+import { PlayerLink } from '@/common/components/player-link'
 import { useClub } from '@/features/clubs/hooks/club-context'
 import { rostiApi, type PlayerVoteState } from '@/lib/rosti-api'
 
@@ -70,22 +70,31 @@ export function PlayerVotePanel() {
               {vote.candidates.map((player) => {
                 const isSelected = vote.myNomineeUserId === player.userId
                 return (
-                  <li key={player.userId}>
+                  <li
+                    key={player.userId}
+                    className="flex items-center gap-2 rounded-lg border px-3 py-2"
+                  >
+                    <PlayerLink
+                      userId={player.userId}
+                      className="flex min-w-0 flex-1 items-center gap-3"
+                    >
+                      <PlayerAvatar name={player.userName} imageUrl={player.image} size="sm" />
+                      <span className="truncate group-hover:underline">{player.userName}</span>
+                    </PlayerLink>
                     <Button
                       type="button"
+                      size="sm"
                       variant={isSelected ? 'secondary' : 'outline'}
                       aria-pressed={isSelected}
                       aria-label={t('matches.detail.playerVote.voteFor', { name: player.userName })}
                       disabled={castVote.isPending}
-                      className={cn('h-auto w-full justify-start gap-3 px-3 py-2')}
                       onClick={() => {
                         if (isSelected) return
                         castVote.mutate(player.userId)
                       }}
                     >
-                      <PlayerAvatar name={player.userName} imageUrl={player.image} size="sm" />
-                      <span className="min-w-0 flex-1 truncate text-left">{player.userName}</span>
-                      {isSelected ? <CheckIcon className="size-4 shrink-0" /> : null}
+                      {isSelected ? <CheckIcon className="size-4" /> : null}
+                      {t('matches.detail.playerVote.vote')}
                     </Button>
                   </li>
                 )
@@ -102,15 +111,15 @@ function ClosedVote({ vote }: { vote: PlayerVoteState }) {
   const { t } = useTranslation()
   if (vote.winner) {
     return (
-      <div className="mt-3 flex items-center gap-3">
+      <PlayerLink userId={vote.winner.userId} className="mt-3 flex items-center gap-3">
         <PlayerAvatar name={vote.winner.userName} imageUrl={vote.winner.image} />
         <div className="min-w-0">
-          <p className="truncate font-medium">{vote.winner.userName}</p>
+          <p className="truncate font-medium group-hover:underline">{vote.winner.userName}</p>
           <p className="text-sm text-muted-foreground">
             {t('matches.detail.playerVote.winner', { name: vote.winner.userName })}
           </p>
         </div>
-      </div>
+      </PlayerLink>
     )
   }
 

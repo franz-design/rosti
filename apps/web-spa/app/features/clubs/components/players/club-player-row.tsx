@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from 'react'
+import { Link, useLocation } from 'react-router'
 import { PlayerAvatar } from '@/common/components/player-avatar'
 import { MemberAvatarControl } from './member-avatar-control'
 import { PlayerActions } from './player-actions'
@@ -26,6 +27,7 @@ export function ClubPlayerRow({
   onChangeAvatar,
   onRemoveAvatar,
 }: ClubPlayerRowProps) {
+  const location = useLocation()
   const avatarSlotRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
@@ -60,7 +62,17 @@ export function ClubPlayerRow({
       </div>
       <div className="flex min-w-0 flex-1 items-start gap-3">
         <div className="min-w-0 flex-1 space-y-1">
-          <p className="truncate font-medium">{row.name}</p>
+          {row.kind === 'member' ? (
+            <Link
+              to={`/players/${row.userId}`}
+              state={{ from: `${location.pathname}${location.search}` }}
+              className="block truncate font-medium hover:underline"
+            >
+              {row.name}
+            </Link>
+          ) : (
+            <p className="truncate font-medium">{row.name}</p>
+          )}
           {row.kind === 'member' && row.name !== row.email ? (
             <p className="truncate text-sm text-muted-foreground">{row.email}</p>
           ) : null}

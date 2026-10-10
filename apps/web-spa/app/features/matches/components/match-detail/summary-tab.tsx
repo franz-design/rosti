@@ -1,6 +1,7 @@
 import { Button } from '@rosti/ui/components/primitives/button'
 import { useTranslation } from 'react-i18next'
 import { PlayerAvatar } from '@/common/components/player-avatar'
+import { PlayerLink } from '@/common/components/player-link'
 import type { Attendance, Lineup, Match } from '@/lib/rosti-api'
 import { AttendanceGroup } from './attendance/attendance-group'
 import { AttendanceManager } from './attendance/attendance-manager'
@@ -107,10 +108,13 @@ export function SummaryTab({
                       key={player.id}
                       className="flex items-center justify-between gap-2 text-sm"
                     >
-                      <span className="flex min-w-0 items-center gap-2">
+                      <PlayerLink
+                        userId={player.userId}
+                        className="flex min-w-0 items-center gap-2"
+                      >
                         <PlayerAvatar name={player.userName} imageUrl={player.image} size="lg" />
-                        <span className="truncate">{player.userName}</span>
-                      </span>
+                        <span className="truncate group-hover:underline">{player.userName}</span>
+                      </PlayerLink>
                       {playerStats ? (
                         <span className="shrink-0 text-xs text-muted-foreground">
                           {t('matches.detail.summary.goals')} {playerStats.goals}

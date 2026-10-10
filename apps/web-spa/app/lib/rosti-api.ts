@@ -176,6 +176,17 @@ export const rostiApi = {
   seasonStats: (orgId: string, seasonId: string) =>
     request<SeasonPlayerStat[]>(`/clubs/${orgId}/seasons/${seasonId}/stats`),
   getHomeStats: (orgId: string) => request<SeasonHomeStats>(`/clubs/${orgId}/home-stats`),
+  getPlayerDetail: (orgId: string, userId: string) =>
+    request<PlayerDetail>(`/clubs/${orgId}/players/${userId}`),
+  updatePlayerSkills: (
+    orgId: string,
+    userId: string,
+    skills: Array<{ key: PlayerSkillKey; value: number }>,
+  ) =>
+    request<PlayerSkillRatings>(`/clubs/${orgId}/players/${userId}/skills`, {
+      method: 'PUT',
+      body: JSON.stringify({ skills }),
+    }),
 
   listMessages: (orgId: string, matchId: string) =>
     request<MatchMessage[]>(`/clubs/${orgId}/matches/${matchId}/messages`),
@@ -379,6 +390,60 @@ export interface PlayedTogether {
   playerA: { userId: string; userName: string; image?: string | null }
   playerB: { userId: string; userName: string; image?: string | null }
   matchesTogether: number
+}
+
+export type PlayerSkillKey =
+  | 'defense'
+  | 'attack'
+  | 'passing'
+  | 'shooting'
+  | 'vision'
+  | 'endurance'
+  | 'physical'
+  | 'goalkeeping'
+  | 'dribbling'
+  | 'rebounding'
+  | 'speed'
+  | 'serve'
+  | 'reception'
+  | 'setting'
+  | 'block'
+  | 'positioning'
+  | 'reading'
+  | 'forehand'
+  | 'backhand'
+  | 'volley'
+  | 'smash'
+  | 'footwork'
+  | 'consistency'
+  | 'bandeja'
+  | 'walls'
+  | 'clear'
+  | 'drop'
+  | 'netPlay'
+
+export interface PlayerSkillRatings {
+  sportType: Exclude<SportType, 'other'>
+  skills: Array<{ key: PlayerSkillKey; value: number }>
+}
+
+export interface PlayerDetail {
+  userId: string
+  name: string
+  email: string
+  phone?: string | null
+  image?: string | null
+  role: 'owner' | 'admin' | 'member'
+  memberSince: string
+  season: { id: string; name: string } | null
+  stats: {
+    matchesPlayed: number
+    goals: number
+    assists: number
+    wins: number
+    losses: number
+  }
+  skillRatings: PlayerSkillRatings | null
 }
 
 export interface SeasonHomeStats {

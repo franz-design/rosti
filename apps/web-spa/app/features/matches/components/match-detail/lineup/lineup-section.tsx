@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { PlayerAvatar } from '@/common/components/player-avatar'
+import { PlayerLink } from '@/common/components/player-link'
 import type { Lineup } from '@/lib/rosti-api'
 
 interface LineupSectionProps {
@@ -31,9 +32,11 @@ export function LineupSection({ lineups, title }: LineupSectionProps) {
           </div>
           <ul className="flex flex-wrap gap-6 text-sm p-5">
             {blue.map((l) => (
-              <li key={l.id} className="flex items-center gap-2">
-                <PlayerAvatar name={l.userName} imageUrl={l.image} size="lg" />
-                <span className="truncate">{l.userName}</span>
+              <li key={l.id}>
+                <PlayerLink userId={l.userId} className="flex items-center gap-2 text-inherit">
+                  <PlayerAvatar name={l.userName} imageUrl={l.image} size="lg" />
+                  <span className="truncate group-hover:underline">{l.userName}</span>
+                </PlayerLink>
               </li>
             ))}
           </ul>
@@ -44,9 +47,11 @@ export function LineupSection({ lineups, title }: LineupSectionProps) {
           </div>
           <ul className="flex flex-wrap gap-6 text-sm p-5">
             {red.map((l) => (
-              <li key={l.id} className="flex items-center gap-2">
-                <PlayerAvatar name={l.userName} imageUrl={l.image} size="lg" />
-                <span className="truncate">{l.userName}</span>
+              <li key={l.id}>
+                <PlayerLink userId={l.userId} className="flex items-center gap-2 text-inherit">
+                  <PlayerAvatar name={l.userName} imageUrl={l.image} size="lg" />
+                  <span className="truncate group-hover:underline">{l.userName}</span>
+                </PlayerLink>
               </li>
             ))}
           </ul>

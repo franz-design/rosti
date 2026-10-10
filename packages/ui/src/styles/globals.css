@@ -27,8 +27,8 @@
   --header-height: 3rem;
   --safe-area-top: env(safe-area-inset-top, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-  /* h-14 row + py-2, plus the home indicator. */
-  --bottom-nav-height: calc(4.5rem + var(--safe-area-bottom));
+  /* pt-1.5 + link padding + icon and label + 6px, plus the home indicator. */
+  --bottom-nav-height: calc(3.75rem + var(--safe-area-bottom));
 
   /* The shell is anchored to the viewport edges. iOS does not shrink the layout
      viewport when the keyboard opens, so these offsets track the visual viewport. */

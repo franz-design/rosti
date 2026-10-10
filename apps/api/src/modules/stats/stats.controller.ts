@@ -6,8 +6,12 @@ import { Session } from '../auth/auth.decorator'
 import { AuthGuard } from '../auth/auth.guard'
 import {
   matchStatsSchema,
+  playerDetailSchema,
+  playerSkillRatingsSchema,
   seasonHomeStatsSchema,
   seasonPlayerStatsSchema,
+  UpdatePlayerSkillsInput,
+  updatePlayerSkillsSchema,
   UpsertMatchStatsInput,
   upsertMatchStatsSchema,
 } from './contracts/stats.contract'
@@ -72,5 +76,24 @@ export class StatsController {
     @TypedParam('organizationId', z.string().uuid()) organizationId: string,
   ) {
     return this.statsService.getHomeStats(organizationId, session.user.id)
+  }
+
+  @TypedRoute.Get('players/:userId', playerDetailSchema)
+  async playerDetail(
+    @Session() session: LoggedInBetterAuthSession,
+    @TypedParam('organizationId', z.string().uuid()) organizationId: string,
+    @TypedParam('userId', z.string().uuid()) userId: string,
+  ) {
+    return this.statsService.getPlayerDetail(organizationId, session.user.id, userId)
+  }
+
+  @TypedRoute.Put('players/:userId/skills', playerSkillRatingsSchema)
+  async updatePlayerSkills(
+    @Session() session: LoggedInBetterAuthSession,
+    @TypedParam('organizationId', z.string().uuid()) organizationId: string,
+    @TypedParam('userId', z.string().uuid()) userId: string,
+    @TypedBody(updatePlayerSkillsSchema) body: UpdatePlayerSkillsInput,
+  ) {
+    return this.statsService.updatePlayerSkills(organizationId, session.user.id, userId, body)
   }
 }

@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/core'
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { User } from '../auth/auth.entity'
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { Organization, User } from '../auth/auth.entity'
 import { OrganizationService } from '../auth/organization.service'
 import { AttendanceStatus, MatchStatus } from '../matches/contracts/match.contract'
 import { MatchAttendance } from '../matches/match-attendance.entity'
@@ -9,15 +9,32 @@ import { Match } from '../matches/match.entity'
 import { SeasonStatus } from '../seasons/contracts/season.contract'
 import { PlayerVoteService } from '../matches/player-vote.service'
 import { Season } from '../seasons/season.entity'
-import { SeasonHomeStatsDto, UpsertMatchStatsInput } from './contracts/stats.contract'
+import {
+  PlayerDetailDto,
+  PlayerSkillRatingsDto,
+  SeasonHomeStatsDto,
+  UpdatePlayerSkillsInput,
+  UpsertMatchStatsInput,
+} from './contracts/stats.contract'
 import { MatchStat } from './match-stat.entity'
+import { PlayerSkill } from './player-skill.entity'
+import { buildSkillRatings, skillKeysForSport } from './player-skills'
 import {
   computeSeasonHomeStats,
   createEmptyHomeStats,
+  type ComputeSeasonHomeStatsInput,
   type HomeStatsGoalRow,
   type HomeStatsLineupRow,
   type HomeStatsPlayerRow,
 } from './season-home-stats'
+
+interface SeasonActivity {
+  season: { id: string; name: string } | null
+  matches: Match[]
+  attendances: MatchAttendance[]
+  lineups: MatchLineup[]
+  stats: MatchStat[]
+}
 
 @Injectable()
 export class StatsService {
@@ -138,13 +155,137 @@ export class StatsService {
    */
   async getHomeStats(organizationId: string, userId: string): Promise<SeasonHomeStatsDto> {
     await this.organizationService.requireMember(organizationId, userId)
+    const activity = await this.loadActiveSeasonActivity(organizationId)
+    if (!activity.season || activity.matches.length === 0) {
+      return createEmptyHomeStats(activity.season)
+    }
 
+    const home = computeSeasonHomeStats(this.toHomeStatsInput(activity, userId))
+    home.club.lastElectedPlayer = await this.playerVoteService.findLastElectedPlayer(
+      activity.matches,
+    )
+    home.club.openPlayerVoteMatchId = this.playerVoteService.findOpenPlayerVoteMatchId(
+      activity.matches,
+    )
+    return home
+  }
+
+  /**
+   * Profile and active-season totals for one club member.
+   */
+  async getPlayerDetail(
+    organizationId: string,
+    viewerUserId: string,
+    playerUserId: string,
+  ): Promise<PlayerDetailDto> {
+    await this.organizationService.requireMember(organizationId, viewerUserId)
+    const member = await this.organizationService.getMember(organizationId, playerUserId)
+    if (!member) throw new NotFoundException('Player not found')
+
+    const activity = await this.loadActiveSeasonActivity(organizationId)
+    const stats = emptyPlayerStats()
+    if (activity.season && activity.matches.length > 0) {
+      const home = computeSeasonHomeStats(this.toHomeStatsInput(activity, playerUserId))
+      stats.matchesPlayed = home.me.matchesPlayed
+      stats.goals = home.me.goals
+      stats.wins = home.me.wins
+      stats.losses = home.me.losses
+      stats.assists = sumAssists(activity.stats, playerUserId)
+    }
+
+    return {
+      userId: member.user.id,
+      name: member.user.name,
+      email: member.user.email,
+      phone: member.user.phone?.trim() || null,
+      image: member.user.image,
+      role: member.role,
+      memberSince: member.createdAt,
+      season: activity.season,
+      stats,
+      skillRatings: await this.loadSkillRatings(
+        organizationId,
+        playerUserId,
+        member.organization.sportType,
+      ),
+    }
+  }
+
+  /**
+   * Self-assessed skill levels for the club sport.
+   * The player can edit their own ratings. Club admins can edit any member.
+   */
+  async updatePlayerSkills(
+    organizationId: string,
+    actorUserId: string,
+    playerUserId: string,
+    data: UpdatePlayerSkillsInput,
+  ): Promise<PlayerSkillRatingsDto> {
+    if (actorUserId === playerUserId) {
+      await this.organizationService.requireMember(organizationId, actorUserId)
+    } else {
+      await this.organizationService.requireRole(organizationId, actorUserId, ['owner', 'admin'])
+    }
+
+    const player = await this.organizationService.getMember(organizationId, playerUserId)
+    if (!player) throw new NotFoundException('Player not found')
+
+    const sportType = player.organization.sportType
+    const allowed = skillKeysForSport(sportType)
+    if (!allowed) throw new BadRequestException('This sport has no skill ratings')
+
+    const hasUnknownSkill = data.skills.some((row) => !allowed.includes(row.key))
+    if (hasUnknownSkill) throw new BadRequestException('Unknown skill for this sport')
+
+    const nextValues = new Map<string, number>()
+    for (const row of data.skills) {
+      nextValues.set(row.key, row.value)
+    }
+
+    for (const [key, value] of nextValues) {
+      let skill = await this.em.findOne(PlayerSkill, {
+        organization: organizationId,
+        user: playerUserId,
+        skill: key,
+      })
+      if (!skill) {
+        skill = new PlayerSkill()
+        skill.organization = this.em.getReference(Organization, organizationId)
+        skill.user = this.em.getReference(User, playerUserId)
+        skill.skill = key
+        this.em.persist(skill)
+      }
+      skill.value = value
+    }
+    await this.em.flush()
+
+    const ratings = await this.loadSkillRatings(organizationId, playerUserId, sportType)
+    if (!ratings) throw new BadRequestException('This sport has no skill ratings')
+    return ratings
+  }
+
+  private async loadSkillRatings(
+    organizationId: string,
+    playerUserId: string,
+    sportType: Organization['sportType'],
+  ): Promise<PlayerSkillRatingsDto | null> {
+    if (!skillKeysForSport(sportType)) return null
+    const stored = await this.em.find(PlayerSkill, {
+      organization: organizationId,
+      user: playerUserId,
+    })
+    return buildSkillRatings(sportType, stored)
+  }
+
+  private async loadActiveSeasonActivity(organizationId: string): Promise<SeasonActivity> {
     const season = await this.em.findOne(
       Season,
       { organization: { id: organizationId }, status: SeasonStatus.Active },
       { orderBy: { startsAt: 'DESC' } },
     )
-    if (!season) return createEmptyHomeStats(null)
+    if (!season) {
+      return { season: null, matches: [], attendances: [], lineups: [], stats: [] }
+    }
 
     const seasonRef = { id: season.id, name: season.name }
     const matches = await this.em.find(Match, {
@@ -152,7 +293,9 @@ export class StatsService {
       season: { id: season.id },
       status: MatchStatus.Played,
     })
-    if (matches.length === 0) return createEmptyHomeStats(seasonRef)
+    if (matches.length === 0) {
+      return { season: seasonRef, matches: [], attendances: [], lineups: [], stats: [] }
+    }
 
     const matchIds = matches.map((match) => match.id)
     const [attendances, lineups, stats] = await Promise.all([
@@ -173,21 +316,25 @@ export class StatsService {
       ),
     ])
 
-    const home = computeSeasonHomeStats({
-      season: seasonRef,
-      viewerUserId: userId,
-      matches: matches.map((match) => ({
+    return { season: seasonRef, matches, attendances, lineups, stats }
+  }
+
+  private toHomeStatsInput(
+    activity: SeasonActivity,
+    viewerUserId: string,
+  ): ComputeSeasonHomeStatsInput {
+    return {
+      season: activity.season,
+      viewerUserId,
+      matches: activity.matches.map((match) => ({
         id: match.id,
         blueScore: match.blueScore,
         redScore: match.redScore,
       })),
-      attendances: attendances.map(toPlayerRow),
-      lineups: lineups.map(toLineupRow),
-      goals: stats.map(toGoalRow),
-    })
-    home.club.lastElectedPlayer = await this.playerVoteService.findLastElectedPlayer(matches)
-    home.club.openPlayerVoteMatchId = this.playerVoteService.findOpenPlayerVoteMatchId(matches)
-    return home
+      attendances: activity.attendances.map(toPlayerRow),
+      lineups: activity.lineups.map(toLineupRow),
+      goals: activity.stats.map(toGoalRow),
+    }
   }
 }
 
@@ -208,6 +355,25 @@ function toLineupRow(row: MatchLineup): HomeStatsLineupRow {
     image: row.user.image,
     team: row.team,
   }
+}
+
+function emptyPlayerStats(): PlayerDetailDto['stats'] {
+  return {
+    matchesPlayed: 0,
+    goals: 0,
+    assists: 0,
+    wins: 0,
+    losses: 0,
+  }
+}
+
+function sumAssists(stats: MatchStat[], userId: string): number {
+  let total = 0
+  for (const stat of stats) {
+    if (stat.user.id !== userId) continue
+    total += stat.assists
+  }
+  return total
 }
 
 function toGoalRow(row: MatchStat): HomeStatsGoalRow {

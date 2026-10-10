@@ -11,9 +11,9 @@ export function AppBottomNav() {
   return (
     <nav
       aria-label={t('dashboard.navigation')}
-      className="z-50 shrink-0 border-t border-border bg-background pt-2 pb-[calc(0.5rem+var(--safe-area-bottom))] shadow-[0_-1px_15px_-3px_rgb(0_0_0/0.1),0_-2px_6px_-4px_rgb(0_0_0/0.1)] md:hidden"
+      className="z-50 shrink-0 border-t border-border bg-background px-2 pt-1.5 pb-[calc(6px+var(--safe-area-bottom))] shadow-[0_-1px_15px_-3px_rgb(0_0_0/0.1),0_-2px_6px_-4px_rgb(0_0_0/0.1)] md:hidden"
     >
-      <ul className="grid h-14 grid-cols-3">
+      <ul className="grid grid-cols-3">
         {items.map((item) => {
           const isActive = isAppNavItemActive(location.pathname, item.to)
 
@@ -23,7 +23,7 @@ export function AppBottomNav() {
                 to={item.to}
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
-                  'flex h-full flex-col items-center justify-center gap-0.5 px-1 text-xs font-medium',
+                  'flex flex-col items-center gap-0.5 px-1 py-1.5 text-xs font-medium leading-tight',
                   isActive ? 'text-primary' : 'text-gray-500',
                 )}
               >

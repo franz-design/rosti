@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { Link, useLocation } from 'react-router'
 import { PlayerAvatar } from '@/common/components/player-avatar'
 import type { SeasonPlayerStat } from '@/lib/rosti-api'
 
@@ -8,6 +9,8 @@ interface SeasonStatsTableProps {
 
 export function SeasonStatsTable({ stats }: SeasonStatsTableProps) {
   const { t } = useTranslation()
+  const location = useLocation()
+  const from = `${location.pathname}${location.search}`
 
   return (
     <table className="w-full border text-sm">
@@ -23,10 +26,14 @@ export function SeasonStatsTable({ stats }: SeasonStatsTableProps) {
         {stats.map((s) => (
           <tr key={s.userId} className="border-b">
             <td className="p-2">
-              <span className="flex min-w-0 items-center gap-2">
+              <Link
+                to={`/players/${s.userId}`}
+                state={{ from }}
+                className="flex min-w-0 items-center gap-2 hover:underline"
+              >
                 <PlayerAvatar name={s.userName} imageUrl={s.image} size="sm" />
                 <span className="truncate">{s.userName}</span>
-              </span>
+              </Link>
             </td>
             <td className="p-2">{s.goals}</td>
             <td className="p-2">{s.assists}</td>

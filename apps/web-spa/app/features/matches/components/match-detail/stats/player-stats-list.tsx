@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PlayerAvatar } from '@/common/components/player-avatar'
+import { PlayerLink } from '@/common/components/player-link'
 import type { Attendance } from '@/lib/rosti-api'
 import { QuantityStepper } from '../quantity-stepper'
 import type { PlayerStatDraft } from '../player-stat-draft'
@@ -63,18 +64,22 @@ export function PlayerStatsList({
               key={player.userId}
               className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2"
             >
-              <span className="flex min-w-0 items-center gap-2">
+              <PlayerLink userId={player.userId} className="flex min-w-0 items-center gap-2">
                 <PlayerAvatar name={player.userName} imageUrl={player.image} size="sm" />
-                <span className="truncate text-sm">{player.userName}</span>
-              </span>
+                <span className="truncate text-sm group-hover:underline">{player.userName}</span>
+              </PlayerLink>
               {canEdit ? (
                 <>
                   <QuantityStepper
                     size="sm"
                     tone="neutral"
                     value={draft.goals}
-                    decreaseLabel={t('matches.detail.stats.decreaseGoals', { player: player.userName })}
-                    increaseLabel={t('matches.detail.stats.increaseGoals', { player: player.userName })}
+                    decreaseLabel={t('matches.detail.stats.decreaseGoals', {
+                      player: player.userName,
+                    })}
+                    increaseLabel={t('matches.detail.stats.increaseGoals', {
+                      player: player.userName,
+                    })}
                     onChange={(goals) => handleChange(player.userId, { ...draft, goals })}
                   />
                   <QuantityStepper
@@ -92,8 +97,12 @@ export function PlayerStatsList({
                 </>
               ) : (
                 <>
-                  <span className="w-[6.75rem] text-center text-sm tabular-nums">{draft.goals}</span>
-                  <span className="w-[6.75rem] text-center text-sm tabular-nums">{draft.assists}</span>
+                  <span className="w-[6.75rem] text-center text-sm tabular-nums">
+                    {draft.goals}
+                  </span>
+                  <span className="w-[6.75rem] text-center text-sm tabular-nums">
+                    {draft.assists}
+                  </span>
                 </>
               )}
             </li>

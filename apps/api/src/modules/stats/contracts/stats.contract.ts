@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { SportType } from '../../auth/entities/organization.entity'
 
 export const matchStatSchema = z
   .object({
@@ -110,3 +111,101 @@ export const seasonHomeStatsSchema = z
   .meta({ title: 'SeasonHomeStatsSchema' })
 
 export type SeasonHomeStatsDto = z.infer<typeof seasonHomeStatsSchema>
+
+export const playerSeasonStatsSchema = z
+  .object({
+    matchesPlayed: z.number().int().nonnegative(),
+    goals: z.number().int().nonnegative(),
+    assists: z.number().int().nonnegative(),
+    wins: z.number().int().nonnegative(),
+    losses: z.number().int().nonnegative(),
+  })
+  .meta({ title: 'PlayerSeasonStatsSchema' })
+
+export type PlayerSeasonStatsDto = z.infer<typeof playerSeasonStatsSchema>
+
+export const playerSkillKeySchema = z.enum([
+  'defense',
+  'attack',
+  'passing',
+  'shooting',
+  'vision',
+  'endurance',
+  'physical',
+  'goalkeeping',
+  'dribbling',
+  'rebounding',
+  'speed',
+  'serve',
+  'reception',
+  'setting',
+  'block',
+  'positioning',
+  'reading',
+  'forehand',
+  'backhand',
+  'volley',
+  'smash',
+  'footwork',
+  'consistency',
+  'bandeja',
+  'walls',
+  'clear',
+  'drop',
+  'netPlay',
+])
+
+export type PlayerSkillKey = z.infer<typeof playerSkillKeySchema>
+
+export const playerSkillRatingSchema = z
+  .object({
+    key: playerSkillKeySchema,
+    value: z.number().int().min(0).max(10),
+  })
+  .meta({ title: 'PlayerSkillRatingSchema' })
+
+export const playerSkillRatingsSchema = z
+  .object({
+    sportType: z.nativeEnum(SportType),
+    skills: z.array(playerSkillRatingSchema),
+  })
+  .meta({ title: 'PlayerSkillRatingsSchema' })
+
+export type PlayerSkillRatingsDto = z.infer<typeof playerSkillRatingsSchema>
+
+export const updatePlayerSkillsSchema = z
+  .object({
+    skills: z
+      .array(
+        z.object({
+          key: playerSkillKeySchema,
+          value: z.number().int().min(0).max(10),
+        }),
+      )
+      .min(1),
+  })
+  .meta({ title: 'UpdatePlayerSkillsSchema' })
+
+export type UpdatePlayerSkillsInput = z.infer<typeof updatePlayerSkillsSchema>
+
+export const playerDetailSchema = z
+  .object({
+    userId: z.string().uuid(),
+    name: z.string(),
+    email: z.string().email(),
+    phone: z.string().nullish(),
+    image: z.string().nullish(),
+    role: z.enum(['owner', 'admin', 'member']),
+    memberSince: z.coerce.date(),
+    season: z
+      .object({
+        id: z.string().uuid(),
+        name: z.string(),
+      })
+      .nullable(),
+    stats: playerSeasonStatsSchema,
+    skillRatings: playerSkillRatingsSchema.nullable(),
+  })
+  .meta({ title: 'PlayerDetailSchema' })
+
+export type PlayerDetailDto = z.infer<typeof playerDetailSchema>

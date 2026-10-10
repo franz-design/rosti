@@ -1,7 +1,9 @@
 import { cn } from '@rosti/ui/lib/utils'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router'
 import { useClub } from '@/features/clubs/hooks/club-context'
+import { authClient } from '@/lib/auth-client'
 import { hasClubHomeHighlights } from '../../utils/home-award-slots'
 import { fetchHomeStatsQueryOptions } from '../../utils/stats-queries'
 import { ClubStatsGrid } from './club-stats-grid'
@@ -12,6 +14,8 @@ import { SectionHeading } from './section-heading'
 export default function HomeStatsSection() {
   const { t } = useTranslation()
   const { activeClub } = useClub()
+  const { data: session } = authClient.useSession()
+  const myUserId = session?.user?.id
   const organizationId = activeClub?.id
   const { data, isLoading } = useQuery({
     ...fetchHomeStatsQueryOptions(organizationId ?? ''),
@@ -48,7 +52,18 @@ export default function HomeStatsSection() {
 
       {showPersonal ? (
         <section className={cn('min-w-0 space-y-3', showClub && 'lg:min-w-72 lg:flex-1')}>
-          <SectionHeading title={t('home.stats.personalTitle')} />
+          <div className="flex items-end justify-between gap-3">
+            <SectionHeading title={t('home.stats.personalTitle')} />
+            {myUserId ? (
+              <Link
+                to={`/players/${myUserId}`}
+                state={{ from: '/dashboard' }}
+                className="shrink-0 text-sm text-muted-foreground underline-offset-4 hover:underline"
+              >
+                {t('playerDetail.open')}
+              </Link>
+            ) : null}
+          </div>
           <PersonalStatsRow stats={data.me} stacked={showClub} />
         </section>
       ) : null}

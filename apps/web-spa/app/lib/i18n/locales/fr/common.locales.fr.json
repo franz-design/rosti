@@ -213,6 +213,7 @@
         "title": "Meilleur joueur",
         "invite": "Vote pour le meilleur joueur du match. Tu as jusqu'au {{date}}.",
         "inviteOpen": "Vote pour le meilleur joueur du match.",
+        "vote": "Voter",
         "voteFor": "Voter pour {{name}}",
         "saved": "Vote enregistré",
         "winner": "{{name}} est élu meilleur joueur.",
@@ -453,6 +454,98 @@
       "goals": "Buts",
       "assists": "Passes",
       "matches": "Matchs"
+    }
+  },
+  "playerDetail": {
+    "back": "Retour",
+    "open": "Voir ma fiche",
+    "loading": "Chargement du joueur…",
+    "notFound": "Ce joueur n'est pas dans le club.",
+    "error": "Impossible de charger ce joueur.",
+    "noClub": "Aucun club sélectionné.",
+    "email": "Email",
+    "phone": "Téléphone",
+    "memberSinceLabel": "Membre depuis",
+    "memberSince": "Membre depuis le {{date}}",
+    "statsTitle": "Statistiques",
+    "noSeason": "Aucune saison en cours",
+    "assists": "Passes"
+  },
+  "playerSkills": {
+    "title": "Compétences",
+    "hint": "De 0 à 10.",
+    "saveError": "Impossible d'enregistrer ce niveau.",
+    "sports": {
+      "football": {
+        "defense": "Défense",
+        "attack": "Attaque",
+        "passing": "Passes",
+        "shooting": "Tirs",
+        "vision": "Vision de jeu",
+        "endurance": "Endurance",
+        "physical": "Physique",
+        "goalkeeping": "Gardien"
+      },
+      "futsal": {
+        "defense": "Défense",
+        "attack": "Attaque",
+        "passing": "Passes",
+        "shooting": "Tirs",
+        "vision": "Vision de jeu",
+        "endurance": "Endurance",
+        "physical": "Physique",
+        "goalkeeping": "Gardien"
+      },
+      "basketball": {
+        "shooting": "Tir",
+        "passing": "Passe",
+        "dribbling": "Dribble",
+        "defense": "Défense",
+        "rebounding": "Rebond",
+        "speed": "Vitesse",
+        "vision": "Vision de jeu",
+        "physical": "Physique"
+      },
+      "volleyball": {
+        "serve": "Service",
+        "reception": "Réception",
+        "setting": "Passe",
+        "attack": "Attaque",
+        "block": "Contre",
+        "defense": "Défense",
+        "positioning": "Placement",
+        "reading": "Lecture du jeu"
+      },
+      "tennis": {
+        "serve": "Service",
+        "forehand": "Coup droit",
+        "backhand": "Revers",
+        "volley": "Volée",
+        "smash": "Smash",
+        "footwork": "Déplacement",
+        "endurance": "Endurance",
+        "consistency": "Régularité"
+      },
+      "padel": {
+        "serve": "Service",
+        "forehand": "Coup droit",
+        "backhand": "Revers",
+        "volley": "Volée",
+        "smash": "Smash",
+        "bandeja": "Bandeja",
+        "defense": "Défense",
+        "walls": "Murs"
+      },
+      "badminton": {
+        "serve": "Service",
+        "clear": "Dégagé",
+        "drop": "Amorti",
+        "smash": "Smash",
+        "netPlay": "Jeu au filet",
+        "defense": "Défense",
+        "footwork": "Déplacement",
+        "endurance": "Endurance"
+      }
     }
   },
   "onboarding": {

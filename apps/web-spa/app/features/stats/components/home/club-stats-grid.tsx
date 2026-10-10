@@ -1,4 +1,6 @@
+import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link, useLocation } from 'react-router'
 import { getPlayerFirstName } from '@/features/matches/utils/lineup-positions'
 import type { SeasonHomeStats } from '@/lib/rosti-api'
 import {
@@ -88,25 +90,43 @@ function AwardSlot({
 
   if (slot.kind === 'elected') {
     return (
-      <AwardCard
-        variant="elected"
-        title={t('home.stats.card.electedTitle')}
-        player={slot.player}
-        emptyLabel={t('home.stats.card.emptyElected')}
-        showStat={false}
-      />
+      <PlayerCardLink userId={slot.player.userId}>
+        <AwardCard
+          variant="elected"
+          title={t('home.stats.card.electedTitle')}
+          player={slot.player}
+          emptyLabel={t('home.stats.card.emptyElected')}
+          showStat={false}
+        />
+      </PlayerCardLink>
     )
   }
 
   const copy = recordCopy[slot.variant]
   return (
-    <AwardCard
-      variant={slot.variant}
-      title={copy.title}
-      statLabel={copy.statLabel}
-      player={slot.player}
-      emptyLabel={copy.emptyLabel}
-    />
+    <PlayerCardLink userId={slot.player.userId}>
+      <AwardCard
+        variant={slot.variant}
+        title={copy.title}
+        statLabel={copy.statLabel}
+        player={slot.player}
+        emptyLabel={copy.emptyLabel}
+      />
+    </PlayerCardLink>
+  )
+}
+
+function PlayerCardLink({ userId, children }: { userId: string; children: ReactNode }) {
+  const location = useLocation()
+
+  return (
+    <Link
+      to={`/players/${userId}`}
+      state={{ from: `${location.pathname}${location.search}` }}
+      className="block w-full rounded-[1.75rem] outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      {children}
+    </Link>
   )
 }
 
