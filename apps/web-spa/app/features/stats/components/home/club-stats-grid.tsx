@@ -43,7 +43,7 @@ export function ClubStatsGrid({ stats }: ClubStatsGridProps) {
   return (
     <div className="min-w-0 space-y-4">
       {slots.length > 0 ? (
-        <div className="flex w-full flex-col items-start gap-4 sm:flex-row">
+        <div className="flex w-full flex-col items-start gap-4 sm:flex-row px-8 sm:px-0">
           {slots.map((slot) => (
             <div key={slotKey(slot)} className="w-full min-w-0 sm:w-72 sm:max-w-72 sm:shrink">
               <AwardSlot slot={slot} recordCopy={recordCopy} />

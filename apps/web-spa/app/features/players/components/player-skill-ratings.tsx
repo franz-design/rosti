@@ -143,7 +143,7 @@ export function PlayerSkillRatingsSection({
       <div>
         <h2 className="text-lg font-medium">{t('playerSkills.title')}</h2>
       </div>
-      <div className="mt-6">
+      <div className="mt-6 flex flex-col gap-6">
         {ratings.skills.map((skill) => (
           <SkillSlider
             key={skill.key}
@@ -184,7 +184,7 @@ function SkillSlider({
   }, [savedValue, resetNonce])
 
   return (
-    <div className="space-y-0.5">
+    <div className="space-y-2">
       <p className="text-sm font-medium">{label}</p>
       <Slider
         value={value}
@@ -199,9 +199,7 @@ function SkillSlider({
           if (next === savedValue) return
           onCommit(skillKey, next)
         }}
-      >
-        {value}
-      </Slider>
+      />
     </div>
   )
 }

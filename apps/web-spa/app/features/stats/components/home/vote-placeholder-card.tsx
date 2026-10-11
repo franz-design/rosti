@@ -11,7 +11,7 @@ export function VotePlaceholderCard({ matchId }: VotePlaceholderCardProps) {
   return (
     <Link
       to={`/matches/${matchId}`}
-      className="flex aspect-[668/1024] w-full flex-col items-center justify-center gap-4 rounded-[1.75rem] border-2 border-dashed border-muted-foreground/40 bg-card px-6 text-center transition-colors hover:border-primary hover:bg-accent/30 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+      className="flex py-8 sm:aspect-[668/1024] w-full flex-col items-center justify-center gap-4 rounded-[1.75rem] border-2 border-dashed border-muted-foreground/40 bg-card px-6 text-center transition-colors hover:border-primary hover:bg-accent/30 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
     >
       <p className="font-display text-lg leading-snug font-semibold">
         {t('home.stats.card.votePrompt')}

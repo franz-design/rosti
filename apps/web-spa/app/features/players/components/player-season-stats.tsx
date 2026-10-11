@@ -59,7 +59,7 @@ export function PlayerSeasonStats({ season, stats }: PlayerSeasonStatsProps) {
           <p className="text-sm text-muted-foreground">{t('playerDetail.noSeason')}</p>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {tiles.map((tile) => (
           <StatTile key={tile.label} {...tile} />
         ))}
