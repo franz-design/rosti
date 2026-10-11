@@ -27,7 +27,7 @@ export function AttendanceGroup({
   return (
     <section className="space-y-2">
       <h2 className="text-base font-medium">
-        {title} <span className="text-muted-foreground">({players.length})</span>
+        {title} <span className="text-primary ml-1">{players.length}</span>
       </h2>
       {players.length === 0 ? (
         <p className="text-sm text-muted-foreground">{emptyLabel}</p>

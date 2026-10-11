@@ -2,6 +2,7 @@ import { Button } from '@rosti/ui/components/primitives/button'
 import { useTranslation } from 'react-i18next'
 import type { SessionFee } from '@/lib/rosti-api'
 import { formatEuro } from '@/features/matches/utils/euros'
+import { cn } from '@rosti/ui/lib/utils'
 
 interface MyFeeCardProps {
   fee: SessionFee | undefined
@@ -21,14 +22,21 @@ export function MyFeeCard({ fee, locale, isPending, onMarkPaid, onUndoPaid }: My
   }
 
   return (
-    <section className="space-y-3 rounded-lg border p-4">
-      <div className="flex items-baseline justify-between gap-3">
+    <section className="space-y-3 rounded-lg border p-4 relative">
+      <div className="flex items-baseline gap-3">
         <h2 className="text-base font-medium">{t('matches.detail.payments.yourShare')}</h2>
-        <p className="text-lg font-semibold tabular-nums">{formatEuro(fee.amountCents, locale)}</p>
+        <p className="text-lg font-semibold tabular-nums text-primary">
+          {formatEuro(fee.amountCents, locale)}
+        </p>
       </div>
-      <p className="text-sm text-muted-foreground">
+      <div
+        className={cn(
+          'text-sm text-muted-foreground absolute right-2 top-2 bg-primary text-white px-2 py-1 rounded-md',
+          fee.status === 'owed' ? 'bg-primary' : 'bg-green-500',
+        )}
+      >
         {t(`matches.detail.payments.status.${fee.status}`)}
-      </p>
+      </div>
       <div className="flex flex-wrap gap-2">
         {fee.status === 'owed' && fee.paymentUrl ? (
           <Button

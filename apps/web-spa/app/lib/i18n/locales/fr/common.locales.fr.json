@@ -226,7 +226,7 @@
         "nobodyToRemind": "Personne à relancer pour l'instant",
         "invalidAmount": "Indique un montant en euros, par exemple 30 ou 12,50.",
         "status": {
-          "owed": "Dû",
+          "owed": "À payer",
           "paid": "Payé",
           "waived": "Offert"
         }
