@@ -1,5 +1,5 @@
 import { cn } from '@rosti/ui/lib/utils'
-import { type CSSProperties, type PointerEvent } from 'react'
+import { type CSSProperties, type PointerEvent, type RefObject, useEffect, useRef } from 'react'
 import electedArt from '@/assets/images/award-cards/last-elected-player.png'
 import scorerArt from '@/assets/images/award-cards/meilleur-buteur.png'
 import lossesArt from '@/assets/images/award-cards/most-defeats.png'
@@ -110,6 +110,7 @@ export function AwardCard({
   showStat = true,
   className,
 }: AwardCardProps) {
+  const cardRef = useAwardCardTouch()
   const artwork = ARTWORK[variant]
   const skin = SKIN[variant]
   const cardMask = {
@@ -119,30 +120,24 @@ export function AwardCard({
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>): void {
     if (event.pointerType !== 'mouse') return
-    const node = event.currentTarget
-    const bounds = node.getBoundingClientRect()
-    const x = clampUnit((event.clientX - bounds.left) / bounds.width)
-    const y = clampUnit((event.clientY - bounds.top) / bounds.height)
-    node.dataset.active = ''
-    node.style.setProperty('--pointer-x', `${(x * 100).toFixed(2)}%`)
-    node.style.setProperty('--pointer-y', `${(y * 100).toFixed(2)}%`)
-    node.style.setProperty('--rotate-x', `${((0.5 - y) * 14).toFixed(2)}deg`)
-    node.style.setProperty('--rotate-y', `${((x - 0.5) * 18).toFixed(2)}deg`)
+    moveCard(event.currentTarget, event.clientX, event.clientY)
   }
 
   function handlePointerLeave(event: PointerEvent<HTMLDivElement>): void {
-    const node = event.currentTarget
-    delete node.dataset.active
-    node.style.setProperty('--pointer-x', '50%')
-    node.style.setProperty('--pointer-y', '16%')
-    node.style.setProperty('--rotate-x', '0deg')
-    node.style.setProperty('--rotate-y', '0deg')
+    if (event.pointerType !== 'mouse') return
+    resetCard(event.currentTarget)
+  }
+
+  function handlePointerCancel(event: PointerEvent<HTMLDivElement>): void {
+    if (event.pointerType !== 'mouse') return
+    resetCard(event.currentTarget)
   }
 
   return (
     <div
+      ref={cardRef}
       className={cn(
-        'group @container relative aspect-[668/1024] w-full perspective-[980px] select-none',
+        'group @container relative aspect-[668/1024] w-full touch-pan-y perspective-[980px] select-none [-webkit-touch-callout:none]',
         '[--pointer-x:50%] [--pointer-y:16%] [--rotate-x:0deg] [--rotate-y:0deg] [--card-scale:1]',
         'data-active:[--card-scale:1.02]',
         className,
@@ -155,7 +150,7 @@ export function AwardCard({
       }
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
-      onPointerCancel={handlePointerLeave}
+      onPointerCancel={handlePointerCancel}
     >
       <div
         className={cn(
@@ -284,4 +279,119 @@ function PortraitFace({ name, image }: { name: string; image?: string | null }) 
 function clampUnit(value: number): number {
   if (Number.isNaN(value)) return 0.5
   return Math.min(1, Math.max(0, value))
+}
+
+const TOUCH_DRAG_SLOP_PX = 12
+const CLICK_BLOCK_MS = 400
+
+interface TouchDrag {
+  identifier: number
+  startX: number
+  startY: number
+  isTilting: boolean
+}
+
+function useAwardCardTouch(): RefObject<HTMLDivElement | null> {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const blockClickRef = useRef(false)
+
+  useEffect(() => {
+    const node = cardRef.current
+    if (!node) return
+
+    let drag: TouchDrag | null = null
+    let blockClickTimer = 0
+
+    const handleClick = (event: MouseEvent): void => {
+      if (!blockClickRef.current) return
+      blockClickRef.current = false
+      event.preventDefault()
+      event.stopPropagation()
+    }
+
+    const handleTouchStart = (event: TouchEvent): void => {
+      if (event.touches.length !== 1) return
+      const touch = event.touches[0]
+      if (!touch) return
+      drag = {
+        identifier: touch.identifier,
+        startX: touch.clientX,
+        startY: touch.clientY,
+        isTilting: false,
+      }
+    }
+
+    const handleTouchMove = (event: TouchEvent): void => {
+      if (!drag) return
+      const touch = findTouch(event.touches, drag.identifier)
+      if (!touch) return
+
+      if (!drag.isTilting) {
+        const deltaX = touch.clientX - drag.startX
+        const deltaY = touch.clientY - drag.startY
+        if (Math.hypot(deltaX, deltaY) < TOUCH_DRAG_SLOP_PX) return
+        // A vertical swipe still scrolls the page. A sideways drag drives the foil.
+        if (Math.abs(deltaY) >= Math.abs(deltaX)) {
+          drag = null
+          return
+        }
+        drag.isTilting = true
+        blockClickRef.current = true
+      }
+
+      if (event.cancelable) event.preventDefault()
+      moveCard(node, touch.clientX, touch.clientY)
+    }
+
+    const endTouch = (): void => {
+      const wasTilting = drag?.isTilting ?? false
+      drag = null
+      if (!wasTilting) return
+      resetCard(node)
+      window.clearTimeout(blockClickTimer)
+      blockClickTimer = window.setTimeout(() => {
+        blockClickRef.current = false
+      }, CLICK_BLOCK_MS)
+    }
+
+    node.addEventListener('touchstart', handleTouchStart, { passive: true })
+    node.addEventListener('touchmove', handleTouchMove, { passive: false })
+    node.addEventListener('touchend', endTouch)
+    node.addEventListener('touchcancel', endTouch)
+    node.addEventListener('click', handleClick)
+
+    return () => {
+      window.clearTimeout(blockClickTimer)
+      node.removeEventListener('touchstart', handleTouchStart)
+      node.removeEventListener('touchmove', handleTouchMove)
+      node.removeEventListener('touchend', endTouch)
+      node.removeEventListener('touchcancel', endTouch)
+      node.removeEventListener('click', handleClick)
+    }
+  }, [])
+
+  return cardRef
+}
+
+function moveCard(node: HTMLDivElement, clientX: number, clientY: number): void {
+  const bounds = node.getBoundingClientRect()
+  const x = clampUnit((clientX - bounds.left) / bounds.width)
+  const y = clampUnit((clientY - bounds.top) / bounds.height)
+  node.dataset.active = ''
+  node.style.setProperty('--pointer-x', `${(x * 100).toFixed(2)}%`)
+  node.style.setProperty('--pointer-y', `${(y * 100).toFixed(2)}%`)
+  node.style.setProperty('--rotate-x', `${((0.5 - y) * 14).toFixed(2)}deg`)
+  node.style.setProperty('--rotate-y', `${((x - 0.5) * 18).toFixed(2)}deg`)
+}
+
+function resetCard(node: HTMLDivElement): void {
+  delete node.dataset.active
+  node.style.setProperty('--pointer-x', '50%')
+  node.style.setProperty('--pointer-y', '16%')
+  node.style.setProperty('--rotate-x', '0deg')
+  node.style.setProperty('--rotate-y', '0deg')
+}
+
+function findTouch(touches: TouchList, identifier: number): Touch | undefined {
+  return Array.from(touches).find((touch) => touch.identifier === identifier)
 }

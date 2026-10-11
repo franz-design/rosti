@@ -6,8 +6,8 @@ export function HomeStatsSkeleton() {
       <div className="min-w-0 space-y-3 lg:w-max lg:max-w-full lg:shrink">
         <Skeleton className="h-6 w-40" />
         <div className="flex w-full flex-col items-start gap-4 sm:flex-row">
-          <Skeleton className="aspect-[668/1024] w-full max-w-72 rounded-[1.75rem] sm:w-72" />
-          <Skeleton className="aspect-[668/1024] w-full max-w-72 rounded-[1.75rem] sm:w-72" />
+          <Skeleton className="aspect-[668/1024] w-full rounded-[1.75rem] sm:w-72 sm:max-w-72" />
+          <Skeleton className="aspect-[668/1024] w-full rounded-[1.75rem] sm:w-72 sm:max-w-72" />
         </div>
       </div>
       <div className="min-w-0 flex-1 space-y-3 lg:min-w-72">

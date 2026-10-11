@@ -1,3 +1,4 @@
+import { Button } from '@rosti/ui/components/primitives/button'
 import { cn } from '@rosti/ui/lib/utils'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -36,7 +37,7 @@ export default function HomeStatsSection() {
     <div
       className={cn(
         'flex min-w-0 flex-col gap-8',
-        showClub && showPersonal && 'lg:flex-row lg:items-start lg:gap-8',
+        showClub && showPersonal && 'xl:flex-row xl:items-start xl:gap-8',
       )}
     >
       {showClub ? (
@@ -55,13 +56,13 @@ export default function HomeStatsSection() {
           <div className="flex items-end justify-between gap-3">
             <SectionHeading title={t('home.stats.personalTitle')} />
             {myUserId ? (
-              <Link
-                to={`/players/${myUserId}`}
-                state={{ from: '/dashboard' }}
-                className="shrink-0 text-sm text-foreground underline-offset-4 hover:underline font-medium"
+              <Button
+                variant="outline"
+                size="sm"
+                render={<Link to={`/players/${myUserId}`} state={{ from: '/dashboard' }} />}
               >
                 {t('playerDetail.open')}
-              </Link>
+              </Button>
             ) : null}
           </div>
           <PersonalStatsRow stats={data.me} stacked={showClub} />
