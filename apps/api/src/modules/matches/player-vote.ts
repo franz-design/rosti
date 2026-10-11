@@ -136,6 +136,24 @@ export function pickOpenPlayerVoteMatchId(
   return last.id
 }
 
+/**
+ * Valid votes received by one player.
+ * A ballot counts when both players attended and the voter did not pick themselves.
+ */
+export function countValidVotes(
+  nomineeUserId: string,
+  presentUserIds: Iterable<string>,
+  ballots: PlayerVoteBallot[],
+): number {
+  const presentIds = new Set(presentUserIds)
+  let count = 0
+  for (const ballot of ballots) {
+    if (!isValidBallot(ballot, presentIds)) continue
+    if (ballot.nomineeUserId === nomineeUserId) count += 1
+  }
+  return count
+}
+
 export function pickLatestMatch<T extends { id: string; startsAt: Date }>(matches: T[]): T | null {
   let latest: T | null = null
   for (const match of matches) {

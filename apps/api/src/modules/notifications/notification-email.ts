@@ -1,5 +1,5 @@
 import { joinAppUrl } from '../email/email-layout'
-import { formatFrenchDate } from '../email/format-french-date'
+import { formatFrenchDate, formatFrenchDay } from '../email/format-french-date'
 
 export interface MatchEmailSource {
   id: string
@@ -87,6 +87,41 @@ export function playerVoteResultEmail(
     paragraphs: [`Aucun meilleur joueur n'a été élu pour ${match.title}.`],
     action: { label: 'Voir le match', url: matchUrl(appUrl, match.id) },
   }
+}
+
+export function feeRequestEmail(input: {
+  match: MatchEmailSource
+  appUrl: string
+  amountCents: number
+  paymentUrl?: string
+  isReminder: boolean
+  shares: number
+}): NotificationEmailCopy {
+  const amount = formatEuroCents(input.amountCents)
+  const day = formatFrenchDay(input.match.startsAt)
+  const paragraphs = [
+    input.isReminder
+      ? `Tu n'as pas encore payé ta part de ${amount} pour la séance ${whenAndWhere(input.match)}.`
+      : `Ta part pour la séance ${whenAndWhere(input.match)} est de ${amount}.`,
+  ]
+  if (input.shares > 1) paragraphs.push(`Cette somme couvre ${input.shares} parts.`)
+  paragraphs.push('Après le paiement, ouvre la séance dans Rösti et indique que tu as payé.')
+  return {
+    subject: input.isReminder
+      ? oneLine(`Rappel : ${amount} pour la séance du ${day}`)
+      : oneLine(`Ta part : ${amount} pour ${input.match.title}`),
+    paragraphs,
+    action: input.paymentUrl
+      ? { label: 'Payer avec PayPal', url: input.paymentUrl }
+      : { label: 'Voir la séance', url: matchUrl(input.appUrl, input.match.id) },
+  }
+}
+
+function formatEuroCents(amountCents: number): string {
+  const euros = Math.trunc(amountCents / 100)
+  const cents = Math.abs(amountCents % 100)
+  if (cents === 0) return `${euros} €`
+  return `${euros},${String(cents).padStart(2, '0')} €`
 }
 
 export function scoreReminderEmail(match: MatchEmailSource, appUrl: string): NotificationEmailCopy {

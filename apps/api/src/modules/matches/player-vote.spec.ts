@@ -1,6 +1,7 @@
 import { MatchStatus } from './contracts/match.contract'
 import {
   computePlayerVoteClosesAt,
+  countValidVotes,
   hasEveryoneVoted,
   isPlayerVoteReady,
   MIN_PLAYER_VOTE_PLAYERS,
@@ -83,6 +84,21 @@ describe('resolvePlayerVote', () => {
 
     expect(actual.winner).toEqual(LUCAS)
     expect(actual.isTie).toBe(false)
+  })
+})
+
+describe('countValidVotes', () => {
+  it('counts only ballots that would elect that player', () => {
+    const presentUserIds = [LUCAS.userId, HUGO.userId]
+
+    expect(
+      countValidVotes(HUGO.userId, presentUserIds, [
+        { voterUserId: LUCAS.userId, nomineeUserId: HUGO.userId },
+        { voterUserId: HUGO.userId, nomineeUserId: HUGO.userId },
+        { voterUserId: ADAM.userId, nomineeUserId: HUGO.userId },
+        { voterUserId: HUGO.userId, nomineeUserId: LUCAS.userId },
+      ]),
+    ).toBe(1)
   })
 })
 

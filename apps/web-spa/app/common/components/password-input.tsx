@@ -26,7 +26,9 @@ export function PasswordInput({ className, disabled, ...props }: PasswordInputPr
         type="button"
         className="absolute inset-y-0 right-0 flex w-10 cursor-pointer items-center justify-center text-muted-foreground outline-none hover:text-foreground focus-visible:text-foreground disabled:pointer-events-none disabled:opacity-50"
         disabled={disabled}
-        aria-label={isVisible ? t('auth.passwordVisibility.hide') : t('auth.passwordVisibility.show')}
+        aria-label={
+          isVisible ? t('auth.passwordVisibility.hide') : t('auth.passwordVisibility.show')
+        }
         aria-pressed={isVisible}
         onMouseDown={(event) => event.preventDefault()}
         onClick={handleToggleVisibility}

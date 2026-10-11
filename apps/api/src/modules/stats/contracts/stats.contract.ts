@@ -54,6 +54,14 @@ export const playerRefSchema = z
 
 export type PlayerRefDto = z.infer<typeof playerRefSchema>
 
+export const electedPlayerSchema = playerRefSchema
+  .extend({
+    voteCount: z.number().int().nonnegative(),
+  })
+  .meta({ title: 'ElectedPlayerSchema' })
+
+export type ElectedPlayerDto = z.infer<typeof electedPlayerSchema>
+
 export const playerHighlightSchema = z
   .object({
     userId: z.string().uuid(),
@@ -82,7 +90,7 @@ export const clubHomeStatsSchema = z
     mostWins: playerHighlightSchema.nullable(),
     mostLosses: playerHighlightSchema.nullable(),
     mostPlayedTogether: playedTogetherSchema.nullable(),
-    lastElectedPlayer: playerRefSchema.nullable(),
+    lastElectedPlayer: electedPlayerSchema.nullable(),
     /** Latest played match while its best-player vote is still open. */
     openPlayerVoteMatchId: z.string().uuid().nullable(),
   })

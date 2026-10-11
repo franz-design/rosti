@@ -11,6 +11,7 @@ const TOGGLE_KEYS = [
   'notifyChatMention',
   'notifyAllChatMessages',
   'notifyPlayerVote',
+  'notifyFeeRequest',
 ] as const satisfies ReadonlyArray<keyof NotificationPreference>
 
 interface NotificationToggleListProps {

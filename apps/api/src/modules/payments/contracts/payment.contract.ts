@@ -35,8 +35,12 @@ export const sessionFeeSchema = z
     userId: z.string().uuid(),
     userName: z.string(),
     amountCents: z.number().int(),
+    shares: z.number().int().positive(),
     status: z.nativeEnum(FeeStatus),
     paidAt: z.coerce.date().nullish(),
+    reminderCount: z.number().int().nonnegative(),
+    lastRemindedAt: z.coerce.date().nullish(),
+    paymentUrl: z.string().url().nullish(),
   })
   .meta({ title: 'SessionFeeSchema' })
 
@@ -50,6 +54,22 @@ export const updateFeeStatusSchema = z
   .meta({ title: 'UpdateFeeStatusSchema' })
 
 export type UpdateFeeStatusInput = z.infer<typeof updateFeeStatusSchema>
+
+export const updateFeeSharesSchema = z
+  .object({
+    shares: z.number().int().min(1).max(20),
+  })
+  .meta({ title: 'UpdateFeeSharesSchema' })
+
+export type UpdateFeeSharesInput = z.infer<typeof updateFeeSharesSchema>
+
+export const remindFeesResultSchema = z
+  .object({
+    remindedCount: z.number().int().nonnegative(),
+  })
+  .meta({ title: 'RemindFeesResultSchema' })
+
+export type RemindFeesResultDto = z.infer<typeof remindFeesResultSchema>
 
 export const clubPaymentLinkSchema = z
   .object({

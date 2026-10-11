@@ -128,6 +128,7 @@
         "winsTitle": "Le winner",
         "lossesTitle": "Abonné aux défaites",
         "electedTitle": "L'élu",
+        "electedStat": "votes",
         "duoTitle": "Le duo",
         "duoStat": "matchs ensemble",
         "emptyScorer": "Aucun but",
@@ -189,7 +190,8 @@
       "tabs": {
         "summary": "Résumé",
         "chat": "Chat",
-        "stats": "Stats"
+        "stats": "Stats",
+        "payments": "Paiement"
       },
       "status": {
         "scheduled": "Planifié",
@@ -200,6 +202,34 @@
         "present": "Présent",
         "absent": "Absent",
         "question": "Tu seras là ?"
+      },
+      "payments": {
+        "loading": "Chargement du paiement…",
+        "empty": "Aucune part pour l'instant. Les parts sont calculées à partir des joueurs présents.",
+        "nothingToPay": "Tu n'as rien à payer pour cette séance.",
+        "yourShare": "Ta part",
+        "pay": "Payer avec PayPal",
+        "markPaid": "J'ai payé",
+        "undoPaid": "Annuler",
+        "pitch": "Terrain (€)",
+        "extras": "Matériel (€)",
+        "saveCost": "Enregistrer le coût",
+        "costSaved": "Coût enregistré",
+        "shares": "Parts",
+        "decreaseShares": "Retirer une part",
+        "increaseShares": "Ajouter une part",
+        "collected": "{{paid}} encaissés sur {{total}}",
+        "reminders": "Relancé {{count}} fois",
+        "lastReminder": "dernière relance le {{date}}",
+        "remind": "Relancer les retardataires",
+        "reminded": "Relances envoyées : {{count}}",
+        "nobodyToRemind": "Personne à relancer pour l'instant",
+        "invalidAmount": "Indique un montant en euros, par exemple 30 ou 12,50.",
+        "status": {
+          "owed": "Dû",
+          "paid": "Payé",
+          "waived": "Offert"
+        }
       },
       "summary": {
         "lineup": "Composition",
@@ -285,6 +315,9 @@
     "location": "Lieu",
     "locationPlaceholder": "Ex. Terrain municipal",
     "maxPlayers": "Nombre max de joueurs",
+    "pitchCost": "Coût du terrain (€)",
+    "pitchCostPlaceholder": "Ex. 30",
+    "pitchCostHint": "Optionnel. Chaque séance de la série reprend ce montant. Tu pourras ajouter le matériel après.",
     "date": "Date",
     "datePlaceholder": "Choisir une date",
     "time": "Heure",
@@ -304,6 +337,7 @@
     "errors": {
       "requiredFields": "Merci de remplir tous les champs.",
       "maxPlayers": "Il faut au moins 2 joueurs.",
+      "pitchCost": "Indique un montant en euros, par exemple 30 ou 12,50.",
       "missingClub": "Club introuvable.",
       "matchOutsideSeason": "La date du premier match est en dehors de la saison."
     }
@@ -379,9 +413,22 @@
     },
     "paymentLink": {
       "title": "Lien de paiement personnel",
-      "hint": "Peer-to-peer uniquement (Lydia, PayPal.me, Revolut…). Pas de PSP commercial pour l’instant.",
+      "hint": "Colle un lien paypal.me. Rösti ajoutera le montant de chaque joueur. Les autres liens (Lydia, Revolut) sont envoyés tels quels.",
       "save": "Enregistrer",
       "saved": "Lien de paiement enregistré"
+    },
+    "feeReminders": {
+      "title": "Relances de paiement",
+      "hint": "Rösti relance les joueurs qui n'ont pas payé. Les délais partent de la demande envoyée après la séance.",
+      "enabled": "Relances automatiques",
+      "on": "Activées",
+      "off": "Désactivées",
+      "first": "Première relance",
+      "second": "Deuxième relance",
+      "none": "Pas de deuxième relance",
+      "daysAfter": "{{count}} jours après la demande",
+      "save": "Enregistrer",
+      "saved": "Relances enregistrées"
     },
     "seasons": {
       "title": "Saisons",
@@ -644,7 +691,8 @@
       "notifyMatchCancelled": "Match annulé",
       "notifyChatMention": "Mentions dans le chat",
       "notifyAllChatMessages": "Tous les messages du chat",
-      "notifyPlayerVote": "Vote du meilleur joueur"
+      "notifyPlayerVote": "Vote du meilleur joueur",
+      "notifyFeeRequest": "Demandes de paiement"
     },
     "firstName": "Prénom",
     "lastName": "Nom",

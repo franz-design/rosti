@@ -17,10 +17,7 @@ export function resetPasswordEmail(input: { name: string; appUrl: string; token:
 export function verificationEmail(input: { name: string; appUrl: string; token: string }) {
   return {
     subject: 'Confirme ton adresse email',
-    paragraphs: [
-      `Bonjour ${input.name},`,
-      'Confirme ton adresse email pour utiliser Rösti.',
-    ],
+    paragraphs: [`Bonjour ${input.name},`, 'Confirme ton adresse email pour utiliser Rösti.'],
     action: {
       label: 'Confirmer mon adresse',
       url: joinAppUrl(input.appUrl, `/verify-email?token=${encodeURIComponent(input.token)}`),

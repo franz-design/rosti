@@ -17,11 +17,11 @@ Anyone can read an avatar. The signed-in player can replace or delete their own.
 
 ## Where the files live
 
-| Environment | Directory |
-|---|---|
+| Environment | Directory                                                                                                                                            |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Development | `apps/api/data/avatars` (gitignored). The dev seeder writes one portrait there for each of the 16 seeded users, from `apps/api/src/seeders/avatars`. |
-| Tests | A folder under the system temp directory |
-| Production | `/data/avatars` on the API container |
+| Tests       | A folder under the system temp directory                                                                                                             |
+| Production  | `/data/avatars` on the API container                                                                                                                 |
 
 In production that path must be a Docker volume on the `api` service. A deploy recreates the container. Without the volume, the photos disappear. See [Production infrastructure](/lonestone-boilerplate/references/rosti-infrastructure).
 

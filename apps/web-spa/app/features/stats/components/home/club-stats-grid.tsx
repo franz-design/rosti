@@ -94,9 +94,9 @@ function AwardSlot({
         <AwardCard
           variant="elected"
           title={t('home.stats.card.electedTitle')}
+          statLabel={t('home.stats.card.electedStat')}
           player={slot.player}
           emptyLabel={t('home.stats.card.emptyElected')}
-          showStat={false}
         />
       </PlayerCardLink>
     )

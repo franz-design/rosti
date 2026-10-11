@@ -28,7 +28,10 @@ const TONE_CLASS: Record<QuantityTone, { frame: string; divider: string; symbol:
   },
 }
 
-const SIZE_CLASS: Record<QuantitySize, { frame: string; button: string; icon: string; input: string }> = {
+const SIZE_CLASS: Record<
+  QuantitySize,
+  { frame: string; button: string; icon: string; input: string }
+> = {
   md: {
     frame: 'h-14 rounded-2xl',
     button: 'w-12',

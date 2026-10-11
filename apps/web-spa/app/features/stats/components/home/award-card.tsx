@@ -25,7 +25,7 @@ interface AwardCardProps {
   /** Ribbon text. Defaults to the player's name. */
   nameLabel?: string
   emptyLabel: string
-  /** Hides the number capsule. The elected card shows the player, not a count. */
+  /** Hides the number capsule under the name. */
   showStat?: boolean
   className?: string
 }
@@ -182,10 +182,7 @@ export function AwardCard({
         <img
           src={artwork}
           alt=""
-          className={cn(
-            'pointer-events-none absolute inset-0 z-[1] size-full',
-            skin.artworkClass,
-          )}
+          className={cn('pointer-events-none absolute inset-0 z-[1] size-full', skin.artworkClass)}
         />
         <div
           className={cn(

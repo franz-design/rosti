@@ -128,6 +128,7 @@
         "winsTitle": "Most wins",
         "lossesTitle": "Most losses",
         "electedTitle": "Best player",
+        "electedStat": "votes",
         "duoTitle": "The duo",
         "duoStat": "matches together",
         "emptyScorer": "No goals",
@@ -189,7 +190,8 @@
       "tabs": {
         "summary": "Summary",
         "chat": "Chat",
-        "stats": "Stats"
+        "stats": "Stats",
+        "payments": "Payment"
       },
       "status": {
         "scheduled": "Scheduled",
@@ -200,6 +202,34 @@
         "present": "Present",
         "absent": "Absent",
         "question": "Are you coming?"
+      },
+      "payments": {
+        "loading": "Loading payment…",
+        "empty": "No shares yet. Shares are calculated from the players who were there.",
+        "nothingToPay": "You have nothing to pay for this session.",
+        "yourShare": "Your share",
+        "pay": "Pay with PayPal",
+        "markPaid": "I've paid",
+        "undoPaid": "Undo",
+        "pitch": "Pitch (€)",
+        "extras": "Equipment (€)",
+        "saveCost": "Save cost",
+        "costSaved": "Cost saved",
+        "shares": "Shares",
+        "decreaseShares": "Remove one share",
+        "increaseShares": "Add one share",
+        "collected": "{{paid}} collected out of {{total}}",
+        "reminders": "Reminders: {{count}}",
+        "lastReminder": "last reminder on {{date}}",
+        "remind": "Remind unpaid players",
+        "reminded": "Reminders sent: {{count}}",
+        "nobodyToRemind": "Nobody to remind right now",
+        "invalidAmount": "Enter an amount in euros, for example 30 or 12.50.",
+        "status": {
+          "owed": "Owed",
+          "paid": "Paid",
+          "waived": "Waived"
+        }
       },
       "summary": {
         "lineup": "Lineup",
@@ -285,6 +315,9 @@
     "location": "Location",
     "locationPlaceholder": "e.g. Municipal pitch",
     "maxPlayers": "Max players",
+    "pitchCost": "Pitch cost (€)",
+    "pitchCostPlaceholder": "e.g. 30",
+    "pitchCostHint": "Optional. Every session in the series uses this amount. You can add equipment cost afterwards.",
     "date": "Date",
     "datePlaceholder": "Pick a date",
     "time": "Time",
@@ -304,6 +337,7 @@
     "errors": {
       "requiredFields": "Please fill in all fields.",
       "maxPlayers": "You need at least 2 players.",
+      "pitchCost": "Enter an amount in euros, for example 30 or 12.50.",
       "missingClub": "Club not found.",
       "matchOutsideSeason": "The first match date is outside the season."
     }
@@ -379,9 +413,22 @@
     },
     "paymentLink": {
       "title": "Personal payment link",
-      "hint": "Peer-to-peer only (Lydia, PayPal.me, Revolut…). No commercial PSP yet.",
+      "hint": "Paste a paypal.me link. Rösti adds each player's amount. Other links (Lydia, Revolut) are sent as they are.",
       "save": "Save",
       "saved": "Payment link saved"
+    },
+    "feeReminders": {
+      "title": "Payment reminders",
+      "hint": "Rösti reminds players who have not paid. The delays start from the request sent after the session.",
+      "enabled": "Automatic reminders",
+      "on": "On",
+      "off": "Off",
+      "first": "First reminder",
+      "second": "Second reminder",
+      "none": "No second reminder",
+      "daysAfter": "{{count}} days after the request",
+      "save": "Save",
+      "saved": "Reminders saved"
     },
     "seasons": {
       "title": "Seasons",
@@ -644,7 +691,8 @@
       "notifyMatchCancelled": "Match cancelled",
       "notifyChatMention": "Chat mentions",
       "notifyAllChatMessages": "All chat messages",
-      "notifyPlayerVote": "Best player vote"
+      "notifyPlayerVote": "Best player vote",
+      "notifyFeeRequest": "Payment requests"
     },
     "firstName": "First name",
     "lastName": "Last name",

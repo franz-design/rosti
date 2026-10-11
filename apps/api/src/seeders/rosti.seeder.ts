@@ -91,6 +91,7 @@ export class RostiSeeder extends Seeder {
       sportType: CLUB.sportType,
       defaultMaxCapacity: CLUB.defaultMaxCapacity,
       matchInviteLeadDays: CLUB.matchInviteLeadDays,
+      feeReminderDelaysDays: [3, 7],
       createdAt: new Date(),
     })
 

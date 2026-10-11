@@ -3,6 +3,42 @@
 import { z } from 'zod';
 
 /**
+ * UpsertMatchCostSchema
+ */
+export const zUpsertMatchCostSchema = z.object({
+    pitchCostCents: z.int().gte(0).lte(9007199254740991),
+    extrasCostCents: z.int().gte(0).lte(9007199254740991).default(0)
+});
+
+/**
+ * UpdateFeeStatusSchema
+ */
+export const zUpdateFeeStatusSchema = z.object({
+    status: z.enum([
+        'owed',
+        'paid',
+        'waived'
+    ])
+});
+
+/**
+ * UpdateFeeSharesSchema
+ */
+export const zUpdateFeeSharesSchema = z.object({
+    shares: z.int().gte(1).lte(20)
+});
+
+/**
+ * ClubPaymentLinkSchema
+ */
+export const zClubPaymentLinkSchema = z.object({
+    paymentLink: z.optional(z.union([
+        z.url(),
+        z.null()
+    ]))
+});
+
+/**
  * UpdateNotificationPreferenceSchema
  */
 export const zUpdateNotificationPreferenceSchema = z.object({
@@ -12,7 +48,9 @@ export const zUpdateNotificationPreferenceSchema = z.object({
     notifyRsvpReminder: z.optional(z.boolean()),
     notifyMatchCancelled: z.optional(z.boolean()),
     notifyChatMention: z.optional(z.boolean()),
-    notifyAllChatMessages: z.optional(z.boolean())
+    notifyAllChatMessages: z.optional(z.boolean()),
+    notifyPlayerVote: z.optional(z.boolean()),
+    notifyFeeRequest: z.optional(z.boolean())
 });
 
 /**
@@ -60,7 +98,13 @@ export const zUpdateClubSchema = z.object({
     defaultMaxCapacity: z.optional(z.union([
         z.int().gt(0).lte(9007199254740991),
         z.null()
-    ]))
+    ])),
+    matchInviteLeadDays: z.optional(z.int().gte(1).lte(30)),
+    matchInviteReminderLeadDays: z.optional(z.union([
+        z.int().gte(1).lte(29),
+        z.null()
+    ])),
+    feeReminderDelaysDays: z.optional(z.array(z.int().gte(1).lte(60)).max(4))
 });
 
 /**
@@ -79,6 +123,7 @@ export const zCreateMatchSchema = z.object({
     startsAt: z.string(),
     location: z.optional(z.string()),
     maxCapacity: z.int().gt(0).lte(9007199254740991),
+    pitchCostCents: z.optional(z.int().gte(0).lte(9007199254740991)),
     reminderOffsetsHours: z.optional(z.array(z.int().gt(0).lte(9007199254740991))),
     recurrence: z.optional(z.object({
         frequency: z.enum([
@@ -126,6 +171,21 @@ export const zCancelMatchSchema = z.object({
 });
 
 /**
+ * SetMatchStatusSchema
+ */
+export const zSetMatchStatusSchema = z.object({
+    status: z.enum(['scheduled', 'played']),
+    startsAt: z.optional(z.string())
+});
+
+/**
+ * CastPlayerVoteSchema
+ */
+export const zCastPlayerVoteSchema = z.object({
+    nomineeUserId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+});
+
+/**
  * RespondAttendanceSchema
  */
 export const zRespondAttendanceSchema = z.object({
@@ -164,35 +224,6 @@ export const zSetPlayerTeamSchema = z.object({
 });
 
 /**
- * UpsertMatchCostSchema
- */
-export const zUpsertMatchCostSchema = z.object({
-    pitchCostCents: z.int().gte(0).lte(9007199254740991),
-    extrasCostCents: z.int().gte(0).lte(9007199254740991).default(0)
-});
-
-/**
- * UpdateFeeStatusSchema
- */
-export const zUpdateFeeStatusSchema = z.object({
-    status: z.enum([
-        'owed',
-        'paid',
-        'waived'
-    ])
-});
-
-/**
- * ClubPaymentLinkSchema
- */
-export const zClubPaymentLinkSchema = z.object({
-    paymentLink: z.optional(z.union([
-        z.url(),
-        z.null()
-    ]))
-});
-
-/**
  * CreateSeasonSchema
  */
 export const zCreateSeasonSchema = z.object({
@@ -226,6 +257,108 @@ export const zUpsertMatchStatsSchema = z.object({
 });
 
 /**
+ * UpdatePlayerSkillsSchema
+ */
+export const zUpdatePlayerSkillsSchema = z.object({
+    skills: z.array(z.object({
+        key: z.enum([
+            'defense',
+            'attack',
+            'passing',
+            'shooting',
+            'vision',
+            'endurance',
+            'physical',
+            'goalkeeping',
+            'dribbling',
+            'rebounding',
+            'speed',
+            'serve',
+            'reception',
+            'setting',
+            'block',
+            'positioning',
+            'reading',
+            'forehand',
+            'backhand',
+            'volley',
+            'smash',
+            'footwork',
+            'consistency',
+            'bandeja',
+            'walls',
+            'clear',
+            'drop',
+            'netPlay'
+        ]),
+        value: z.int().gte(0).lte(10)
+    })).min(1)
+});
+
+/**
+ * AvatarSchema
+ *
+ * Public URL of the current avatar, or null when the avatar was removed
+ */
+export const zAvatarSchema = z.object({
+    image: z.union([
+        z.string(),
+        z.null()
+    ])
+});
+
+/**
+ * MatchCostSchema
+ */
+export const zMatchCostSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    pitchCostCents: z.int().gte(0).lte(9007199254740991),
+    extrasCostCents: z.int().gte(0).lte(9007199254740991),
+    perPlayerCents: z.optional(z.int().gte(0).lte(9007199254740991)),
+    presentCount: z.optional(z.int().gte(-9007199254740991).lte(9007199254740991))
+});
+
+/**
+ * SessionFeeSchema
+ */
+export const zSessionFeeSchema = z.object({
+    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userName: z.string(),
+    amountCents: z.int().gte(-9007199254740991).lte(9007199254740991),
+    shares: z.int().gt(0).lte(9007199254740991),
+    status: z.enum([
+        'owed',
+        'paid',
+        'waived'
+    ]),
+    paidAt: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    reminderCount: z.int().gte(0).lte(9007199254740991),
+    lastRemindedAt: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    paymentUrl: z.optional(z.union([
+        z.url(),
+        z.null()
+    ]))
+});
+
+export const zGetMatchesMatchIdFees = z.array(zSessionFeeSchema);
+
+/**
+ * RemindFeesResultSchema
+ */
+export const zRemindFeesResultSchema = z.object({
+    remindedCount: z.int().gte(0).lte(9007199254740991)
+});
+
+/**
  * NotificationPreferenceSchema
  */
 export const zNotificationPreferenceSchema = z.object({
@@ -236,7 +369,9 @@ export const zNotificationPreferenceSchema = z.object({
     notifyRsvpReminder: z.boolean(),
     notifyMatchCancelled: z.boolean(),
     notifyChatMention: z.boolean(),
-    notifyAllChatMessages: z.boolean()
+    notifyAllChatMessages: z.boolean(),
+    notifyPlayerVote: z.boolean(),
+    notifyFeeRequest: z.boolean()
 });
 
 /**
@@ -247,6 +382,10 @@ export const zMatchMessageSchema = z.object({
     matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
     authorId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
     authorName: z.string(),
+    authorImage: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
     body: z.string(),
     mentionedUserIds: z.array(z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)),
     createdAt: z.string()
@@ -291,6 +430,12 @@ export const zClubSchema = z.object({
         z.int().gt(0).lte(9007199254740991),
         z.null()
     ])),
+    matchInviteLeadDays: z.int().gte(1).lte(30),
+    matchInviteReminderLeadDays: z.optional(z.union([
+        z.int().gte(1).lte(29),
+        z.null()
+    ])),
+    feeReminderDelaysDays: z.array(z.int().gte(1).lte(60)).max(4),
     createdAt: z.string()
 });
 
@@ -311,6 +456,10 @@ export const zClubMemberSchema = z.object({
         z.null()
     ])),
     phone: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    image: z.optional(z.union([
         z.string(),
         z.null()
     ])),
@@ -374,6 +523,51 @@ export const zMatchSchema = z.object({
 export const zPostDefault = z.array(zMatchSchema);
 
 /**
+ * PlayerVotePlayerSchema
+ */
+export const zPlayerVotePlayerSchema = z.object({
+    userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    userName: z.string(),
+    image: z.optional(z.union([
+        z.string(),
+        z.null()
+    ]))
+});
+
+/**
+ * PlayerVoteStateSchema
+ */
+export const zPlayerVoteStateSchema = z.object({
+    phase: z.enum([
+        'unavailable',
+        'open',
+        'closed'
+    ]),
+    closesAt: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    canVote: z.boolean(),
+    candidates: z.array(zPlayerVotePlayerSchema),
+    myNomineeUserId: z.optional(z.union([
+        z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        z.null()
+    ])),
+    winner: z.union([
+        z.object({
+            userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+            userName: z.string(),
+            image: z.optional(z.union([
+                z.string(),
+                z.null()
+            ]))
+        }),
+        z.null()
+    ]),
+    isTie: z.boolean()
+});
+
+/**
  * AttendanceSchema
  */
 export const zAttendanceSchema = z.object({
@@ -381,6 +575,10 @@ export const zAttendanceSchema = z.object({
     matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
     userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
     userName: z.string(),
+    image: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
     status: z.enum([
         'present',
         'absent',
@@ -402,6 +600,10 @@ export const zLineupSchema = z.object({
     matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
     userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
     userName: z.string(),
+    image: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
     team: z.enum(['blue', 'red'])
 });
 
@@ -410,40 +612,6 @@ export const zGetMatchIdLineups = z.array(zLineupSchema);
 export const zPutMatchIdLineups = z.array(zLineupSchema);
 
 export const zPutMatchIdLineupsUserId = z.array(zLineupSchema);
-
-/**
- * MatchCostSchema
- */
-export const zMatchCostSchema = z.object({
-    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-    matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-    pitchCostCents: z.int().gte(0).lte(9007199254740991),
-    extrasCostCents: z.int().gte(0).lte(9007199254740991),
-    perPlayerCents: z.optional(z.int().gte(0).lte(9007199254740991)),
-    presentCount: z.optional(z.int().gte(-9007199254740991).lte(9007199254740991))
-});
-
-/**
- * SessionFeeSchema
- */
-export const zSessionFeeSchema = z.object({
-    id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-    matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-    userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-    userName: z.string(),
-    amountCents: z.int().gte(-9007199254740991).lte(9007199254740991),
-    status: z.enum([
-        'owed',
-        'paid',
-        'waived'
-    ]),
-    paidAt: z.optional(z.union([
-        z.string(),
-        z.null()
-    ]))
-});
-
-export const zGetMatchesMatchIdFees = z.array(zSessionFeeSchema);
 
 /**
  * SeasonSchema
@@ -471,6 +639,10 @@ export const zMatchStatSchema = z.object({
     matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
     userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
     userName: z.string(),
+    image: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
     goals: z.int().gte(0).lte(9007199254740991),
     assists: z.int().gte(0).lte(9007199254740991)
 });
@@ -485,6 +657,10 @@ export const zGetMatchesMatchIdStats = z.array(zMatchStatSchema);
 export const zSeasonPlayerStatSchema = z.object({
     userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
     userName: z.string(),
+    image: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
     goals: z.int().gte(-9007199254740991).lte(9007199254740991),
     assists: z.int().gte(-9007199254740991).lte(9007199254740991),
     matchesPlayed: z.int().gte(-9007199254740991).lte(9007199254740991)
@@ -501,6 +677,10 @@ export const zClubHomeStatsSchema = z.object({
         z.object({
             userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
             userName: z.string(),
+            image: z.optional(z.union([
+                z.string(),
+                z.null()
+            ])),
             value: z.int().gte(0).lte(9007199254740991)
         }),
         z.null()
@@ -509,6 +689,10 @@ export const zClubHomeStatsSchema = z.object({
         z.object({
             userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
             userName: z.string(),
+            image: z.optional(z.union([
+                z.string(),
+                z.null()
+            ])),
             value: z.int().gte(0).lte(9007199254740991)
         }),
         z.null()
@@ -517,6 +701,10 @@ export const zClubHomeStatsSchema = z.object({
         z.object({
             userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
             userName: z.string(),
+            image: z.optional(z.union([
+                z.string(),
+                z.null()
+            ])),
             value: z.int().gte(0).lte(9007199254740991)
         }),
         z.null()
@@ -525,14 +713,38 @@ export const zClubHomeStatsSchema = z.object({
         z.object({
             playerA: z.object({
                 userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-                userName: z.string()
+                userName: z.string(),
+                image: z.optional(z.union([
+                    z.string(),
+                    z.null()
+                ]))
             }),
             playerB: z.object({
                 userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-                userName: z.string()
+                userName: z.string(),
+                image: z.optional(z.union([
+                    z.string(),
+                    z.null()
+                ]))
             }),
             matchesTogether: z.int().gte(0).lte(9007199254740991)
         }),
+        z.null()
+    ]),
+    lastElectedPlayer: z.union([
+        z.object({
+            userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+            userName: z.string(),
+            image: z.optional(z.union([
+                z.string(),
+                z.null()
+            ])),
+            voteCount: z.int().gte(0).lte(9007199254740991)
+        }),
+        z.null()
+    ]),
+    openPlayerVoteMatchId: z.union([
+        z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
         z.null()
     ])
 });
@@ -562,13 +774,157 @@ export const zSeasonHomeStatsSchema = z.object({
     me: zPersonalHomeStatsSchema
 });
 
+/**
+ * PlayerSeasonStatsSchema
+ */
+export const zPlayerSeasonStatsSchema = z.object({
+    matchesPlayed: z.int().gte(0).lte(9007199254740991),
+    goals: z.int().gte(0).lte(9007199254740991),
+    assists: z.int().gte(0).lte(9007199254740991),
+    wins: z.int().gte(0).lte(9007199254740991),
+    losses: z.int().gte(0).lte(9007199254740991)
+});
+
+/**
+ * PlayerDetailSchema
+ */
+export const zPlayerDetailSchema = z.object({
+    userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+    name: z.string(),
+    email: z.email().regex(/^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/),
+    phone: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    image: z.optional(z.union([
+        z.string(),
+        z.null()
+    ])),
+    role: z.enum([
+        'owner',
+        'admin',
+        'member'
+    ]),
+    memberSince: z.string(),
+    season: z.union([
+        z.object({
+            id: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+            name: z.string()
+        }),
+        z.null()
+    ]),
+    stats: zPlayerSeasonStatsSchema,
+    skillRatings: z.union([
+        z.object({
+            sportType: z.enum([
+                'football',
+                'futsal',
+                'basketball',
+                'volleyball',
+                'tennis',
+                'padel',
+                'badminton',
+                'other'
+            ]),
+            skills: z.array(z.object({
+                key: z.enum([
+                    'defense',
+                    'attack',
+                    'passing',
+                    'shooting',
+                    'vision',
+                    'endurance',
+                    'physical',
+                    'goalkeeping',
+                    'dribbling',
+                    'rebounding',
+                    'speed',
+                    'serve',
+                    'reception',
+                    'setting',
+                    'block',
+                    'positioning',
+                    'reading',
+                    'forehand',
+                    'backhand',
+                    'volley',
+                    'smash',
+                    'footwork',
+                    'consistency',
+                    'bandeja',
+                    'walls',
+                    'clear',
+                    'drop',
+                    'netPlay'
+                ]),
+                value: z.int().gte(0).lte(10)
+            }))
+        }),
+        z.null()
+    ])
+});
+
+/**
+ * PlayerSkillRatingSchema
+ */
+export const zPlayerSkillRatingSchema = z.object({
+    key: z.enum([
+        'defense',
+        'attack',
+        'passing',
+        'shooting',
+        'vision',
+        'endurance',
+        'physical',
+        'goalkeeping',
+        'dribbling',
+        'rebounding',
+        'speed',
+        'serve',
+        'reception',
+        'setting',
+        'block',
+        'positioning',
+        'reading',
+        'forehand',
+        'backhand',
+        'volley',
+        'smash',
+        'footwork',
+        'consistency',
+        'bandeja',
+        'walls',
+        'clear',
+        'drop',
+        'netPlay'
+    ]),
+    value: z.int().gte(0).lte(10)
+});
+
+/**
+ * PlayerSkillRatingsSchema
+ */
+export const zPlayerSkillRatingsSchema = z.object({
+    sportType: z.enum([
+        'football',
+        'futsal',
+        'basketball',
+        'volleyball',
+        'tennis',
+        'padel',
+        'badminton',
+        'other'
+    ]),
+    skills: z.array(zPlayerSkillRatingSchema)
+});
+
+export const zPaymentControllerOrganizationId = z.string();
+
 export const zChatControllerOrganizationId = z.string();
 
 export const zChatControllerMatchId = z.string();
 
 export const zMatchControllerOrganizationId = z.string();
-
-export const zPaymentControllerOrganizationId = z.string();
 
 export const zSeasonControllerOrganizationId = z.string();
 
@@ -577,6 +933,38 @@ export const zStatsControllerOrganizationId = z.string();
 export const zAppControllerGetHelloData = z.object({
     body: z.optional(z.never()),
     path: z.optional(z.never()),
+    query: z.optional(z.never())
+});
+
+export const zAvatarControllerRemoveData = z.object({
+    body: z.optional(z.never()),
+    path: z.optional(z.never()),
+    query: z.optional(z.never())
+});
+
+/**
+ * Public URL of the current avatar, or null when the avatar was removed
+ */
+export const zAvatarControllerRemoveResponse = zAvatarSchema;
+
+export const zAvatarControllerUploadData = z.object({
+    body: z.object({
+        file: z.string()
+    }),
+    path: z.optional(z.never()),
+    query: z.optional(z.never())
+});
+
+/**
+ * Public URL of the current avatar, or null when the avatar was removed
+ */
+export const zAvatarControllerUploadResponse = zAvatarSchema;
+
+export const zAvatarFileControllerGetData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        userId: z.string()
+    }),
     query: z.optional(z.never())
 });
 
@@ -627,7 +1015,13 @@ export const zClubControllerUpdateData = z.object({
         defaultMaxCapacity: z.optional(z.union([
             z.int().gt(0).lte(9007199254740991),
             z.null()
-        ]))
+        ])),
+        matchInviteLeadDays: z.optional(z.int().gte(1).lte(30)),
+        matchInviteReminderLeadDays: z.optional(z.union([
+            z.int().gte(1).lte(29),
+            z.null()
+        ])),
+        feeReminderDelaysDays: z.optional(z.array(z.int().gte(1).lte(60)).max(4))
     }),
     path: z.object({
         organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
@@ -668,6 +1062,219 @@ export const zClubControllerUpdateRoleData = z.object({
  * Successful response
  */
 export const zClubControllerUpdateRoleResponse = zClubMemberSchema;
+
+export const zClubControllerRemoveMemberAvatarData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        memberId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Public URL of the current avatar, or null when the avatar was removed
+ */
+export const zClubControllerRemoveMemberAvatarResponse = zAvatarSchema;
+
+export const zClubControllerUploadMemberAvatarData = z.object({
+    body: z.object({
+        file: z.string()
+    }),
+    path: z.object({
+        memberId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Public URL of the current avatar, or null when the avatar was removed
+ */
+export const zClubControllerUploadMemberAvatarResponse = zAvatarSchema;
+
+export const zNotificationControllerGetPreferencesData = z.object({
+    body: z.optional(z.never()),
+    path: z.optional(z.never()),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zNotificationControllerGetPreferencesResponse = zNotificationPreferenceSchema;
+
+export const zNotificationControllerUpdatePreferencesData = z.object({
+    body: z.object({
+        emailEnabled: z.optional(z.boolean()),
+        pushEnabled: z.optional(z.boolean()),
+        notifyNewMatch: z.optional(z.boolean()),
+        notifyRsvpReminder: z.optional(z.boolean()),
+        notifyMatchCancelled: z.optional(z.boolean()),
+        notifyChatMention: z.optional(z.boolean()),
+        notifyAllChatMessages: z.optional(z.boolean()),
+        notifyPlayerVote: z.optional(z.boolean()),
+        notifyFeeRequest: z.optional(z.boolean())
+    }),
+    path: z.optional(z.never()),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zNotificationControllerUpdatePreferencesResponse = zNotificationPreferenceSchema;
+
+export const zNotificationControllerRegisterDeviceData = z.object({
+    body: z.object({
+        token: z.string().min(1),
+        platform: z.enum([
+            'ios',
+            'android',
+            'web'
+        ])
+    }),
+    path: z.optional(z.never()),
+    query: z.optional(z.never())
+});
+
+export const zUnsubscribeControllerShowUnsubscribeData = z.object({
+    body: z.optional(z.never()),
+    path: z.optional(z.never()),
+    query: z.optional(z.never())
+});
+
+export const zUnsubscribeControllerUnsubscribeData = z.object({
+    body: z.optional(z.never()),
+    path: z.optional(z.never()),
+    query: z.optional(z.never())
+});
+
+export const zPaymentControllerGetCostData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerGetCostResponse = zMatchCostSchema;
+
+export const zPaymentControllerUpsertCostData = z.object({
+    body: z.object({
+        pitchCostCents: z.int().gte(0).lte(9007199254740991),
+        extrasCostCents: z.int().gte(0).lte(9007199254740991).default(0)
+    }),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerUpsertCostResponse = zMatchCostSchema;
+
+export const zPaymentControllerListFeesData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerListFeesResponse = zGetMatchesMatchIdFees;
+
+export const zPaymentControllerUpdateFeeData = z.object({
+    body: z.object({
+        status: z.enum([
+            'owed',
+            'paid',
+            'waived'
+        ])
+    }),
+    path: z.object({
+        feeId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerUpdateFeeResponse = zSessionFeeSchema;
+
+export const zPaymentControllerUpdateFeeSharesData = z.object({
+    body: z.object({
+        shares: z.int().gte(1).lte(20)
+    }),
+    path: z.object({
+        feeId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerUpdateFeeSharesResponse = zSessionFeeSchema;
+
+export const zPaymentControllerRemindUnpaidData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerRemindUnpaidResponse = zRemindFeesResultSchema;
+
+export const zPaymentControllerGetPaymentLinkData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerGetPaymentLinkResponse = zClubPaymentLinkSchema;
+
+export const zPaymentControllerSetPaymentLinkData = z.object({
+    body: z.object({
+        paymentLink: z.optional(z.union([
+            z.url(),
+            z.null()
+        ]))
+    }),
+    path: z.object({
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zPaymentControllerSetPaymentLinkResponse = zClubPaymentLinkSchema;
 
 export const zSeasonControllerListData = z.object({
     body: z.optional(z.never()),
@@ -757,6 +1364,7 @@ export const zMatchControllerCreateData = z.object({
         startsAt: z.string(),
         location: z.optional(z.string()),
         maxCapacity: z.int().gt(0).lte(9007199254740991),
+        pitchCostCents: z.optional(z.int().gte(0).lte(9007199254740991)),
         reminderOffsetsHours: z.optional(z.array(z.int().gt(0).lte(9007199254740991))),
         recurrence: z.optional(z.object({
             frequency: z.enum([
@@ -845,6 +1453,23 @@ export const zMatchControllerCancelData = z.object({
  */
 export const zMatchControllerCancelResponse = zMatchSchema;
 
+export const zMatchControllerSetStatusData = z.object({
+    body: z.object({
+        status: z.enum(['scheduled', 'played']),
+        startsAt: z.optional(z.string())
+    }),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerSetStatusResponse = zMatchSchema;
+
 export const zMatchControllerMarkPlayedData = z.object({
     body: z.optional(z.never()),
     path: z.object({
@@ -858,6 +1483,36 @@ export const zMatchControllerMarkPlayedData = z.object({
  * Successful response
  */
 export const zMatchControllerMarkPlayedResponse = zMatchSchema;
+
+export const zMatchControllerGetPlayerVoteData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerGetPlayerVoteResponse = zPlayerVoteStateSchema;
+
+export const zMatchControllerCastPlayerVoteData = z.object({
+    body: z.object({
+        nomineeUserId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    path: z.object({
+        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zMatchControllerCastPlayerVoteResponse = zPlayerVoteStateSchema;
 
 export const zMatchControllerListAttendancesData = z.object({
     body: z.optional(z.never()),
@@ -963,49 +1618,6 @@ export const zMatchControllerSetPlayerTeamData = z.object({
  */
 export const zMatchControllerSetPlayerTeamResponse = zPutMatchIdLineupsUserId;
 
-export const zNotificationControllerGetPreferencesData = z.object({
-    body: z.optional(z.never()),
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
-/**
- * Successful response
- */
-export const zNotificationControllerGetPreferencesResponse = zNotificationPreferenceSchema;
-
-export const zNotificationControllerUpdatePreferencesData = z.object({
-    body: z.object({
-        emailEnabled: z.optional(z.boolean()),
-        pushEnabled: z.optional(z.boolean()),
-        notifyNewMatch: z.optional(z.boolean()),
-        notifyRsvpReminder: z.optional(z.boolean()),
-        notifyMatchCancelled: z.optional(z.boolean()),
-        notifyChatMention: z.optional(z.boolean()),
-        notifyAllChatMessages: z.optional(z.boolean())
-    }),
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
-/**
- * Successful response
- */
-export const zNotificationControllerUpdatePreferencesResponse = zNotificationPreferenceSchema;
-
-export const zNotificationControllerRegisterDeviceData = z.object({
-    body: z.object({
-        token: z.string().min(1),
-        platform: z.enum([
-            'ios',
-            'android',
-            'web'
-        ])
-    }),
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
 export const zStatsControllerListMatchData = z.object({
     body: z.optional(z.never()),
     path: z.object({
@@ -1067,6 +1679,68 @@ export const zStatsControllerHomeStatsData = z.object({
  */
 export const zStatsControllerHomeStatsResponse = zSeasonHomeStatsSchema;
 
+export const zStatsControllerPlayerDetailData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zStatsControllerPlayerDetailResponse = zPlayerDetailSchema;
+
+export const zStatsControllerUpdatePlayerSkillsData = z.object({
+    body: z.object({
+        skills: z.array(z.object({
+            key: z.enum([
+                'defense',
+                'attack',
+                'passing',
+                'shooting',
+                'vision',
+                'endurance',
+                'physical',
+                'goalkeeping',
+                'dribbling',
+                'rebounding',
+                'speed',
+                'serve',
+                'reception',
+                'setting',
+                'block',
+                'positioning',
+                'reading',
+                'forehand',
+                'backhand',
+                'volley',
+                'smash',
+                'footwork',
+                'consistency',
+                'bandeja',
+                'walls',
+                'clear',
+                'drop',
+                'netPlay'
+            ]),
+            value: z.int().gte(0).lte(10)
+        })).min(1)
+    }),
+    path: z.object({
+        userId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
+        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Successful response
+ */
+export const zStatsControllerUpdatePlayerSkillsResponse = zPlayerSkillRatingsSchema;
+
 export const zChatControllerListData = z.object({
     body: z.optional(z.never()),
     path: z.object({
@@ -1097,99 +1771,3 @@ export const zChatControllerPostData = z.object({
  * Successful response
  */
 export const zChatControllerPostResponse = zMatchMessageSchema;
-
-export const zPaymentControllerGetCostData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * Successful response
- */
-export const zPaymentControllerGetCostResponse = zMatchCostSchema;
-
-export const zPaymentControllerUpsertCostData = z.object({
-    body: z.object({
-        pitchCostCents: z.int().gte(0).lte(9007199254740991),
-        extrasCostCents: z.int().gte(0).lte(9007199254740991).default(0)
-    }),
-    path: z.object({
-        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * Successful response
- */
-export const zPaymentControllerUpsertCostResponse = zMatchCostSchema;
-
-export const zPaymentControllerListFeesData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        matchId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * Successful response
- */
-export const zPaymentControllerListFeesResponse = zGetMatchesMatchIdFees;
-
-export const zPaymentControllerUpdateFeeData = z.object({
-    body: z.object({
-        status: z.enum([
-            'owed',
-            'paid',
-            'waived'
-        ])
-    }),
-    path: z.object({
-        feeId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/),
-        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * Successful response
- */
-export const zPaymentControllerUpdateFeeResponse = zSessionFeeSchema;
-
-export const zPaymentControllerGetPaymentLinkData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * Successful response
- */
-export const zPaymentControllerGetPaymentLinkResponse = zClubPaymentLinkSchema;
-
-export const zPaymentControllerSetPaymentLinkData = z.object({
-    body: z.object({
-        paymentLink: z.optional(z.union([
-            z.url(),
-            z.null()
-        ]))
-    }),
-    path: z.object({
-        organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * Successful response
- */
-export const zPaymentControllerSetPaymentLinkResponse = zClubPaymentLinkSchema;

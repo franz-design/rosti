@@ -24,8 +24,8 @@ function isAdminRole(role: ClubRole | undefined): boolean {
 
 export function ClubProvider({ children }: { children: ReactNode }) {
   const { data: session } = authClient.useSession()
-  const [activeClubId, setActiveClubIdState] = useState<string | null>(
-    () => localStorage.getItem('rosti.activeClubId'),
+  const [activeClubId, setActiveClubIdState] = useState<string | null>(() =>
+    localStorage.getItem('rosti.activeClubId'),
   )
 
   const {

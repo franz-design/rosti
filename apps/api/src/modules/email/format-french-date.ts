@@ -23,3 +23,13 @@ export function formatFrenchDate(date: Date): string {
 
   return `${read('weekday')} ${read('day')} ${read('month')} à ${time}`
 }
+
+/** Date without the hour. Example: "lundi 23 novembre". */
+export function formatFrenchDay(date: Date): string {
+  return new Intl.DateTimeFormat('fr-FR', {
+    timeZone: PARIS_TIME_ZONE,
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(date)
+}

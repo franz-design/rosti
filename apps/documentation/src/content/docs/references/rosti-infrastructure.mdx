@@ -11,17 +11,17 @@ There is one environment. It is production. There is no staging.
 
 One OVH VPS runs everything.
 
-| | |
-|---|---|
-| Name | `vps-4196f155.vps.ovh.net` |
-| IPv4 | `146.59.199.200` |
-| IPv6 | `2001:41d0:305:2100::1:7394` |
-| OS | Ubuntu 24.04 |
-| Region | Gravelines (GRA), France |
-| Size | VPS-1 — 2 vCores, 4 GB RAM, 40 GB disk |
-| OVH backup | Standard automatic backup, on |
-| Snapshot | Off |
-| Secondary DNS | None |
+|               |                                        |
+| ------------- | -------------------------------------- |
+| Name          | `vps-4196f155.vps.ovh.net`             |
+| IPv4          | `146.59.199.200`                       |
+| IPv6          | `2001:41d0:305:2100::1:7394`           |
+| OS            | Ubuntu 24.04                           |
+| Region        | Gravelines (GRA), France               |
+| Size          | VPS-1 — 2 vCores, 4 GB RAM, 40 GB disk |
+| OVH backup    | Standard automatic backup, on          |
+| Snapshot      | Off                                    |
+| Secondary DNS | None                                   |
 
 ## Domain
 
@@ -29,11 +29,11 @@ One OVH VPS runs everything.
 
 The app does not use OVH web hosting. Dokploy on the VPS serves the hostnames below.
 
-| Hostname | Role |
-|---|---|
-| `https://rosti.lesk.fr` | Web app (`web-spa`) |
-| `https://rosti-api.lesk.fr` | API |
-| `https://dokploy.lesk.fr` | Dokploy |
+| Hostname                    | Role                |
+| --------------------------- | ------------------- |
+| `https://rosti.lesk.fr`     | Web app (`web-spa`) |
+| `https://rosti-api.lesk.fr` | API                 |
+| `https://dokploy.lesk.fr`   | Dokploy             |
 
 Each of those names has an A record in the OVH zone.
 
@@ -43,11 +43,11 @@ Transactional email goes through Resend only. The zone has the Resend records: `
 
 Dokploy project **Rösti**, environment **production**, three services:
 
-| Service | What it is | Who can reach it |
-|---|---|---|
-| `db` | PostgreSQL | The Dokploy network only. Not exposed on the internet. |
-| `api` | Image `ghcr.io/fan17-design/rosti-api` | `https://rosti-api.lesk.fr` |
-| `web-spa` | Image `ghcr.io/fan17-design/rosti-web-spa` | `https://rosti.lesk.fr` |
+| Service   | What it is                                 | Who can reach it                                       |
+| --------- | ------------------------------------------ | ------------------------------------------------------ |
+| `db`      | PostgreSQL                                 | The Dokploy network only. Not exposed on the internet. |
+| `api`     | Image `ghcr.io/fan17-design/rosti-api`     | `https://rosti-api.lesk.fr`                            |
+| `web-spa` | Image `ghcr.io/fan17-design/rosti-web-spa` | `https://rosti.lesk.fr`                                |
 
 `api` and `web-spa` use the Docker provider and pull from `ghcr.io`. The registry user is `fan17-design`. The registry password stays in Dokploy. Do not copy it into the repo or into docs.
 

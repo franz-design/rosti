@@ -7,7 +7,10 @@ const shellPath = 'build/client/index.html'
 rmSync('build/client/sw.mjs', { force: true })
 const serviceWorker = readFileSync(serviceWorkerPath, 'utf8')
 
-if (serviceWorker.includes('"url":"index.html"') || serviceWorker.includes('"url": "/index.html"')) {
+if (
+  serviceWorker.includes('"url":"index.html"') ||
+  serviceWorker.includes('"url": "/index.html"')
+) {
   process.stdout.write('App shell is already in the precache.\n')
   process.exit(0)
 }

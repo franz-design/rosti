@@ -1,4 +1,9 @@
-import { newMatchEmail, playerVoteResultEmail, rsvpReminderEmail } from './notification-email'
+import {
+  feeRequestEmail,
+  newMatchEmail,
+  playerVoteResultEmail,
+  rsvpReminderEmail,
+} from './notification-email'
 
 const APP_URL = 'https://app.lesk.fr'
 const MATCH = {
@@ -26,6 +31,39 @@ describe('notification emails', () => {
       'Le match a lieu lundi 23 novembre à 11h. Est-ce que tu seras présent ?',
     )
     expect(actual.paragraphs.join(' ')).not.toContain('2026-11-23')
+  })
+
+  it('asks for the share with a PayPal link that already has the amount', () => {
+    const actual = feeRequestEmail({
+      match: MATCH,
+      appUrl: APP_URL,
+      amountCents: 650,
+      paymentUrl: 'https://paypal.me/alex/6.50EUR',
+      isReminder: false,
+      shares: 2,
+    })
+
+    expect(actual.subject).toBe('Ta part : 6,50 € pour Match — FC Gros')
+    expect(actual.paragraphs[0]).toContain('6,50 €')
+    expect(actual.paragraphs[1]).toBe('Cette somme couvre 2 parts.')
+    expect(actual.action).toEqual({
+      label: 'Payer avec PayPal',
+      url: 'https://paypal.me/alex/6.50EUR',
+    })
+  })
+
+  it('reminds an unpaid player and falls back to the match when there is no PayPal link', () => {
+    const actual = feeRequestEmail({
+      match: MATCH,
+      appUrl: APP_URL,
+      amountCents: 600,
+      isReminder: true,
+      shares: 1,
+    })
+
+    expect(actual.subject).toBe('Rappel : 6 € pour la séance du lundi 23 novembre')
+    expect(actual.paragraphs[0]).toContain("Tu n'as pas encore payé")
+    expect(actual.action.url).toBe('https://app.lesk.fr/matches/match-1')
   })
 
   it('names the elected player', () => {

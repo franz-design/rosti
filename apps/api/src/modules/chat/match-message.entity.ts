@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Index,
-  ManyToOne,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/decorators/legacy'
+import { Entity, Index, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy'
 import { User } from '../auth/entities/user.entity'
 import { Match } from '../matches/match.entity'
 

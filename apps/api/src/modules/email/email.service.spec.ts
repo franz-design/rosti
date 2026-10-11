@@ -80,8 +80,7 @@ describe('emailService', () => {
       expect(mockSendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           headers: {
-            'List-Unsubscribe':
-              '<https://api.lesk.fr/api/notifications/unsubscribe?token=abc>',
+            'List-Unsubscribe': '<https://api.lesk.fr/api/notifications/unsubscribe?token=abc>',
             'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
           },
         }),

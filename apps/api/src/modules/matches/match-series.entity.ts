@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Enum,
-  Index,
-  ManyToOne,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/decorators/legacy'
+import { Entity, Enum, Index, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy'
 import { Organization } from '../auth/entities/organization.entity'
 import { User } from '../auth/entities/user.entity'
 import { Season } from '../seasons/season.entity'

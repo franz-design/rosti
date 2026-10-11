@@ -8,7 +8,7 @@ describe('renderUnsubscribePage', () => {
 
     expect(actual).toContain('<form method="post"')
     expect(actual).toContain('Me désinscrire')
-    expect(actual).not.toContain('C\'est noté')
+    expect(actual).not.toContain("C'est noté")
   })
 
   it('does not offer a button for a broken link', () => {

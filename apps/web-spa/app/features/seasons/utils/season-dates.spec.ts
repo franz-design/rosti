@@ -125,7 +125,9 @@ describe('isMatchDateOutsideSeason', () => {
 
   it('accepts dates inside the window', () => {
     expect(isMatchDateOutsideSeason(new Date(2026, 8, 1), seasonStartsAt, seasonEndsAt)).toBe(false)
-    expect(isMatchDateOutsideSeason(new Date(2027, 5, 30), seasonStartsAt, seasonEndsAt)).toBe(false)
+    expect(isMatchDateOutsideSeason(new Date(2027, 5, 30), seasonStartsAt, seasonEndsAt)).toBe(
+      false,
+    )
   })
 
   it('rejects dates outside the window', () => {

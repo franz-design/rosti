@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/core'
 import { CreateRequestContext } from '@mikro-orm/decorators/legacy'
-import { Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common'
 import { config } from '../../config/env.config'
 import { Member, Organization, User } from '../auth/auth.entity'
 import { EmailService } from '../email/email.service'
@@ -9,6 +9,11 @@ import { buildUnsubscribeUrl, readUnsubscribeToken } from '../email/unsubscribe-
 import { AttendanceStatus, MatchStatus } from '../matches/contracts/match.contract'
 import { MatchAttendance } from '../matches/match-attendance.entity'
 import { Match } from '../matches/match.entity'
+import { FeeStatus } from '../payments/contracts/payment.contract'
+import { MatchCost } from '../payments/match-cost.entity'
+import { buildPaymentUrl } from '../payments/payment-link'
+import { PaymentService } from '../payments/payment.service'
+import { SessionFee } from '../payments/session-fee.entity'
 import {
   DevicePlatform,
   ScheduledJobStatus,
@@ -17,6 +22,14 @@ import {
 import { DeviceToken } from './device-token.entity'
 import { NotificationPreference } from './notification-preference.entity'
 import { ScheduledJob } from './scheduled-job.entity'
+import {
+  canRemindFee,
+  computeFeeRequestRunAt,
+  FEE_REQUEST_DELAY_MS,
+  planFeeReminderRunAts,
+  shouldScheduleFeeRequest,
+  shouldSendFeeRequest,
+} from './fee-request'
 import {
   canRemindScore,
   CLUB_ADMIN_ROLES,
@@ -33,6 +46,7 @@ import {
   cancelledMatchEmail,
   chatMentionEmail,
   chatMessageEmail,
+  feeRequestEmail,
   newMatchEmail,
   type NotificationEmailCopy,
   rsvpReminderEmail,
@@ -48,6 +62,8 @@ export class NotificationService {
   constructor(
     private readonly em: EntityManager,
     private readonly emailService: EmailService,
+    @Inject(forwardRef(() => PaymentService))
+    private readonly paymentService: PaymentService,
   ) {}
 
   async getOrCreatePreferences(userId: string): Promise<NotificationPreference> {
@@ -77,6 +93,7 @@ export class NotificationService {
       notifyChatMention: data.notifyChatMention ?? prefs.notifyChatMention,
       notifyAllChatMessages: data.notifyAllChatMessages ?? prefs.notifyAllChatMessages,
       notifyPlayerVote: data.notifyPlayerVote ?? prefs.notifyPlayerVote,
+      notifyFeeRequest: data.notifyFeeRequest ?? prefs.notifyFeeRequest,
     })
     await this.em.flush()
     return prefs
@@ -103,6 +120,7 @@ export class NotificationService {
 
   async scheduleMatchReminders(match: Match, options?: { resetInvite?: boolean }): Promise<void> {
     await this.scheduleScoreReminder(match)
+    await this.scheduleFeeRequest(match)
     await this.syncUpcomingMatchInvites(match.organization.id, {
       resetMatchIds: options?.resetInvite ? [match.id] : [],
     })
@@ -144,6 +162,30 @@ export class NotificationService {
         resetSent: resetMatchIds.has(match.id),
       })
     }
+  }
+
+  /**
+   * Plans the payment request for 90 minutes after kickoff, when the match has a cost
+   * and the request has not been sent yet.
+   */
+  async scheduleFeeRequest(match: Match): Promise<void> {
+    const cost = await this.em.findOne(MatchCost, { match: { id: match.id } })
+    const existingJobCount = await this.em.count(ScheduledJob, {
+      match: { id: match.id },
+      type: ScheduledJobType.FeeRequest,
+      status: ScheduledJobStatus.Pending,
+    })
+    if (
+      !shouldScheduleFeeRequest({
+        status: match.status,
+        feesNotifiedAt: cost?.feesNotifiedAt,
+        hasCost: cost != null,
+        existingJobCount,
+      })
+    ) {
+      return
+    }
+    await this.enqueue(match, ScheduledJobType.FeeRequest, computeFeeRequestRunAt(match.startsAt))
   }
 
   async scheduleScoreReminder(match: Match): Promise<void> {
@@ -281,6 +323,7 @@ export class NotificationService {
   @CreateRequestContext()
   async processDueJobs(): Promise<number> {
     await this.ensureScoreReminders()
+    await this.ensureFeeRequests()
     await this.syncAllUpcomingMatchInvites()
     const now = new Date()
     const jobs = await this.em.find(
@@ -296,6 +339,10 @@ export class NotificationService {
           await this.sendRsvpReminders(job.match)
         } else if (job.type === ScheduledJobType.ScoreReminder) {
           await this.sendScoreReminders(job.match)
+        } else if (job.type === ScheduledJobType.FeeRequest) {
+          await this.sendFeeRequests(job.match)
+        } else if (job.type === ScheduledJobType.FeeReminder) {
+          await this.remindUnpaidFees(job.match)
         }
         job.status = ScheduledJobStatus.Done
       } catch (err) {
@@ -305,6 +352,114 @@ export class NotificationService {
     }
     await this.em.flush()
     return jobs.length
+  }
+
+  private async ensureFeeRequests(): Promise<void> {
+    const now = new Date()
+    const latestKickoff = new Date(now.getTime() - FEE_REQUEST_DELAY_MS)
+    const earliestKickoff = new Date(latestKickoff.getTime() - 6 * 60 * 60 * 1000)
+
+    const matches = await this.em.find(
+      Match,
+      {
+        status: { $ne: MatchStatus.Cancelled },
+        startsAt: { $gt: earliestKickoff, $lte: latestKickoff },
+      },
+      { limit: 50 },
+    )
+
+    for (const match of matches) {
+      const cost = await this.em.findOne(MatchCost, { match: { id: match.id } })
+      if (
+        !shouldSendFeeRequest({
+          status: match.status,
+          feesNotifiedAt: cost?.feesNotifiedAt,
+          hasCost: cost != null,
+        })
+      ) {
+        continue
+      }
+      const existing = await this.em.count(ScheduledJob, {
+        match: { id: match.id },
+        type: ScheduledJobType.FeeRequest,
+        status: ScheduledJobStatus.Pending,
+      })
+      if (existing > 0) continue
+      await this.enqueue(match, ScheduledJobType.FeeRequest, now)
+    }
+  }
+
+  private async sendFeeRequests(match: Match): Promise<void> {
+    await this.em.populate(match, ['organization'])
+    if (match.status === MatchStatus.Cancelled) return
+
+    const cost = await this.em.findOne(MatchCost, { match: { id: match.id } })
+    if (!cost || cost.feesNotifiedAt) return
+
+    await this.paymentService.recomputeFees(match.id)
+    const fees = await this.em.find(SessionFee, { match: { id: match.id } }, { populate: ['user'] })
+    for (const fee of fees) {
+      if (fee.status !== FeeStatus.Owed || fee.amountCents <= 0) continue
+      await this.deliverFeeEmail(fee, match, false)
+    }
+
+    const notifiedAt = new Date()
+    cost.feesNotifiedAt = notifiedAt
+    const delays = match.organization.feeReminderDelaysDays ?? []
+    for (const runAt of planFeeReminderRunAts(notifiedAt, delays)) {
+      this.persistJob(match, ScheduledJobType.FeeReminder, runAt)
+    }
+    await this.em.flush()
+  }
+
+  /**
+   * Emails every player who still owes money and was not reminded in the last 20 hours.
+   * Returns how many emails were sent.
+   */
+  async remindUnpaidFees(match: Match): Promise<number> {
+    await this.em.populate(match, ['organization'])
+    if (match.status === MatchStatus.Cancelled) return 0
+
+    const fees = await this.em.find(
+      SessionFee,
+      { match: { id: match.id }, status: FeeStatus.Owed },
+      { populate: ['user'] },
+    )
+    const now = new Date()
+    let remindedCount = 0
+    for (const fee of fees) {
+      if (fee.amountCents <= 0) continue
+      if (!canRemindFee({ status: fee.status, lastRemindedAt: fee.lastRemindedAt, now })) continue
+      const sent = await this.deliverFeeEmail(fee, match, true)
+      if (!sent) continue
+      fee.reminderCount += 1
+      fee.lastRemindedAt = now
+      remindedCount += 1
+    }
+    await this.em.flush()
+    return remindedCount
+  }
+
+  private async deliverFeeEmail(
+    fee: SessionFee,
+    match: Match,
+    isReminder: boolean,
+  ): Promise<boolean> {
+    const prefs = await this.getOrCreatePreferences(fee.user.id)
+    if (!prefs.notifyFeeRequest) return false
+    await this.deliver(
+      fee.user,
+      prefs,
+      feeRequestEmail({
+        match,
+        appUrl: config.clients.webApp.url,
+        amountCents: fee.amountCents,
+        paymentUrl: buildPaymentUrl(match.organization.paymentLink, fee.amountCents),
+        isReminder,
+        shares: fee.shares,
+      }),
+    )
+    return true
   }
 
   private async ensureScoreReminders(): Promise<void> {

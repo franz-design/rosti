@@ -31,7 +31,7 @@ export interface HomeAwardClub {
   mostWins: PlayerHighlight | null
   mostLosses: PlayerHighlight | null
   mostPlayedTogether: HomeAwardDuo | null
-  lastElectedPlayer: HomeAwardPlayer | null
+  lastElectedPlayer: (HomeAwardPlayer & { voteCount: number }) | null
   openPlayerVoteMatchId: string | null
 }
 
@@ -60,7 +60,15 @@ export function hasClubHomeHighlights(club: HomeAwardClub): boolean {
 
 function featuredSlot(club: HomeAwardClub): HomeAwardSlot | null {
   if (club.lastElectedPlayer) {
-    return { kind: 'elected', player: { ...club.lastElectedPlayer, value: 0 } }
+    return {
+      kind: 'elected',
+      player: {
+        userId: club.lastElectedPlayer.userId,
+        userName: club.lastElectedPlayer.userName,
+        image: club.lastElectedPlayer.image,
+        value: club.lastElectedPlayer.voteCount,
+      },
+    }
   }
   if (club.openPlayerVoteMatchId) {
     return { kind: 'vote', matchId: club.openPlayerVoteMatchId }

@@ -21,9 +21,7 @@ export function MatchCardActions({ match, onPostpone, onCancel }: MatchCardActio
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={
-          <Button variant="ghost" size="icon-sm" aria-label={t('matches.menuOpen')} />
-        }
+        render={<Button variant="ghost" size="icon-sm" aria-label={t('matches.menuOpen')} />}
       >
         <MoreVertical className="size-4" />
       </DropdownMenuTrigger>

@@ -11,6 +11,7 @@ import { useFullBleedShell } from '@/common/hooks/app-shell-context'
 import { authClient } from '@/lib/auth-client'
 import { rostiApi } from '@/lib/rosti-api'
 import { ChatTab } from './components/match-detail/chat/chat-tab'
+import { PaymentsTab } from './components/match-detail/payments/payments-tab'
 import { LineupDialog } from './components/match-detail/lineup/lineup-dialog'
 import { MatchDetailHeader } from './components/match-detail/match-detail-header'
 import {
@@ -451,6 +452,18 @@ export default function MatchDetailPage() {
               )
             }}
             canManage={canManageComposition}
+          />
+        </TabsContent>
+
+        <TabsContent
+          value="payments"
+          className={cn('mt-6 space-y-6 outline-none', isChat && 'px-6')}
+        >
+          <PaymentsTab
+            orgId={orgId ?? ''}
+            matchId={matchId ?? ''}
+            currentUserId={session?.user?.id}
+            isClubAdmin={isClubAdmin}
           />
         </TabsContent>
       </Tabs>

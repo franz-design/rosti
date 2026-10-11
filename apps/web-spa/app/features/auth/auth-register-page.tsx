@@ -84,9 +84,7 @@ export default function Register() {
   return (
     <div className="space-y-6">
       <AuthPageHeader
-        title={
-          intent === 'create' ? t('auth.register.createClubTitle') : t('auth.register.title')
-        }
+        title={intent === 'create' ? t('auth.register.createClubTitle') : t('auth.register.title')}
         description={description}
       />
       <AuthRegisterForm

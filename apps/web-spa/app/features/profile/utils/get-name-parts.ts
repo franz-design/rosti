@@ -28,10 +28,7 @@ export function getNameParts(user: ProfileUser | undefined): ProfileNameParts {
   }
 }
 
-export function getProfileDisplayName(
-  user: ProfileUser | undefined,
-  fallback: string,
-): string {
+export function getProfileDisplayName(user: ProfileUser | undefined, fallback: string): string {
   return (
     [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
     user?.name ||

@@ -4,13 +4,16 @@ import { OrganizationService } from '../auth/organization.service'
 import { AttendanceStatus } from '../matches/contracts/match.contract'
 import { MatchAttendance } from '../matches/match-attendance.entity'
 import { Match } from '../matches/match.entity'
-import {
-  FeeStatus,
-  UpsertMatchCostInput,
-  UpdateFeeStatusInput,
-} from './contracts/payment.contract'
+import { FeeStatus, UpdateFeeStatusInput, UpsertMatchCostInput } from './contracts/payment.contract'
+import { planFeeUpdates } from './fee-split'
 import { MatchCost } from './match-cost.entity'
 import { SessionFee } from './session-fee.entity'
+
+export interface RecomputeFeesResult {
+  fees: SessionFee[]
+  sharePriceCents: number
+  presentCount: number
+}
 
 @Injectable()
 export class PaymentService {
@@ -24,7 +27,7 @@ export class PaymentService {
     userId: string,
     matchId: string,
     data: UpsertMatchCostInput,
-  ): Promise<{ cost: MatchCost; fees: SessionFee[] }> {
+  ): Promise<{ cost: MatchCost } & RecomputeFeesResult> {
     await this.organizationService.requireRole(organizationId, userId, ['owner', 'admin'])
     const match = await this.em.findOne(Match, {
       id: matchId,
@@ -40,35 +43,77 @@ export class PaymentService {
     }
     cost.pitchCostCents = data.pitchCostCents
     cost.extrasCostCents = data.extrasCostCents
+    await this.em.flush()
+
+    const result = await this.recomputeFees(matchId)
+    return { cost, ...result }
+  }
+
+  /**
+   * Rebuilds one share per present player.
+   * Keeps status, paid date and share count. Drops an unpaid share when the player is no longer present.
+   */
+  async recomputeFees(matchId: string): Promise<RecomputeFeesResult> {
+    const cost = await this.em.findOne(
+      MatchCost,
+      { match: { id: matchId } },
+      { populate: ['match'] },
+    )
+    if (!cost) return { fees: [], sharePriceCents: 0, presentCount: 0 }
 
     const present = await this.em.find(
       MatchAttendance,
       { match: { id: matchId }, status: AttendanceStatus.Present },
       { populate: ['user'] },
     )
-    if (present.length === 0) {
-      throw new BadRequestException('No present players to split the cost')
-    }
+    const existing = await this.em.find(
+      SessionFee,
+      { match: { id: matchId } },
+      { populate: ['user', 'match'] },
+    )
+    const plan = planFeeUpdates({
+      totalCents: cost.pitchCostCents + cost.extrasCostCents,
+      presentUserIds: present.map((attendance) => attendance.user.id),
+      existing: existing.map((fee) => ({
+        userId: fee.user.id,
+        shares: fee.shares,
+        status: fee.status,
+        amountCents: fee.amountCents,
+      })),
+    })
 
-    const total = data.pitchCostCents + data.extrasCostCents
-    const perPlayer = Math.ceil(total / present.length)
-
-    const existingFees = await this.em.find(SessionFee, { match: { id: matchId } })
-    for (const fee of existingFees) this.em.remove(fee)
-
+    const presentByUser = new Map(present.map((attendance) => [attendance.user.id, attendance]))
+    const existingByUser = new Map(existing.map((fee) => [fee.user.id, fee]))
     const fees: SessionFee[] = []
-    for (const attendance of present) {
-      const fee = new SessionFee()
-      fee.match = match
-      fee.user = attendance.user
-      fee.amountCents = perPlayer
-      fee.status = FeeStatus.Owed
-      this.em.persist(fee)
+
+    for (const item of plan.fees) {
+      const current = existingByUser.get(item.userId)
+      if (item.remove) {
+        if (current) this.em.remove(current)
+        continue
+      }
+
+      let fee = current
+      if (!fee) {
+        const attendance = presentByUser.get(item.userId)
+        if (!attendance) continue
+        fee = new SessionFee()
+        fee.match = cost.match
+        fee.user = attendance.user
+        fee.status = FeeStatus.Owed
+        this.em.persist(fee)
+      }
+      fee.shares = item.shares
+      fee.amountCents = item.amountCents
       fees.push(fee)
     }
 
     await this.em.flush()
-    return { cost, fees }
+    return {
+      fees,
+      sharePriceCents: plan.sharePriceCents,
+      presentCount: present.length,
+    }
   }
 
   async getMatchCost(
@@ -115,5 +160,36 @@ export class PaymentService {
     fee.paidAt = data.status === FeeStatus.Paid ? new Date() : undefined
     await this.em.flush()
     return fee
+  }
+
+  /**
+   * Sets how many shares one present player covers, then recalculates every share.
+   */
+  async updateFeeShares(
+    organizationId: string,
+    userId: string,
+    feeId: string,
+    shares: number,
+  ): Promise<SessionFee> {
+    await this.organizationService.requireRole(organizationId, userId, ['owner', 'admin'])
+    const fee = await this.em.findOne(
+      SessionFee,
+      { id: feeId, match: { organization: { id: organizationId } } },
+      { populate: ['user', 'match'] },
+    )
+    if (!fee) throw new NotFoundException('Fee not found')
+
+    const isPresent = await this.em.count(MatchAttendance, {
+      match: { id: fee.match.id },
+      user: { id: fee.user.id },
+      status: AttendanceStatus.Present,
+    })
+    if (isPresent === 0) {
+      throw new BadRequestException('Only a present player can take extra shares')
+    }
+
+    fee.shares = shares
+    const { fees } = await this.recomputeFees(fee.match.id)
+    return fees.find((item) => item.id === fee.id) ?? fee
   }
 }

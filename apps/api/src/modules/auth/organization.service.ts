@@ -15,6 +15,7 @@ export interface UpdateOrganizationInput {
   defaultMaxCapacity?: number | null
   matchInviteLeadDays?: number
   matchInviteReminderLeadDays?: number | null
+  feeReminderDelaysDays?: number[]
 }
 
 @Injectable()
@@ -146,6 +147,11 @@ export class OrganizationService {
       if (data.matchInviteReminderLeadDays !== undefined) {
         org.matchInviteReminderLeadDays = reminderLeadDays
       }
+    }
+    if (data.feeReminderDelaysDays !== undefined) {
+      org.feeReminderDelaysDays = [...new Set(data.feeReminderDelaysDays)].sort(
+        (left, right) => left - right,
+      )
     }
 
     await this.em.flush()

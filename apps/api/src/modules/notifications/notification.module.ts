@@ -1,6 +1,7 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
-import { Module } from '@nestjs/common'
+import { Module, forwardRef } from '@nestjs/common'
 import { EmailModule } from '../email/email.module'
+import { PaymentModule } from '../payments/payment.module'
 import { DeviceToken } from './device-token.entity'
 import { NotificationController } from './notification.controller'
 import { UnsubscribeController } from './unsubscribe.controller'
@@ -13,6 +14,7 @@ import { ScheduledJob } from './scheduled-job.entity'
   imports: [
     EmailModule,
     MikroOrmModule.forFeature([NotificationPreference, DeviceToken, ScheduledJob]),
+    forwardRef(() => PaymentModule),
   ],
   controllers: [NotificationController, UnsubscribeController],
   providers: [NotificationService, NotificationScheduler],

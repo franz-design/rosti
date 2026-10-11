@@ -30,6 +30,7 @@ export class NotificationController {
       notifyChatMention: prefs.notifyChatMention,
       notifyAllChatMessages: prefs.notifyAllChatMessages,
       notifyPlayerVote: prefs.notifyPlayerVote,
+      notifyFeeRequest: prefs.notifyFeeRequest,
     }
   }
 
@@ -49,6 +50,7 @@ export class NotificationController {
       notifyChatMention: prefs.notifyChatMention,
       notifyAllChatMessages: prefs.notifyAllChatMessages,
       notifyPlayerVote: prefs.notifyPlayerVote,
+      notifyFeeRequest: prefs.notifyFeeRequest,
     }
   }
 

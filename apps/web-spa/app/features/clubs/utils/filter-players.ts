@@ -14,7 +14,10 @@ function foldName(value: string): string {
  * Matching ignores case and accents. A blank query keeps the full list.
  */
 export function filterPlayersByName<T extends NamedPlayer>(players: T[], query: string): T[] {
-  const terms = foldName(query).trim().split(/\s+/).filter((term) => term.length > 0)
+  const terms = foldName(query)
+    .trim()
+    .split(/\s+/)
+    .filter((term) => term.length > 0)
   if (terms.length === 0) return players
 
   return players.filter((player) => {

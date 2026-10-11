@@ -24,6 +24,7 @@ interface CreateMatchFormValues {
   title: string
   location: string
   maxPlayers: number
+  pitchCost: string
   matchDate: Date | undefined
   matchTime: string
   recurrence: RecurrenceChoice
@@ -40,6 +41,7 @@ interface CreateMatchFormProps {
   onTitleChange: (value: string) => void
   onLocationChange: (value: string) => void
   onMaxPlayersChange: (value: number) => void
+  onPitchCostChange: (value: string) => void
   onDateChange: (value: Date | undefined) => void
   onTimeChange: (value: string) => void
   onRecurrenceChange: (value: RecurrenceChoice) => void
@@ -56,6 +58,7 @@ export function CreateMatchForm({
   onTitleChange,
   onLocationChange,
   onMaxPlayersChange,
+  onPitchCostChange,
   onDateChange,
   onTimeChange,
   onRecurrenceChange,
@@ -97,6 +100,18 @@ export function CreateMatchForm({
           value={values.maxPlayers}
           onChange={(e) => onMaxPlayersChange(Number(e.target.value) || 0)}
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="pitchCost">{t('createMatch.pitchCost')}</Label>
+        <Input
+          id="pitchCost"
+          inputMode="decimal"
+          value={values.pitchCost}
+          onChange={(event) => onPitchCostChange(event.target.value)}
+          placeholder={t('createMatch.pitchCostPlaceholder')}
+        />
+        <p className="text-sm text-muted-foreground">{t('createMatch.pitchCostHint')}</p>
       </div>
 
       <div className="space-y-2">

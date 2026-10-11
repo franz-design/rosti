@@ -13,6 +13,7 @@ import { fetchSeasonsQueryOptions } from '@/features/seasons/utils/seasons-queri
 import { rostiApi } from '@/lib/rosti-api'
 import { CreateMatchForm } from './components/create-match/create-match-form'
 import { CreateMatchHeader } from './components/create-match/create-match-header'
+import { eurosToCents } from './utils/euros'
 import {
   buildMatchRecurrencePayload,
   combineDateAndTime,
@@ -31,6 +32,7 @@ export default function CreateMatchPage() {
   const [title, setTitle] = useState('')
   const [location, setLocation] = useState('')
   const [maxPlayers, setMaxPlayers] = useState(10)
+  const [pitchCost, setPitchCost] = useState('')
   const [defaultsReady, setDefaultsReady] = useState(false)
   const [matchDate, setMatchDate] = useState<Date | undefined>(() => defaultNextMatchDate())
   const [matchTime, setMatchTime] = useState('19:00')
@@ -72,6 +74,8 @@ export default function CreateMatchPage() {
       if (!activeClub) throw new Error(t('createMatch.errors.missingClub'))
       if (!matchDate || !title.trim()) throw new Error(t('createMatch.errors.requiredFields'))
       if (maxPlayers < 2) throw new Error(t('createMatch.errors.maxPlayers'))
+      const pitchCostCents = eurosToCents(pitchCost)
+      if (pitchCostCents == null) throw new Error(t('createMatch.errors.pitchCost'))
 
       let seasonId = activeSeason?.id
       if (!seasonId) {
@@ -100,6 +104,7 @@ export default function CreateMatchPage() {
         startsAt: startsAt.toISOString(),
         location: location.trim() || undefined,
         maxCapacity: maxPlayers,
+        ...(pitchCostCents > 0 ? { pitchCostCents } : {}),
         recurrence: buildMatchRecurrencePayload({
           recurrence,
           endMode,
@@ -129,6 +134,7 @@ export default function CreateMatchPage() {
           title,
           location,
           maxPlayers,
+          pitchCost,
           matchDate,
           matchTime,
           recurrence,
@@ -142,6 +148,7 @@ export default function CreateMatchPage() {
         onTitleChange={setTitle}
         onLocationChange={setLocation}
         onMaxPlayersChange={setMaxPlayers}
+        onPitchCostChange={setPitchCost}
         onDateChange={setMatchDate}
         onTimeChange={setMatchTime}
         onRecurrenceChange={setRecurrence}

@@ -16,6 +16,7 @@ import {
 } from './components/settings/club-settings-tabs'
 import { InviteMembersSection } from './components/settings/invite-members-section'
 import { MatchInviteSettingsSection } from './components/settings/match-invite-settings-section'
+import { FeeReminderSettingsSection } from './components/settings/fee-reminder-settings-section'
 import { PaymentLinkSection } from './components/settings/payment-link-section'
 import { SeasonsSettingsSection } from './components/settings/seasons-settings-section'
 import { useClub } from './hooks/club-context'
@@ -107,13 +108,16 @@ export default function ClubSettingsPage() {
         </TabsContent>
 
         <TabsContent value="payment" className="outline-none">
-          <PaymentLinkSection
-            value={link}
-            placeholder={data?.paymentLink ?? undefined}
-            isPending={save.isPending}
-            onChange={setLink}
-            onSave={() => save.mutate()}
-          />
+          <div className="space-y-8">
+            <PaymentLinkSection
+              value={link}
+              placeholder={data?.paymentLink ?? undefined}
+              isPending={save.isPending}
+              onChange={setLink}
+              onSave={() => save.mutate()}
+            />
+            <FeeReminderSettingsSection />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

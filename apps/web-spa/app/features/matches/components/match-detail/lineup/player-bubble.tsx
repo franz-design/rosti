@@ -16,9 +16,7 @@ export function PlayerBubble({ name, imageUrl, team }: PlayerBubbleProps) {
       <span
         className={cn(
           'flex size-12 items-center justify-center overflow-hidden rounded-full border-2 text-xs font-semibold text-white shadow-md',
-          team === 'blue'
-            ? 'border-team-blue-dark bg-team-blue'
-            : 'border-primary-dark bg-primary',
+          team === 'blue' ? 'border-team-blue-dark bg-team-blue' : 'border-primary-dark bg-primary',
         )}
       >
         {imageUrl ? <img src={imageUrl} alt="" className="size-full object-cover" /> : initials}

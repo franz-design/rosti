@@ -52,6 +52,7 @@ export const rostiApi = {
       defaultMaxCapacity?: number | null
       matchInviteLeadDays?: number
       matchInviteReminderLeadDays?: number | null
+      feeReminderDelaysDays?: number[]
     },
   ) =>
     request<Club>(`/clubs/${orgId}`, {
@@ -235,6 +236,15 @@ export const rostiApi = {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     }),
+  updateFeeShares: (orgId: string, feeId: string, shares: number) =>
+    request<SessionFee>(`/clubs/${orgId}/fees/${feeId}/shares`, {
+      method: 'PATCH',
+      body: JSON.stringify({ shares }),
+    }),
+  remindUnpaidFees: (orgId: string, matchId: string) =>
+    request<{ remindedCount: number }>(`/clubs/${orgId}/matches/${matchId}/fees/remind`, {
+      method: 'POST',
+    }),
   getPaymentLink: (orgId: string) =>
     request<{ paymentLink?: string }>(`/clubs/${orgId}/payment-link`),
   setPaymentLink: (orgId: string, paymentLink: string | null) =>
@@ -265,6 +275,7 @@ export interface Club {
   defaultMaxCapacity?: number | null
   matchInviteLeadDays: number
   matchInviteReminderLeadDays?: number | null
+  feeReminderDelaysDays: number[]
   createdAt: string
 }
 
@@ -332,6 +343,7 @@ export interface CreateMatchBody {
   startsAt: string
   location?: string
   maxCapacity: number
+  pitchCostCents?: number
   reminderOffsetsHours?: number[]
   recurrence?: {
     frequency: 'weekly' | 'monthly' | 'monthly_nth_weekday' | 'custom'
@@ -458,6 +470,7 @@ export interface SeasonHomeStats {
       userId: string
       userName: string
       image?: string | null
+      voteCount: number
     } | null
     openPlayerVoteMatchId: string | null
   }
@@ -490,6 +503,7 @@ export interface NotificationPreference {
   notifyChatMention: boolean
   notifyAllChatMessages: boolean
   notifyPlayerVote: boolean
+  notifyFeeRequest: boolean
 }
 
 export interface MatchCost {
@@ -507,6 +521,10 @@ export interface SessionFee {
   userId: string
   userName: string
   amountCents: number
+  shares: number
   status: 'owed' | 'paid' | 'waived'
   paidAt?: string | null
+  reminderCount: number
+  lastRemindedAt?: string | null
+  paymentUrl?: string | null
 }

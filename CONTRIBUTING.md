@@ -8,7 +8,7 @@ Valid types and scopes live in [`commitlint.config.ts`](./commitlint.config.ts).
 
 We follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/). Every message looks like `type(scope): description`. A local git hook (lefthook) runs commitlint on the message. If it fails, the error tells you which rule broke; the allowed values are in `commitlint.config.ts`.
 
-**WIP commits on your branch only need that format.** Half-steps, typo fixes, and "wip" subjects are fine. They will never land on `main` as commits. We squash. Their messages die with them unless you deliberately promote the *content* into the pull request description.
+**WIP commits on your branch only need that format.** Half-steps, typo fixes, and "wip" subjects are fine. They will never land on `main` as commits. We squash. Their messages die with them unless you deliberately promote the _content_ into the pull request description.
 
 The subject says what changed. The **body** says why: the approach you took, what you rejected, and the constraint that drove it. Write a body whenever the commit makes a decision.
 
@@ -60,7 +60,7 @@ Do not merge as part of finalization. Once review and the PR lint check are gree
 
 If a badly written message reaches `main` anyway, there is a correction tool that needs no git surgery: release-please honors a `BEGIN_COMMIT_OVERRIDE … END_COMMIT_OVERRIDE` block in the PR description, and it reads the description at parse time — so it works even **after** the merge. Edit the merged PR's description, put the corrected conventional message inside the block, and the Release PR recomputes.
 
-This splits the git record from the parsed record, so it is an escape hatch, not a normal-flow tool. In normal flow, fix the description *before* merging.
+This splits the git record from the parsed record, so it is an escape hatch, not a normal-flow tool. In normal flow, fix the description _before_ merging.
 
 ## Repository settings
 

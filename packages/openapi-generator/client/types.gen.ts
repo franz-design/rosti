@@ -5,6 +5,35 @@ export type ClientOptions = {
 };
 
 /**
+ * UpsertMatchCostSchema
+ */
+export type UpsertMatchCostSchema = {
+    pitchCostCents: number;
+    extrasCostCents: number;
+};
+
+/**
+ * UpdateFeeStatusSchema
+ */
+export type UpdateFeeStatusSchema = {
+    status: 'owed' | 'paid' | 'waived';
+};
+
+/**
+ * UpdateFeeSharesSchema
+ */
+export type UpdateFeeSharesSchema = {
+    shares: number;
+};
+
+/**
+ * ClubPaymentLinkSchema
+ */
+export type ClubPaymentLinkSchema = {
+    paymentLink?: string | null;
+};
+
+/**
  * UpdateNotificationPreferenceSchema
  */
 export type UpdateNotificationPreferenceSchema = {
@@ -15,6 +44,8 @@ export type UpdateNotificationPreferenceSchema = {
     notifyMatchCancelled?: boolean;
     notifyChatMention?: boolean;
     notifyAllChatMessages?: boolean;
+    notifyPlayerVote?: boolean;
+    notifyFeeRequest?: boolean;
 };
 
 /**
@@ -41,6 +72,9 @@ export type UpdateClubSchema = {
     venue?: string | null;
     sportType?: 'football' | 'futsal' | 'basketball' | 'volleyball' | 'tennis' | 'padel' | 'badminton' | 'other' | null;
     defaultMaxCapacity?: number | null;
+    matchInviteLeadDays?: number;
+    matchInviteReminderLeadDays?: number | null;
+    feeReminderDelaysDays?: Array<number>;
 };
 
 /**
@@ -59,6 +93,7 @@ export type CreateMatchSchema = {
     startsAt: string;
     location?: string;
     maxCapacity: number;
+    pitchCostCents?: number;
     reminderOffsetsHours?: Array<number>;
     recurrence?: {
         frequency: 'weekly' | 'monthly' | 'monthly_nth_weekday' | 'custom';
@@ -86,6 +121,21 @@ export type UpdateMatchSchema = {
  */
 export type CancelMatchSchema = {
     reason?: string;
+};
+
+/**
+ * SetMatchStatusSchema
+ */
+export type SetMatchStatusSchema = {
+    status: 'scheduled' | 'played';
+    startsAt?: string;
+};
+
+/**
+ * CastPlayerVoteSchema
+ */
+export type CastPlayerVoteSchema = {
+    nomineeUserId: string;
 };
 
 /**
@@ -120,28 +170,6 @@ export type SetPlayerTeamSchema = {
 };
 
 /**
- * UpsertMatchCostSchema
- */
-export type UpsertMatchCostSchema = {
-    pitchCostCents: number;
-    extrasCostCents: number;
-};
-
-/**
- * UpdateFeeStatusSchema
- */
-export type UpdateFeeStatusSchema = {
-    status: 'owed' | 'paid' | 'waived';
-};
-
-/**
- * ClubPaymentLinkSchema
- */
-export type ClubPaymentLinkSchema = {
-    paymentLink?: string | null;
-};
-
-/**
  * CreateSeasonSchema
  */
 export type CreateSeasonSchema = {
@@ -172,6 +200,63 @@ export type UpsertMatchStatsSchema = {
 };
 
 /**
+ * UpdatePlayerSkillsSchema
+ */
+export type UpdatePlayerSkillsSchema = {
+    skills: Array<{
+        key: 'defense' | 'attack' | 'passing' | 'shooting' | 'vision' | 'endurance' | 'physical' | 'goalkeeping' | 'dribbling' | 'rebounding' | 'speed' | 'serve' | 'reception' | 'setting' | 'block' | 'positioning' | 'reading' | 'forehand' | 'backhand' | 'volley' | 'smash' | 'footwork' | 'consistency' | 'bandeja' | 'walls' | 'clear' | 'drop' | 'netPlay';
+        value: number;
+    }>;
+};
+
+/**
+ * AvatarSchema
+ *
+ * Public URL of the current avatar, or null when the avatar was removed
+ */
+export type AvatarSchema = {
+    image: string | null;
+};
+
+/**
+ * MatchCostSchema
+ */
+export type MatchCostSchema = {
+    id: string;
+    matchId: string;
+    pitchCostCents: number;
+    extrasCostCents: number;
+    perPlayerCents?: number;
+    presentCount?: number;
+};
+
+/**
+ * SessionFeeSchema
+ */
+export type SessionFeeSchema = {
+    id: string;
+    matchId: string;
+    userId: string;
+    userName: string;
+    amountCents: number;
+    shares: number;
+    status: 'owed' | 'paid' | 'waived';
+    paidAt?: string | null;
+    reminderCount: number;
+    lastRemindedAt?: string | null;
+    paymentUrl?: string | null;
+};
+
+export type GetMatchesMatchIdFees = Array<SessionFeeSchema>;
+
+/**
+ * RemindFeesResultSchema
+ */
+export type RemindFeesResultSchema = {
+    remindedCount: number;
+};
+
+/**
  * NotificationPreferenceSchema
  */
 export type NotificationPreferenceSchema = {
@@ -183,6 +268,8 @@ export type NotificationPreferenceSchema = {
     notifyMatchCancelled: boolean;
     notifyChatMention: boolean;
     notifyAllChatMessages: boolean;
+    notifyPlayerVote: boolean;
+    notifyFeeRequest: boolean;
 };
 
 /**
@@ -193,6 +280,7 @@ export type MatchMessageSchema = {
     matchId: string;
     authorId: string;
     authorName: string;
+    authorImage?: string | null;
     body: string;
     mentionedUserIds: Array<string>;
     createdAt: string;
@@ -212,6 +300,9 @@ export type ClubSchema = {
     venue?: string | null;
     sportType?: 'football' | 'futsal' | 'basketball' | 'volleyball' | 'tennis' | 'padel' | 'badminton' | 'other' | null;
     defaultMaxCapacity?: number | null;
+    matchInviteLeadDays: number;
+    matchInviteReminderLeadDays?: number | null;
+    feeReminderDelaysDays: Array<number>;
     createdAt: string;
 };
 
@@ -226,6 +317,7 @@ export type ClubMemberSchema = {
     firstName?: string | null;
     lastName?: string | null;
     phone?: string | null;
+    image?: string | null;
     role: 'owner' | 'admin' | 'member';
     createdAt: string;
 };
@@ -257,6 +349,32 @@ export type MatchSchema = {
 export type PostDefault = Array<MatchSchema>;
 
 /**
+ * PlayerVoteStateSchema
+ */
+export type PlayerVoteStateSchema = {
+    phase: 'unavailable' | 'open' | 'closed';
+    closesAt?: string | null;
+    canVote: boolean;
+    candidates: Array<PlayerVotePlayerSchema>;
+    myNomineeUserId?: string | null;
+    winner: {
+        userId: string;
+        userName: string;
+        image?: string | null;
+    } | null;
+    isTie: boolean;
+};
+
+/**
+ * PlayerVotePlayerSchema
+ */
+export type PlayerVotePlayerSchema = {
+    userId: string;
+    userName: string;
+    image?: string | null;
+};
+
+/**
  * AttendanceSchema
  */
 export type AttendanceSchema = {
@@ -264,6 +382,7 @@ export type AttendanceSchema = {
     matchId: string;
     userId: string;
     userName: string;
+    image?: string | null;
     status: 'present' | 'absent' | 'pending';
     respondedAt?: string | null;
 };
@@ -278,6 +397,7 @@ export type LineupSchema = {
     matchId: string;
     userId: string;
     userName: string;
+    image?: string | null;
     team: 'blue' | 'red';
 };
 
@@ -286,33 +406,6 @@ export type GetMatchIdLineups = Array<LineupSchema>;
 export type PutMatchIdLineups = Array<LineupSchema>;
 
 export type PutMatchIdLineupsUserId = Array<LineupSchema>;
-
-/**
- * MatchCostSchema
- */
-export type MatchCostSchema = {
-    id: string;
-    matchId: string;
-    pitchCostCents: number;
-    extrasCostCents: number;
-    perPlayerCents?: number;
-    presentCount?: number;
-};
-
-/**
- * SessionFeeSchema
- */
-export type SessionFeeSchema = {
-    id: string;
-    matchId: string;
-    userId: string;
-    userName: string;
-    amountCents: number;
-    status: 'owed' | 'paid' | 'waived';
-    paidAt?: string | null;
-};
-
-export type GetMatchesMatchIdFees = Array<SessionFeeSchema>;
 
 /**
  * SeasonSchema
@@ -335,6 +428,7 @@ export type MatchStatSchema = {
     matchId: string;
     userId: string;
     userName: string;
+    image?: string | null;
     goals: number;
     assists: number;
 };
@@ -349,6 +443,7 @@ export type GetMatchesMatchIdStats = Array<MatchStatSchema>;
 export type SeasonPlayerStatSchema = {
     userId: string;
     userName: string;
+    image?: string | null;
     goals: number;
     assists: number;
     matchesPlayed: number;
@@ -376,16 +471,19 @@ export type ClubHomeStatsSchema = {
     topScorer: {
         userId: string;
         userName: string;
+        image?: string | null;
         value: number;
     } | null;
     mostWins: {
         userId: string;
         userName: string;
+        image?: string | null;
         value: number;
     } | null;
     mostLosses: {
         userId: string;
         userName: string;
+        image?: string | null;
         value: number;
     } | null;
     mostPlayedTogether: {
@@ -395,6 +493,7 @@ export type ClubHomeStatsSchema = {
         playerA: {
             userId: string;
             userName: string;
+            image?: string | null;
         };
         /**
          * PlayerRefSchema
@@ -402,9 +501,17 @@ export type ClubHomeStatsSchema = {
         playerB: {
             userId: string;
             userName: string;
+            image?: string | null;
         };
         matchesTogether: number;
     } | null;
+    lastElectedPlayer: {
+        userId: string;
+        userName: string;
+        image?: string | null;
+        voteCount: number;
+    } | null;
+    openPlayerVoteMatchId: string | null;
 };
 
 /**
@@ -417,13 +524,65 @@ export type PersonalHomeStatsSchema = {
     losses: number;
 };
 
+/**
+ * PlayerDetailSchema
+ */
+export type PlayerDetailSchema = {
+    userId: string;
+    name: string;
+    email: string;
+    phone?: string | null;
+    image?: string | null;
+    role: 'owner' | 'admin' | 'member';
+    memberSince: string;
+    season: {
+        id: string;
+        name: string;
+    } | null;
+    stats: PlayerSeasonStatsSchema;
+    skillRatings: {
+        sportType: 'football' | 'futsal' | 'basketball' | 'volleyball' | 'tennis' | 'padel' | 'badminton' | 'other';
+        skills: Array<{
+            key: 'defense' | 'attack' | 'passing' | 'shooting' | 'vision' | 'endurance' | 'physical' | 'goalkeeping' | 'dribbling' | 'rebounding' | 'speed' | 'serve' | 'reception' | 'setting' | 'block' | 'positioning' | 'reading' | 'forehand' | 'backhand' | 'volley' | 'smash' | 'footwork' | 'consistency' | 'bandeja' | 'walls' | 'clear' | 'drop' | 'netPlay';
+            value: number;
+        }>;
+    } | null;
+};
+
+/**
+ * PlayerSeasonStatsSchema
+ */
+export type PlayerSeasonStatsSchema = {
+    matchesPlayed: number;
+    goals: number;
+    assists: number;
+    wins: number;
+    losses: number;
+};
+
+/**
+ * PlayerSkillRatingsSchema
+ */
+export type PlayerSkillRatingsSchema = {
+    sportType: 'football' | 'futsal' | 'basketball' | 'volleyball' | 'tennis' | 'padel' | 'badminton' | 'other';
+    skills: Array<PlayerSkillRatingSchema>;
+};
+
+/**
+ * PlayerSkillRatingSchema
+ */
+export type PlayerSkillRatingSchema = {
+    key: 'defense' | 'attack' | 'passing' | 'shooting' | 'vision' | 'endurance' | 'physical' | 'goalkeeping' | 'dribbling' | 'rebounding' | 'speed' | 'serve' | 'reception' | 'setting' | 'block' | 'positioning' | 'reading' | 'forehand' | 'backhand' | 'volley' | 'smash' | 'footwork' | 'consistency' | 'bandeja' | 'walls' | 'clear' | 'drop' | 'netPlay';
+    value: number;
+};
+
+export type PaymentControllerOrganizationId = string;
+
 export type ChatControllerOrganizationId = string;
 
 export type ChatControllerMatchId = string;
 
 export type MatchControllerOrganizationId = string;
-
-export type PaymentControllerOrganizationId = string;
 
 export type SeasonControllerOrganizationId = string;
 
@@ -437,6 +596,53 @@ export type AppControllerGetHelloData = {
 };
 
 export type AppControllerGetHelloResponses = {
+    200: unknown;
+};
+
+export type AvatarControllerRemoveData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/me/avatar';
+};
+
+export type AvatarControllerRemoveResponses = {
+    /**
+     * Public URL of the current avatar, or null when the avatar was removed
+     */
+    200: AvatarSchema;
+};
+
+export type AvatarControllerRemoveResponse = AvatarControllerRemoveResponses[keyof AvatarControllerRemoveResponses];
+
+export type AvatarControllerUploadData = {
+    body: {
+        file: Blob | File;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/me/avatar';
+};
+
+export type AvatarControllerUploadResponses = {
+    /**
+     * Public URL of the current avatar, or null when the avatar was removed
+     */
+    200: AvatarSchema;
+};
+
+export type AvatarControllerUploadResponse = AvatarControllerUploadResponses[keyof AvatarControllerUploadResponses];
+
+export type AvatarFileControllerGetData = {
+    body?: never;
+    path: {
+        userId: string;
+    };
+    query?: never;
+    url: '/api/avatars/{userId}';
+};
+
+export type AvatarFileControllerGetResponses = {
     200: unknown;
 };
 
@@ -483,6 +689,9 @@ export type ClubControllerUpdateData = {
         venue?: string | null;
         sportType?: 'football' | 'futsal' | 'basketball' | 'volleyball' | 'tennis' | 'padel' | 'badminton' | 'other' | null;
         defaultMaxCapacity?: number | null;
+        matchInviteLeadDays?: number;
+        matchInviteReminderLeadDays?: number | null;
+        feeReminderDelaysDays?: Array<number>;
     };
     path: {
         organizationId: string;
@@ -541,6 +750,301 @@ export type ClubControllerUpdateRoleResponses = {
 };
 
 export type ClubControllerUpdateRoleResponse = ClubControllerUpdateRoleResponses[keyof ClubControllerUpdateRoleResponses];
+
+export type ClubControllerRemoveMemberAvatarData = {
+    body?: never;
+    path: {
+        memberId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/members/{memberId}/avatar';
+};
+
+export type ClubControllerRemoveMemberAvatarResponses = {
+    /**
+     * Public URL of the current avatar, or null when the avatar was removed
+     */
+    200: AvatarSchema;
+};
+
+export type ClubControllerRemoveMemberAvatarResponse = ClubControllerRemoveMemberAvatarResponses[keyof ClubControllerRemoveMemberAvatarResponses];
+
+export type ClubControllerUploadMemberAvatarData = {
+    body: {
+        file: Blob | File;
+    };
+    path: {
+        memberId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/members/{memberId}/avatar';
+};
+
+export type ClubControllerUploadMemberAvatarResponses = {
+    /**
+     * Public URL of the current avatar, or null when the avatar was removed
+     */
+    200: AvatarSchema;
+};
+
+export type ClubControllerUploadMemberAvatarResponse = ClubControllerUploadMemberAvatarResponses[keyof ClubControllerUploadMemberAvatarResponses];
+
+export type NotificationControllerGetPreferencesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/notifications/preferences';
+};
+
+export type NotificationControllerGetPreferencesResponses = {
+    /**
+     * Successful response
+     */
+    200: NotificationPreferenceSchema;
+};
+
+export type NotificationControllerGetPreferencesResponse = NotificationControllerGetPreferencesResponses[keyof NotificationControllerGetPreferencesResponses];
+
+export type NotificationControllerUpdatePreferencesData = {
+    /**
+     * UpdateNotificationPreferenceSchema
+     */
+    body: {
+        emailEnabled?: boolean;
+        pushEnabled?: boolean;
+        notifyNewMatch?: boolean;
+        notifyRsvpReminder?: boolean;
+        notifyMatchCancelled?: boolean;
+        notifyChatMention?: boolean;
+        notifyAllChatMessages?: boolean;
+        notifyPlayerVote?: boolean;
+        notifyFeeRequest?: boolean;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/notifications/preferences';
+};
+
+export type NotificationControllerUpdatePreferencesResponses = {
+    /**
+     * Successful response
+     */
+    200: NotificationPreferenceSchema;
+};
+
+export type NotificationControllerUpdatePreferencesResponse = NotificationControllerUpdatePreferencesResponses[keyof NotificationControllerUpdatePreferencesResponses];
+
+export type NotificationControllerRegisterDeviceData = {
+    /**
+     * RegisterDeviceSchema
+     */
+    body: {
+        token: string;
+        platform: 'ios' | 'android' | 'web';
+    };
+    path?: never;
+    query?: never;
+    url: '/api/notifications/devices';
+};
+
+export type NotificationControllerRegisterDeviceResponses = {
+    201: unknown;
+};
+
+export type UnsubscribeControllerShowUnsubscribeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/notifications/unsubscribe';
+};
+
+export type UnsubscribeControllerShowUnsubscribeResponses = {
+    200: unknown;
+};
+
+export type UnsubscribeControllerUnsubscribeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/notifications/unsubscribe';
+};
+
+export type UnsubscribeControllerUnsubscribeResponses = {
+    201: unknown;
+};
+
+export type PaymentControllerGetCostData = {
+    body?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/cost';
+};
+
+export type PaymentControllerGetCostResponses = {
+    /**
+     * Successful response
+     */
+    200: MatchCostSchema;
+};
+
+export type PaymentControllerGetCostResponse = PaymentControllerGetCostResponses[keyof PaymentControllerGetCostResponses];
+
+export type PaymentControllerUpsertCostData = {
+    /**
+     * UpsertMatchCostSchema
+     */
+    body: {
+        pitchCostCents: number;
+        extrasCostCents: number;
+    };
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/cost';
+};
+
+export type PaymentControllerUpsertCostResponses = {
+    /**
+     * Successful response
+     */
+    200: MatchCostSchema;
+};
+
+export type PaymentControllerUpsertCostResponse = PaymentControllerUpsertCostResponses[keyof PaymentControllerUpsertCostResponses];
+
+export type PaymentControllerListFeesData = {
+    body?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/fees';
+};
+
+export type PaymentControllerListFeesResponses = {
+    /**
+     * Successful response
+     */
+    200: GetMatchesMatchIdFees;
+};
+
+export type PaymentControllerListFeesResponse = PaymentControllerListFeesResponses[keyof PaymentControllerListFeesResponses];
+
+export type PaymentControllerUpdateFeeData = {
+    /**
+     * UpdateFeeStatusSchema
+     */
+    body: {
+        status: 'owed' | 'paid' | 'waived';
+    };
+    path: {
+        feeId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/fees/{feeId}';
+};
+
+export type PaymentControllerUpdateFeeResponses = {
+    /**
+     * Successful response
+     */
+    200: SessionFeeSchema;
+};
+
+export type PaymentControllerUpdateFeeResponse = PaymentControllerUpdateFeeResponses[keyof PaymentControllerUpdateFeeResponses];
+
+export type PaymentControllerUpdateFeeSharesData = {
+    /**
+     * UpdateFeeSharesSchema
+     */
+    body: {
+        shares: number;
+    };
+    path: {
+        feeId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/fees/{feeId}/shares';
+};
+
+export type PaymentControllerUpdateFeeSharesResponses = {
+    /**
+     * Successful response
+     */
+    200: SessionFeeSchema;
+};
+
+export type PaymentControllerUpdateFeeSharesResponse = PaymentControllerUpdateFeeSharesResponses[keyof PaymentControllerUpdateFeeSharesResponses];
+
+export type PaymentControllerRemindUnpaidData = {
+    body?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/fees/remind';
+};
+
+export type PaymentControllerRemindUnpaidResponses = {
+    /**
+     * Successful response
+     */
+    200: RemindFeesResultSchema;
+};
+
+export type PaymentControllerRemindUnpaidResponse = PaymentControllerRemindUnpaidResponses[keyof PaymentControllerRemindUnpaidResponses];
+
+export type PaymentControllerGetPaymentLinkData = {
+    body?: never;
+    path: {
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/payment-link';
+};
+
+export type PaymentControllerGetPaymentLinkResponses = {
+    /**
+     * Successful response
+     */
+    200: ClubPaymentLinkSchema;
+};
+
+export type PaymentControllerGetPaymentLinkResponse = PaymentControllerGetPaymentLinkResponses[keyof PaymentControllerGetPaymentLinkResponses];
+
+export type PaymentControllerSetPaymentLinkData = {
+    /**
+     * ClubPaymentLinkSchema
+     */
+    body: {
+        paymentLink?: string | null;
+    };
+    path: {
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/payment-link';
+};
+
+export type PaymentControllerSetPaymentLinkResponses = {
+    /**
+     * Successful response
+     */
+    200: ClubPaymentLinkSchema;
+};
+
+export type PaymentControllerSetPaymentLinkResponse = PaymentControllerSetPaymentLinkResponses[keyof PaymentControllerSetPaymentLinkResponses];
 
 export type SeasonControllerListData = {
     body?: never;
@@ -661,6 +1165,7 @@ export type MatchControllerCreateData = {
         startsAt: string;
         location?: string;
         maxCapacity: number;
+        pitchCostCents?: number;
         reminderOffsetsHours?: Array<number>;
         recurrence?: {
             frequency: 'weekly' | 'monthly' | 'monthly_nth_weekday' | 'custom';
@@ -758,6 +1263,31 @@ export type MatchControllerCancelResponses = {
 
 export type MatchControllerCancelResponse = MatchControllerCancelResponses[keyof MatchControllerCancelResponses];
 
+export type MatchControllerSetStatusData = {
+    /**
+     * SetMatchStatusSchema
+     */
+    body: {
+        status: 'scheduled' | 'played';
+        startsAt?: string;
+    };
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/status';
+};
+
+export type MatchControllerSetStatusResponses = {
+    /**
+     * Successful response
+     */
+    200: MatchSchema;
+};
+
+export type MatchControllerSetStatusResponse = MatchControllerSetStatusResponses[keyof MatchControllerSetStatusResponses];
+
 export type MatchControllerMarkPlayedData = {
     body?: never;
     path: {
@@ -776,6 +1306,49 @@ export type MatchControllerMarkPlayedResponses = {
 };
 
 export type MatchControllerMarkPlayedResponse = MatchControllerMarkPlayedResponses[keyof MatchControllerMarkPlayedResponses];
+
+export type MatchControllerGetPlayerVoteData = {
+    body?: never;
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/player-vote';
+};
+
+export type MatchControllerGetPlayerVoteResponses = {
+    /**
+     * Successful response
+     */
+    200: PlayerVoteStateSchema;
+};
+
+export type MatchControllerGetPlayerVoteResponse = MatchControllerGetPlayerVoteResponses[keyof MatchControllerGetPlayerVoteResponses];
+
+export type MatchControllerCastPlayerVoteData = {
+    /**
+     * CastPlayerVoteSchema
+     */
+    body: {
+        nomineeUserId: string;
+    };
+    path: {
+        matchId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/matches/{matchId}/player-vote';
+};
+
+export type MatchControllerCastPlayerVoteResponses = {
+    /**
+     * Successful response
+     */
+    200: PlayerVoteStateSchema;
+};
+
+export type MatchControllerCastPlayerVoteResponse = MatchControllerCastPlayerVoteResponses[keyof MatchControllerCastPlayerVoteResponses];
 
 export type MatchControllerListAttendancesData = {
     body?: never;
@@ -916,66 +1489,6 @@ export type MatchControllerSetPlayerTeamResponses = {
 
 export type MatchControllerSetPlayerTeamResponse = MatchControllerSetPlayerTeamResponses[keyof MatchControllerSetPlayerTeamResponses];
 
-export type NotificationControllerGetPreferencesData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/notifications/preferences';
-};
-
-export type NotificationControllerGetPreferencesResponses = {
-    /**
-     * Successful response
-     */
-    200: NotificationPreferenceSchema;
-};
-
-export type NotificationControllerGetPreferencesResponse = NotificationControllerGetPreferencesResponses[keyof NotificationControllerGetPreferencesResponses];
-
-export type NotificationControllerUpdatePreferencesData = {
-    /**
-     * UpdateNotificationPreferenceSchema
-     */
-    body: {
-        emailEnabled?: boolean;
-        pushEnabled?: boolean;
-        notifyNewMatch?: boolean;
-        notifyRsvpReminder?: boolean;
-        notifyMatchCancelled?: boolean;
-        notifyChatMention?: boolean;
-        notifyAllChatMessages?: boolean;
-    };
-    path?: never;
-    query?: never;
-    url: '/api/notifications/preferences';
-};
-
-export type NotificationControllerUpdatePreferencesResponses = {
-    /**
-     * Successful response
-     */
-    200: NotificationPreferenceSchema;
-};
-
-export type NotificationControllerUpdatePreferencesResponse = NotificationControllerUpdatePreferencesResponses[keyof NotificationControllerUpdatePreferencesResponses];
-
-export type NotificationControllerRegisterDeviceData = {
-    /**
-     * RegisterDeviceSchema
-     */
-    body: {
-        token: string;
-        platform: 'ios' | 'android' | 'web';
-    };
-    path?: never;
-    query?: never;
-    url: '/api/notifications/devices';
-};
-
-export type NotificationControllerRegisterDeviceResponses = {
-    201: unknown;
-};
-
 export type StatsControllerListMatchData = {
     body?: never;
     path: {
@@ -1060,6 +1573,52 @@ export type StatsControllerHomeStatsResponses = {
 
 export type StatsControllerHomeStatsResponse = StatsControllerHomeStatsResponses[keyof StatsControllerHomeStatsResponses];
 
+export type StatsControllerPlayerDetailData = {
+    body?: never;
+    path: {
+        userId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/players/{userId}';
+};
+
+export type StatsControllerPlayerDetailResponses = {
+    /**
+     * Successful response
+     */
+    200: PlayerDetailSchema;
+};
+
+export type StatsControllerPlayerDetailResponse = StatsControllerPlayerDetailResponses[keyof StatsControllerPlayerDetailResponses];
+
+export type StatsControllerUpdatePlayerSkillsData = {
+    /**
+     * UpdatePlayerSkillsSchema
+     */
+    body: {
+        skills: Array<{
+            key: 'defense' | 'attack' | 'passing' | 'shooting' | 'vision' | 'endurance' | 'physical' | 'goalkeeping' | 'dribbling' | 'rebounding' | 'speed' | 'serve' | 'reception' | 'setting' | 'block' | 'positioning' | 'reading' | 'forehand' | 'backhand' | 'volley' | 'smash' | 'footwork' | 'consistency' | 'bandeja' | 'walls' | 'clear' | 'drop' | 'netPlay';
+            value: number;
+        }>;
+    };
+    path: {
+        userId: string;
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/clubs/{organizationId}/players/{userId}/skills';
+};
+
+export type StatsControllerUpdatePlayerSkillsResponses = {
+    /**
+     * Successful response
+     */
+    200: PlayerSkillRatingsSchema;
+};
+
+export type StatsControllerUpdatePlayerSkillsResponse = StatsControllerUpdatePlayerSkillsResponses[keyof StatsControllerUpdatePlayerSkillsResponses];
+
 export type ChatControllerListData = {
     body?: never;
     path: {
@@ -1103,131 +1662,3 @@ export type ChatControllerPostResponses = {
 };
 
 export type ChatControllerPostResponse = ChatControllerPostResponses[keyof ChatControllerPostResponses];
-
-export type PaymentControllerGetCostData = {
-    body?: never;
-    path: {
-        matchId: string;
-        organizationId: string;
-    };
-    query?: never;
-    url: '/api/clubs/{organizationId}/matches/{matchId}/cost';
-};
-
-export type PaymentControllerGetCostResponses = {
-    /**
-     * Successful response
-     */
-    200: MatchCostSchema;
-};
-
-export type PaymentControllerGetCostResponse = PaymentControllerGetCostResponses[keyof PaymentControllerGetCostResponses];
-
-export type PaymentControllerUpsertCostData = {
-    /**
-     * UpsertMatchCostSchema
-     */
-    body: {
-        pitchCostCents: number;
-        extrasCostCents: number;
-    };
-    path: {
-        matchId: string;
-        organizationId: string;
-    };
-    query?: never;
-    url: '/api/clubs/{organizationId}/matches/{matchId}/cost';
-};
-
-export type PaymentControllerUpsertCostResponses = {
-    /**
-     * Successful response
-     */
-    200: MatchCostSchema;
-};
-
-export type PaymentControllerUpsertCostResponse = PaymentControllerUpsertCostResponses[keyof PaymentControllerUpsertCostResponses];
-
-export type PaymentControllerListFeesData = {
-    body?: never;
-    path: {
-        matchId: string;
-        organizationId: string;
-    };
-    query?: never;
-    url: '/api/clubs/{organizationId}/matches/{matchId}/fees';
-};
-
-export type PaymentControllerListFeesResponses = {
-    /**
-     * Successful response
-     */
-    200: GetMatchesMatchIdFees;
-};
-
-export type PaymentControllerListFeesResponse = PaymentControllerListFeesResponses[keyof PaymentControllerListFeesResponses];
-
-export type PaymentControllerUpdateFeeData = {
-    /**
-     * UpdateFeeStatusSchema
-     */
-    body: {
-        status: 'owed' | 'paid' | 'waived';
-    };
-    path: {
-        feeId: string;
-        organizationId: string;
-    };
-    query?: never;
-    url: '/api/clubs/{organizationId}/fees/{feeId}';
-};
-
-export type PaymentControllerUpdateFeeResponses = {
-    /**
-     * Successful response
-     */
-    200: SessionFeeSchema;
-};
-
-export type PaymentControllerUpdateFeeResponse = PaymentControllerUpdateFeeResponses[keyof PaymentControllerUpdateFeeResponses];
-
-export type PaymentControllerGetPaymentLinkData = {
-    body?: never;
-    path: {
-        organizationId: string;
-    };
-    query?: never;
-    url: '/api/clubs/{organizationId}/payment-link';
-};
-
-export type PaymentControllerGetPaymentLinkResponses = {
-    /**
-     * Successful response
-     */
-    200: ClubPaymentLinkSchema;
-};
-
-export type PaymentControllerGetPaymentLinkResponse = PaymentControllerGetPaymentLinkResponses[keyof PaymentControllerGetPaymentLinkResponses];
-
-export type PaymentControllerSetPaymentLinkData = {
-    /**
-     * ClubPaymentLinkSchema
-     */
-    body: {
-        paymentLink?: string | null;
-    };
-    path: {
-        organizationId: string;
-    };
-    query?: never;
-    url: '/api/clubs/{organizationId}/payment-link';
-};
-
-export type PaymentControllerSetPaymentLinkResponses = {
-    /**
-     * Successful response
-     */
-    200: ClubPaymentLinkSchema;
-};
-
-export type PaymentControllerSetPaymentLinkResponse = PaymentControllerSetPaymentLinkResponses[keyof PaymentControllerSetPaymentLinkResponses];

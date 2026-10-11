@@ -49,6 +49,7 @@ export const clubSchema = z
     defaultMaxCapacity: z.number().int().positive().nullish(),
     matchInviteLeadDays: z.number().int().min(1).max(30),
     matchInviteReminderLeadDays: z.number().int().min(1).max(29).nullish(),
+    feeReminderDelaysDays: z.array(z.number().int().min(1).max(60)).max(4),
     createdAt: z.coerce.date(),
   })
   .meta({ title: 'ClubSchema' })
@@ -64,6 +65,7 @@ export const updateClubSchema = z
     defaultMaxCapacity: z.number().int().positive().nullish(),
     matchInviteLeadDays: z.number().int().min(1).max(30).optional(),
     matchInviteReminderLeadDays: z.number().int().min(1).max(29).nullish(),
+    feeReminderDelaysDays: z.array(z.number().int().min(1).max(60)).max(4).optional(),
   })
   .meta({ title: 'UpdateClubSchema' })
 

@@ -55,6 +55,13 @@ export class Organization {
   })
   matchInviteReminderLeadDays?: number
 
+  /**
+   * Days after the payment request when unpaid players are reminded.
+   * An empty list turns reminders off. Default is 3 days, then 7 days.
+   */
+  @Property({ type: 'json', defaultRaw: `'[3,7]'::jsonb` })
+  feeReminderDelaysDays: number[] = [3, 7]
+
   @Property({ fieldName: 'createdAt' })
   createdAt: Date = new Date()
 }

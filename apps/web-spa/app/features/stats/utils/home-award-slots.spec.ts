@@ -80,11 +80,17 @@ describe('selectHomeAwardSlots', () => {
         topScorer: LUCAS,
         mostWins: HUGO,
         mostLosses: ADAM,
-        lastElectedPlayer: { userId: LUCAS.userId, userName: LUCAS.userName, image: null },
+        lastElectedPlayer: {
+          userId: LUCAS.userId,
+          userName: LUCAS.userName,
+          image: null,
+          voteCount: 4,
+        },
       }),
     )
 
     expect(actual.map(slotLabel)).toEqual(['elected', 'wins'])
+    expect(actual[0]).toMatchObject({ kind: 'elected', player: { value: 4 } })
   })
 
   it('still shows one season record when every record belongs to the elected player', () => {
@@ -94,7 +100,12 @@ describe('selectHomeAwardSlots', () => {
         topScorer: LUCAS,
         mostWins: { ...LUCAS, value: 2 },
         mostLosses: { ...LUCAS, value: 1 },
-        lastElectedPlayer: { userId: LUCAS.userId, userName: LUCAS.userName, image: null },
+        lastElectedPlayer: {
+          userId: LUCAS.userId,
+          userName: LUCAS.userName,
+          image: null,
+          voteCount: 2,
+        },
       }),
     )
 
@@ -126,7 +137,12 @@ describe('selectHomeAwardSlots', () => {
     const actual = selectHomeAwardSlots(
       club({
         matchesPlayed: 2,
-        lastElectedPlayer: { userId: HUGO.userId, userName: HUGO.userName, image: null },
+        lastElectedPlayer: {
+          userId: HUGO.userId,
+          userName: HUGO.userName,
+          image: null,
+          voteCount: 3,
+        },
         openPlayerVoteMatchId: MATCH_ID,
       }),
     )
@@ -134,7 +150,7 @@ describe('selectHomeAwardSlots', () => {
     expect(actual).toEqual([
       {
         kind: 'elected',
-        player: { userId: HUGO.userId, userName: HUGO.userName, image: null, value: 0 },
+        player: { userId: HUGO.userId, userName: HUGO.userName, image: null, value: 3 },
       },
     ])
   })

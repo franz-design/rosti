@@ -55,6 +55,7 @@ export const createMatchSchema = z
     startsAt: z.coerce.date(),
     location: z.string().optional(),
     maxCapacity: z.number().int().positive(),
+    pitchCostCents: z.number().int().nonnegative().optional(),
     reminderOffsetsHours: z.array(z.number().int().positive()).optional(),
     recurrence: z
       .object({

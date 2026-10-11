@@ -17,8 +17,92 @@
     "/api": {
       "get": {
         "operationId": "AppController_getHello",
-        "tags": ["App"],
+        "tags": [
+          "App"
+        ],
         "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/me/avatar": {
+      "put": {
+        "operationId": "AvatarController_upload",
+        "tags": [
+          "Avatar"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Public URL of the current avatar, or null when the avatar was removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvatarSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "AvatarController_remove",
+        "tags": [
+          "Avatar"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Public URL of the current avatar, or null when the avatar was removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvatarSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/avatars/{userId}": {
+      "get": {
+        "operationId": "AvatarFileController_get",
+        "tags": [
+          "AvatarFile"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -29,7 +113,9 @@
     "/api/clubs": {
       "get": {
         "operationId": "ClubController_listMine",
-        "tags": ["Clubs"],
+        "tags": [
+          "Clubs"
+        ],
         "parameters": [],
         "responses": {
           "200": {
@@ -48,7 +134,9 @@
     "/api/clubs/{organizationId}": {
       "get": {
         "operationId": "ClubController_getOne",
-        "tags": ["Clubs"],
+        "tags": [
+          "Clubs"
+        ],
         "parameters": [
           {
             "name": "organizationId",
@@ -76,7 +164,9 @@
       },
       "patch": {
         "operationId": "ClubController_update",
-        "tags": ["Clubs"],
+        "tags": [
+          "Clubs"
+        ],
         "parameters": [
           {
             "name": "organizationId",
@@ -142,6 +232,32 @@
                         "type": "null"
                       }
                     ]
+                  },
+                  "matchInviteLeadDays": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 30
+                  },
+                  "matchInviteReminderLeadDays": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 29
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "feeReminderDelaysDays": {
+                    "maxItems": 4,
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 60
+                    }
                   }
                 },
                 "additionalProperties": false,
@@ -167,7 +283,9 @@
     "/api/clubs/{organizationId}/members": {
       "get": {
         "operationId": "ClubController_listMembers",
-        "tags": ["Clubs"],
+        "tags": [
+          "Clubs"
+        ],
         "parameters": [
           {
             "name": "organizationId",
@@ -197,7 +315,9 @@
     "/api/clubs/{organizationId}/members/{memberId}/role": {
       "patch": {
         "operationId": "ClubController_updateRole",
-        "tags": ["Clubs"],
+        "tags": [
+          "Clubs"
+        ],
         "parameters": [
           {
             "name": "memberId",
@@ -229,10 +349,15 @@
                 "properties": {
                   "role": {
                     "type": "string",
-                    "enum": ["admin", "member"]
+                    "enum": [
+                      "admin",
+                      "member"
+                    ]
                   }
                 },
-                "required": ["role"],
+                "required": [
+                  "role"
+                ],
                 "additionalProperties": false,
                 "title": "UpdateMemberRoleSchema"
               }
@@ -253,10 +378,677 @@
         }
       }
     },
+    "/api/clubs/{organizationId}/members/{memberId}/avatar": {
+      "put": {
+        "operationId": "ClubController_uploadMemberAvatar",
+        "tags": [
+          "Clubs"
+        ],
+        "parameters": [
+          {
+            "name": "memberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Public URL of the current avatar, or null when the avatar was removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvatarSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "ClubController_removeMemberAvatar",
+        "tags": [
+          "Clubs"
+        ],
+        "parameters": [
+          {
+            "name": "memberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public URL of the current avatar, or null when the avatar was removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvatarSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/preferences": {
+      "get": {
+        "operationId": "NotificationController_getPreferences",
+        "tags": [
+          "Notifications"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferenceSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "NotificationController_updatePreferences",
+        "tags": [
+          "Notifications"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "emailEnabled": {
+                    "type": "boolean"
+                  },
+                  "pushEnabled": {
+                    "type": "boolean"
+                  },
+                  "notifyNewMatch": {
+                    "type": "boolean"
+                  },
+                  "notifyRsvpReminder": {
+                    "type": "boolean"
+                  },
+                  "notifyMatchCancelled": {
+                    "type": "boolean"
+                  },
+                  "notifyChatMention": {
+                    "type": "boolean"
+                  },
+                  "notifyAllChatMessages": {
+                    "type": "boolean"
+                  },
+                  "notifyPlayerVote": {
+                    "type": "boolean"
+                  },
+                  "notifyFeeRequest": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false,
+                "title": "UpdateNotificationPreferenceSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferenceSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/devices": {
+      "post": {
+        "operationId": "NotificationController_registerDevice",
+        "tags": [
+          "Notifications"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "platform": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android",
+                      "web"
+                    ]
+                  }
+                },
+                "required": [
+                  "token",
+                  "platform"
+                ],
+                "additionalProperties": false,
+                "title": "RegisterDeviceSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/notifications/unsubscribe": {
+      "get": {
+        "operationId": "UnsubscribeController_showUnsubscribe",
+        "tags": [
+          "Unsubscribe"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "operationId": "UnsubscribeController_unsubscribe",
+        "tags": [
+          "Unsubscribe"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/clubs/{organizationId}/matches/{matchId}/cost": {
+      "put": {
+        "operationId": "PaymentController_upsertCost",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "matchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pitchCostCents": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "extrasCostCents": {
+                    "default": 0,
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "pitchCostCents",
+                  "extrasCostCents"
+                ],
+                "additionalProperties": false,
+                "title": "UpsertMatchCostSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchCostSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "PaymentController_getCost",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "matchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchCostSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{organizationId}/matches/{matchId}/fees": {
+      "get": {
+        "operationId": "PaymentController_listFees",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "matchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Get_matches__matchId_fees"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{organizationId}/fees/{feeId}": {
+      "patch": {
+        "operationId": "PaymentController_updateFee",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "feeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "owed",
+                      "paid",
+                      "waived"
+                    ]
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "additionalProperties": false,
+                "title": "UpdateFeeStatusSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionFeeSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{organizationId}/fees/{feeId}/shares": {
+      "patch": {
+        "operationId": "PaymentController_updateFeeShares",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "feeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "shares": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 20
+                  }
+                },
+                "required": [
+                  "shares"
+                ],
+                "additionalProperties": false,
+                "title": "UpdateFeeSharesSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionFeeSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{organizationId}/matches/{matchId}/fees/remind": {
+      "post": {
+        "operationId": "PaymentController_remindUnpaid",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "matchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemindFeesResultSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{organizationId}/payment-link": {
+      "put": {
+        "operationId": "PaymentController_setPaymentLink",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "paymentLink": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "title": "ClubPaymentLinkSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClubPaymentLinkSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "PaymentController_getPaymentLink",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClubPaymentLinkSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clubs/{organizationId}/seasons": {
       "post": {
         "operationId": "SeasonController_create",
-        "tags": ["Seasons"],
+        "tags": [
+          "Seasons"
+        ],
         "parameters": [
           {
             "name": "organizationId",
@@ -287,7 +1079,10 @@
                     "type": "string"
                   }
                 },
-                "required": ["name", "startsAt"],
+                "required": [
+                  "name",
+                  "startsAt"
+                ],
                 "additionalProperties": false,
                 "title": "CreateSeasonSchema"
               }
@@ -309,7 +1104,9 @@
       },
       "get": {
         "operationId": "SeasonController_list",
-        "tags": ["Seasons"],
+        "tags": [
+          "Seasons"
+        ],
         "parameters": [
           {
             "name": "organizationId",
@@ -339,7 +1136,9 @@
     "/api/clubs/{organizationId}/seasons/{seasonId}": {
       "get": {
         "operationId": "SeasonController_get",
-        "tags": ["Seasons"],
+        "tags": [
+          "Seasons"
+        ],
         "parameters": [
           {
             "name": "seasonId",
@@ -377,7 +1176,9 @@
       },
       "patch": {
         "operationId": "SeasonController_update",
-        "tags": ["Seasons"],
+        "tags": [
+          "Seasons"
+        ],
         "parameters": [
           {
             "name": "seasonId",
@@ -426,7 +1227,10 @@
                   },
                   "status": {
                     "type": "string",
-                    "enum": ["active", "closed"]
+                    "enum": [
+                      "active",
+                      "closed"
+                    ]
                   }
                 },
                 "additionalProperties": false,
@@ -452,7 +1256,9 @@
     "/api/clubs/{organizationId}/matches": {
       "post": {
         "operationId": "MatchController_create",
-        "tags": ["Matches"],
+        "tags": [
+          "Matches"
+        ],
         "parameters": [
           {
             "name": "organizationId",
@@ -492,6 +1298,11 @@
                     "exclusiveMinimum": 0,
                     "maximum": 9007199254740991
                   },
+                  "pitchCostCents": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
                   "reminderOffsetsHours": {
                     "type": "array",
                     "items": {
@@ -505,7 +1316,12 @@
                     "properties": {
                       "frequency": {
                         "type": "string",
-                        "enum": ["weekly", "monthly", "monthly_nth_weekday", "custom"]
+                        "enum": [
+                          "weekly",
+                          "monthly",
+                          "monthly_nth_weekday",
+                          "custom"
+                        ]
                       },
                       "rrule": {
                         "type": "string"
@@ -519,11 +1335,18 @@
                         "maximum": 52
                       }
                     },
-                    "required": ["frequency"],
+                    "required": [
+                      "frequency"
+                    ],
                     "additionalProperties": false
                   }
                 },
-                "required": ["seasonId", "title", "startsAt", "maxCapacity"],
+                "required": [
+                  "seasonId",
+                  "title",
+                  "startsAt",
+                  "maxCapacity"
+                ],
                 "additionalProperties": false,
                 "title": "CreateMatchSchema"
               }
@@ -545,7 +1368,9 @@
       },
       "get": {
         "operationId": "MatchController_list",
-        "tags": ["Matches"],
+        "tags": [
+          "Matches"
+        ],
         "parameters": [
           {
             "name": "seasonId",
@@ -583,7 +1408,9 @@
     "/api/clubs/{organizationId}/matches/{matchId}": {
       "get": {
         "operationId": "MatchController_get",
-        "tags": ["Matches"],
+        "tags": [
+          "Matches"
+        ],
         "parameters": [
           {
             "name": "matchId",
@@ -621,7 +1448,9 @@
       },
       "patch": {
         "operationId": "MatchController_update",
-        "tags": ["Matches"],
+        "tags": [
+          "Matches"
+        ],
         "parameters": [
           {
             "name": "matchId",
@@ -736,7 +1565,9 @@
     "/api/clubs/{organizationId}/matches/{matchId}/cancel": {
       "post": {
         "operationId": "MatchController_cancel",
-        "tags": ["Matches"],
+        "tags": [
+          "Matches"
+        ],
         "parameters": [
           {
             "name": "matchId",
@@ -790,10 +1621,81 @@
         }
       }
     },
+    "/api/clubs/{organizationId}/matches/{matchId}/status": {
+      "post": {
+        "operationId": "MatchController_setStatus",
+        "tags": [
+          "Matches"
+        ],
+        "parameters": [
+          {
+            "name": "matchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "scheduled",
+                      "played"
+                    ]
+                  },
+                  "startsAt": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "additionalProperties": false,
+                "title": "SetMatchStatusSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clubs/{organizationId}/matches/{matchId}/played": {
       "post": {
         "operationId": "MatchController_markPlayed",
-        "tags": ["Matches"],
+        "tags": [
+          "Matches"
+        ],
         "parameters": [
           {
             "name": "matchId",
@@ -830,10 +1732,116 @@
         }
       }
     },
+    "/api/clubs/{organizationId}/matches/{matchId}/player-vote": {
+      "get": {
+        "operationId": "MatchController_getPlayerVote",
+        "tags": [
+          "Matches"
+        ],
+        "parameters": [
+          {
+            "name": "matchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerVoteStateSchema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "MatchController_castPlayerVote",
+        "tags": [
+          "Matches"
+        ],
+        "parameters": [
+          {
+            "name": "matchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nomineeUserId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": [
+                  "nomineeUserId"
+                ],
+                "additionalProperties": false,
+                "title": "CastPlayerVoteSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerVoteStateSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clubs/{organizationId}/matches/{matchId}/attendances": {
       "get": {
         "operationId": "MatchController_listAttendances",
-        "tags": ["Matches"],
+        "tags": [
+          "Matches"
+        ],
         "parameters": [
           {
             "name": "matchId",
@@ -873,7 +1881,9 @@
     "/api/clubs/{organizationId}/matches/{matchId}/attendances/me": {
       "post": {
         "operationId": "MatchController_respond",
-        "tags": ["Matches"],
+        "tags": [
+          "Matches"
+        ],
         "parameters": [
           {
             "name": "matchId",
@@ -905,10 +1915,15 @@
                 "properties": {
                   "status": {
                     "type": "string",
-                    "enum": ["present", "absent"]
+                    "enum": [
+                      "present",
+                      "absent"
+                    ]
                   }
                 },
-                "required": ["status"],
+                "required": [
+                  "status"
+                ],
                 "additionalProperties": false,
                 "title": "RespondAttendanceSchema"
               }
@@ -932,7 +1947,9 @@
     "/api/clubs/{organizationId}/matches/{matchId}/attendances/{userId}": {
       "patch": {
         "operationId": "MatchController_setAttendance",
-        "tags": ["Matches"],
+        "tags": [
+          "Matches"
+        ],
         "parameters": [
           {
             "name": "userId",
@@ -974,10 +1991,16 @@
                 "properties": {
                   "status": {
                     "type": "string",
-                    "enum": ["present", "absent", "pending"]
+                    "enum": [
+                      "present",
+                      "absent",
+                      "pending"
+                    ]
                   }
                 },
-                "required": ["status"],
+                "required": [
+                  "status"
+                ],
                 "additionalProperties": false,
                 "title": "SetAttendanceSchema"
               }
@@ -1001,7 +2024,9 @@
     "/api/clubs/{organizationId}/matches/{matchId}/lineups": {
       "get": {
         "operationId": "MatchController_listLineups",
-        "tags": ["Matches"],
+        "tags": [
+          "Matches"
+        ],
         "parameters": [
           {
             "name": "matchId",
@@ -1039,7 +2064,9 @@
       },
       "put": {
         "operationId": "MatchController_setLineup",
-        "tags": ["Matches"],
+        "tags": [
+          "Matches"
+        ],
         "parameters": [
           {
             "name": "matchId",
@@ -1081,15 +2108,23 @@
                         },
                         "team": {
                           "type": "string",
-                          "enum": ["blue", "red"]
+                          "enum": [
+                            "blue",
+                            "red"
+                          ]
                         }
                       },
-                      "required": ["userId", "team"],
+                      "required": [
+                        "userId",
+                        "team"
+                      ],
                       "additionalProperties": false
                     }
                   }
                 },
-                "required": ["assignments"],
+                "required": [
+                  "assignments"
+                ],
                 "additionalProperties": false,
                 "title": "SetLineupSchema"
               }
@@ -1113,7 +2148,9 @@
     "/api/clubs/{organizationId}/matches/{matchId}/lineups/{userId}": {
       "put": {
         "operationId": "MatchController_setPlayerTeam",
-        "tags": ["Matches"],
+        "tags": [
+          "Matches"
+        ],
         "parameters": [
           {
             "name": "userId",
@@ -1157,7 +2194,10 @@
                     "anyOf": [
                       {
                         "type": "string",
-                        "enum": ["blue", "red"]
+                        "enum": [
+                          "blue",
+                          "red"
+                        ]
                       },
                       {
                         "type": "null"
@@ -1165,7 +2205,9 @@
                     ]
                   }
                 },
-                "required": ["team"],
+                "required": [
+                  "team"
+                ],
                 "additionalProperties": false,
                 "title": "SetPlayerTeamSchema"
               }
@@ -1186,116 +2228,12 @@
         }
       }
     },
-    "/api/notifications/preferences": {
-      "get": {
-        "operationId": "NotificationController_getPreferences",
-        "tags": ["Notifications"],
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotificationPreferenceSchema"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "operationId": "NotificationController_updatePreferences",
-        "tags": ["Notifications"],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "emailEnabled": {
-                    "type": "boolean"
-                  },
-                  "pushEnabled": {
-                    "type": "boolean"
-                  },
-                  "notifyNewMatch": {
-                    "type": "boolean"
-                  },
-                  "notifyRsvpReminder": {
-                    "type": "boolean"
-                  },
-                  "notifyMatchCancelled": {
-                    "type": "boolean"
-                  },
-                  "notifyChatMention": {
-                    "type": "boolean"
-                  },
-                  "notifyAllChatMessages": {
-                    "type": "boolean"
-                  }
-                },
-                "additionalProperties": false,
-                "title": "UpdateNotificationPreferenceSchema"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotificationPreferenceSchema"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/notifications/devices": {
-      "post": {
-        "operationId": "NotificationController_registerDevice",
-        "tags": ["Notifications"],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "token": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "platform": {
-                    "type": "string",
-                    "enum": ["ios", "android", "web"]
-                  }
-                },
-                "required": ["token", "platform"],
-                "additionalProperties": false,
-                "title": "RegisterDeviceSchema"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        }
-      }
-    },
     "/api/clubs/{organizationId}/matches/{matchId}/stats": {
       "put": {
         "operationId": "StatsController_upsert",
-        "tags": ["Stats"],
+        "tags": [
+          "Stats"
+        ],
         "parameters": [
           {
             "name": "matchId",
@@ -1346,12 +2284,18 @@
                           "maximum": 9007199254740991
                         }
                       },
-                      "required": ["userId", "goals", "assists"],
+                      "required": [
+                        "userId",
+                        "goals",
+                        "assists"
+                      ],
                       "additionalProperties": false
                     }
                   }
                 },
-                "required": ["stats"],
+                "required": [
+                  "stats"
+                ],
                 "additionalProperties": false,
                 "title": "UpsertMatchStatsSchema"
               }
@@ -1373,7 +2317,9 @@
       },
       "get": {
         "operationId": "StatsController_listMatch",
-        "tags": ["Stats"],
+        "tags": [
+          "Stats"
+        ],
         "parameters": [
           {
             "name": "matchId",
@@ -1413,7 +2359,9 @@
     "/api/clubs/{organizationId}/seasons/{seasonId}/stats": {
       "get": {
         "operationId": "StatsController_seasonStats",
-        "tags": ["Stats"],
+        "tags": [
+          "Stats"
+        ],
         "parameters": [
           {
             "name": "seasonId",
@@ -1453,7 +2401,9 @@
     "/api/clubs/{organizationId}/home-stats": {
       "get": {
         "operationId": "StatsController_homeStats",
-        "tags": ["Stats"],
+        "tags": [
+          "Stats"
+        ],
         "parameters": [
           {
             "name": "organizationId",
@@ -1480,10 +2430,165 @@
         }
       }
     },
+    "/api/clubs/{organizationId}/players/{userId}": {
+      "get": {
+        "operationId": "StatsController_playerDetail",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerDetailSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clubs/{organizationId}/players/{userId}/skills": {
+      "put": {
+        "operationId": "StatsController_updatePlayerSkills",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "skills": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "enum": [
+                            "defense",
+                            "attack",
+                            "passing",
+                            "shooting",
+                            "vision",
+                            "endurance",
+                            "physical",
+                            "goalkeeping",
+                            "dribbling",
+                            "rebounding",
+                            "speed",
+                            "serve",
+                            "reception",
+                            "setting",
+                            "block",
+                            "positioning",
+                            "reading",
+                            "forehand",
+                            "backhand",
+                            "volley",
+                            "smash",
+                            "footwork",
+                            "consistency",
+                            "bandeja",
+                            "walls",
+                            "clear",
+                            "drop",
+                            "netPlay"
+                          ]
+                        },
+                        "value": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 10
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "value"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "skills"
+                ],
+                "additionalProperties": false,
+                "title": "UpdatePlayerSkillsSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerSkillRatingsSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/clubs/{organizationId}/matches/{matchId}/messages": {
       "get": {
         "operationId": "ChatController_list",
-        "tags": ["Chat"],
+        "tags": [
+          "Chat"
+        ],
         "parameters": [
           {
             "name": "matchId",
@@ -1521,7 +2626,9 @@
       },
       "post": {
         "operationId": "ChatController_post",
-        "tags": ["Chat"],
+        "tags": [
+          "Chat"
+        ],
         "parameters": [
           {
             "name": "matchId",
@@ -1565,7 +2672,9 @@
                     }
                   }
                 },
-                "required": ["body"],
+                "required": [
+                  "body"
+                ],
                 "additionalProperties": false,
                 "title": "CreateMatchMessageSchema"
               }
@@ -1585,296 +2694,83 @@
           }
         }
       }
-    },
-    "/api/clubs/{organizationId}/matches/{matchId}/cost": {
-      "put": {
-        "operationId": "PaymentController_upsertCost",
-        "tags": ["Payments"],
-        "parameters": [
-          {
-            "name": "matchId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            }
-          },
-          {
-            "name": "organizationId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "pitchCostCents": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 9007199254740991
-                  },
-                  "extrasCostCents": {
-                    "default": 0,
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 9007199254740991
-                  }
-                },
-                "required": ["pitchCostCents", "extrasCostCents"],
-                "additionalProperties": false,
-                "title": "UpsertMatchCostSchema"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MatchCostSchema"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "operationId": "PaymentController_getCost",
-        "tags": ["Payments"],
-        "parameters": [
-          {
-            "name": "matchId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            }
-          },
-          {
-            "name": "organizationId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MatchCostSchema"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clubs/{organizationId}/matches/{matchId}/fees": {
-      "get": {
-        "operationId": "PaymentController_listFees",
-        "tags": ["Payments"],
-        "parameters": [
-          {
-            "name": "matchId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            }
-          },
-          {
-            "name": "organizationId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Get_matches__matchId_fees"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clubs/{organizationId}/fees/{feeId}": {
-      "patch": {
-        "operationId": "PaymentController_updateFee",
-        "tags": ["Payments"],
-        "parameters": [
-          {
-            "name": "feeId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            }
-          },
-          {
-            "name": "organizationId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "status": {
-                    "type": "string",
-                    "enum": ["owed", "paid", "waived"]
-                  }
-                },
-                "required": ["status"],
-                "additionalProperties": false,
-                "title": "UpdateFeeStatusSchema"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SessionFeeSchema"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/clubs/{organizationId}/payment-link": {
-      "put": {
-        "operationId": "PaymentController_setPaymentLink",
-        "tags": ["Payments"],
-        "parameters": [
-          {
-            "name": "organizationId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "paymentLink": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "format": "uri"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
-                },
-                "additionalProperties": false,
-                "title": "ClubPaymentLinkSchema"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClubPaymentLinkSchema"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "operationId": "PaymentController_getPaymentLink",
-        "tags": ["Payments"],
-        "parameters": [
-          {
-            "name": "organizationId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ClubPaymentLinkSchema"
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
     "schemas": {
+      "UpsertMatchCostSchema": {
+        "type": "object",
+        "properties": {
+          "pitchCostCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "extrasCostCents": {
+            "default": 0,
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "pitchCostCents",
+          "extrasCostCents"
+        ],
+        "additionalProperties": false,
+        "title": "UpsertMatchCostSchema"
+      },
+      "UpdateFeeStatusSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "owed",
+              "paid",
+              "waived"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false,
+        "title": "UpdateFeeStatusSchema"
+      },
+      "UpdateFeeSharesSchema": {
+        "type": "object",
+        "properties": {
+          "shares": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          }
+        },
+        "required": [
+          "shares"
+        ],
+        "additionalProperties": false,
+        "title": "UpdateFeeSharesSchema"
+      },
+      "ClubPaymentLinkSchema": {
+        "type": "object",
+        "properties": {
+          "paymentLink": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "title": "ClubPaymentLinkSchema"
+      },
       "UpdateNotificationPreferenceSchema": {
         "type": "object",
         "properties": {
@@ -1898,6 +2794,12 @@
           },
           "notifyAllChatMessages": {
             "type": "boolean"
+          },
+          "notifyPlayerVote": {
+            "type": "boolean"
+          },
+          "notifyFeeRequest": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false,
@@ -1912,10 +2814,17 @@
           },
           "platform": {
             "type": "string",
-            "enum": ["ios", "android", "web"]
+            "enum": [
+              "ios",
+              "android",
+              "web"
+            ]
           }
         },
-        "required": ["token", "platform"],
+        "required": [
+          "token",
+          "platform"
+        ],
         "additionalProperties": false,
         "title": "RegisterDeviceSchema"
       },
@@ -1936,7 +2845,9 @@
             }
           }
         },
-        "required": ["body"],
+        "required": [
+          "body"
+        ],
         "additionalProperties": false,
         "title": "CreateMatchMessageSchema"
       },
@@ -1989,6 +2900,32 @@
                 "type": "null"
               }
             ]
+          },
+          "matchInviteLeadDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 30
+          },
+          "matchInviteReminderLeadDays": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 29
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "feeReminderDelaysDays": {
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60
+            }
           }
         },
         "additionalProperties": false,
@@ -1999,10 +2936,15 @@
         "properties": {
           "role": {
             "type": "string",
-            "enum": ["admin", "member"]
+            "enum": [
+              "admin",
+              "member"
+            ]
           }
         },
-        "required": ["role"],
+        "required": [
+          "role"
+        ],
         "additionalProperties": false,
         "title": "UpdateMemberRoleSchema"
       },
@@ -2029,6 +2971,11 @@
             "exclusiveMinimum": 0,
             "maximum": 9007199254740991
           },
+          "pitchCostCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
           "reminderOffsetsHours": {
             "type": "array",
             "items": {
@@ -2042,7 +2989,12 @@
             "properties": {
               "frequency": {
                 "type": "string",
-                "enum": ["weekly", "monthly", "monthly_nth_weekday", "custom"]
+                "enum": [
+                  "weekly",
+                  "monthly",
+                  "monthly_nth_weekday",
+                  "custom"
+                ]
               },
               "rrule": {
                 "type": "string"
@@ -2056,11 +3008,18 @@
                 "maximum": 52
               }
             },
-            "required": ["frequency"],
+            "required": [
+              "frequency"
+            ],
             "additionalProperties": false
           }
         },
-        "required": ["seasonId", "title", "startsAt", "maxCapacity"],
+        "required": [
+          "seasonId",
+          "title",
+          "startsAt",
+          "maxCapacity"
+        ],
         "additionalProperties": false,
         "title": "CreateMatchSchema"
       },
@@ -2142,15 +3101,55 @@
         "additionalProperties": false,
         "title": "CancelMatchSchema"
       },
+      "SetMatchStatusSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "played"
+            ]
+          },
+          "startsAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false,
+        "title": "SetMatchStatusSchema"
+      },
+      "CastPlayerVoteSchema": {
+        "type": "object",
+        "properties": {
+          "nomineeUserId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "nomineeUserId"
+        ],
+        "additionalProperties": false,
+        "title": "CastPlayerVoteSchema"
+      },
       "RespondAttendanceSchema": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["present", "absent"]
+            "enum": [
+              "present",
+              "absent"
+            ]
           }
         },
-        "required": ["status"],
+        "required": [
+          "status"
+        ],
         "additionalProperties": false,
         "title": "RespondAttendanceSchema"
       },
@@ -2159,10 +3158,16 @@
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["present", "absent", "pending"]
+            "enum": [
+              "present",
+              "absent",
+              "pending"
+            ]
           }
         },
-        "required": ["status"],
+        "required": [
+          "status"
+        ],
         "additionalProperties": false,
         "title": "SetAttendanceSchema"
       },
@@ -2181,15 +3186,23 @@
                 },
                 "team": {
                   "type": "string",
-                  "enum": ["blue", "red"]
+                  "enum": [
+                    "blue",
+                    "red"
+                  ]
                 }
               },
-              "required": ["userId", "team"],
+              "required": [
+                "userId",
+                "team"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["assignments"],
+        "required": [
+          "assignments"
+        ],
         "additionalProperties": false,
         "title": "SetLineupSchema"
       },
@@ -2200,7 +3213,10 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": ["blue", "red"]
+                "enum": [
+                  "blue",
+                  "red"
+                ]
               },
               {
                 "type": "null"
@@ -2208,58 +3224,11 @@
             ]
           }
         },
-        "required": ["team"],
+        "required": [
+          "team"
+        ],
         "additionalProperties": false,
         "title": "SetPlayerTeamSchema"
-      },
-      "UpsertMatchCostSchema": {
-        "type": "object",
-        "properties": {
-          "pitchCostCents": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "extrasCostCents": {
-            "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          }
-        },
-        "required": ["pitchCostCents", "extrasCostCents"],
-        "additionalProperties": false,
-        "title": "UpsertMatchCostSchema"
-      },
-      "UpdateFeeStatusSchema": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": ["owed", "paid", "waived"]
-          }
-        },
-        "required": ["status"],
-        "additionalProperties": false,
-        "title": "UpdateFeeStatusSchema"
-      },
-      "ClubPaymentLinkSchema": {
-        "type": "object",
-        "properties": {
-          "paymentLink": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uri"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "additionalProperties": false,
-        "title": "ClubPaymentLinkSchema"
       },
       "CreateSeasonSchema": {
         "type": "object",
@@ -2275,7 +3244,10 @@
             "type": "string"
           }
         },
-        "required": ["name", "startsAt"],
+        "required": [
+          "name",
+          "startsAt"
+        ],
         "additionalProperties": false,
         "title": "CreateSeasonSchema"
       },
@@ -2301,7 +3273,10 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "closed"]
+            "enum": [
+              "active",
+              "closed"
+            ]
           }
         },
         "additionalProperties": false,
@@ -2331,14 +3306,256 @@
                   "maximum": 9007199254740991
                 }
               },
-              "required": ["userId", "goals", "assists"],
+              "required": [
+                "userId",
+                "goals",
+                "assists"
+              ],
               "additionalProperties": false
             }
           }
         },
-        "required": ["stats"],
+        "required": [
+          "stats"
+        ],
         "additionalProperties": false,
         "title": "UpsertMatchStatsSchema"
+      },
+      "UpdatePlayerSkillsSchema": {
+        "type": "object",
+        "properties": {
+          "skills": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "enum": [
+                    "defense",
+                    "attack",
+                    "passing",
+                    "shooting",
+                    "vision",
+                    "endurance",
+                    "physical",
+                    "goalkeeping",
+                    "dribbling",
+                    "rebounding",
+                    "speed",
+                    "serve",
+                    "reception",
+                    "setting",
+                    "block",
+                    "positioning",
+                    "reading",
+                    "forehand",
+                    "backhand",
+                    "volley",
+                    "smash",
+                    "footwork",
+                    "consistency",
+                    "bandeja",
+                    "walls",
+                    "clear",
+                    "drop",
+                    "netPlay"
+                  ]
+                },
+                "value": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                }
+              },
+              "required": [
+                "key",
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "skills"
+        ],
+        "additionalProperties": false,
+        "title": "UpdatePlayerSkillsSchema"
+      },
+      "AvatarSchema": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "image"
+        ],
+        "additionalProperties": false,
+        "title": "AvatarSchema",
+        "description": "Public URL of the current avatar, or null when the avatar was removed"
+      },
+      "MatchCostSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "matchId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "pitchCostCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "extrasCostCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "perPlayerCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "presentCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id",
+          "matchId",
+          "pitchCostCents",
+          "extrasCostCents"
+        ],
+        "additionalProperties": false,
+        "title": "MatchCostSchema"
+      },
+      "SessionFeeSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "matchId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "amountCents": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "shares": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "owed",
+              "paid",
+              "waived"
+            ]
+          },
+          "paidAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reminderCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "lastRemindedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "paymentUrl": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "matchId",
+          "userId",
+          "userName",
+          "amountCents",
+          "shares",
+          "status",
+          "reminderCount"
+        ],
+        "additionalProperties": false,
+        "title": "SessionFeeSchema"
+      },
+      "Get_matches__matchId_fees": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SessionFeeSchema"
+        }
+      },
+      "RemindFeesResultSchema": {
+        "type": "object",
+        "properties": {
+          "remindedCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "remindedCount"
+        ],
+        "additionalProperties": false,
+        "title": "RemindFeesResultSchema"
       },
       "NotificationPreferenceSchema": {
         "type": "object",
@@ -2368,6 +3585,12 @@
           },
           "notifyAllChatMessages": {
             "type": "boolean"
+          },
+          "notifyPlayerVote": {
+            "type": "boolean"
+          },
+          "notifyFeeRequest": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -2378,7 +3601,9 @@
           "notifyRsvpReminder",
           "notifyMatchCancelled",
           "notifyChatMention",
-          "notifyAllChatMessages"
+          "notifyAllChatMessages",
+          "notifyPlayerVote",
+          "notifyFeeRequest"
         ],
         "additionalProperties": false,
         "title": "NotificationPreferenceSchema"
@@ -2403,6 +3628,16 @@
           },
           "authorName": {
             "type": "string"
+          },
+          "authorImage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "body": {
             "type": "string"
@@ -2520,11 +3755,43 @@
               }
             ]
           },
+          "matchInviteLeadDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 30
+          },
+          "matchInviteReminderLeadDays": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 29
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "feeReminderDelaysDays": {
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60
+            }
+          },
           "createdAt": {
             "type": "string"
           }
         },
-        "required": ["id", "name", "createdAt"],
+        "required": [
+          "id",
+          "name",
+          "matchInviteLeadDays",
+          "feeReminderDelaysDays",
+          "createdAt"
+        ],
         "additionalProperties": false,
         "title": "ClubSchema"
       },
@@ -2579,15 +3846,36 @@
               }
             ]
           },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "role": {
             "type": "string",
-            "enum": ["owner", "admin", "member"]
+            "enum": [
+              "owner",
+              "admin",
+              "member"
+            ]
           },
           "createdAt": {
             "type": "string"
           }
         },
-        "required": ["id", "userId", "name", "email", "role", "createdAt"],
+        "required": [
+          "id",
+          "userId",
+          "name",
+          "email",
+          "role",
+          "createdAt"
+        ],
         "additionalProperties": false,
         "title": "ClubMemberSchema"
       },
@@ -2650,7 +3938,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["scheduled", "cancelled", "played"]
+            "enum": [
+              "scheduled",
+              "cancelled",
+              "played"
+            ]
           },
           "blueScore": {
             "anyOf": [
@@ -2700,7 +3992,10 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": ["blue", "red"]
+                "enum": [
+                  "blue",
+                  "red"
+                ]
               },
               {
                 "type": "null"
@@ -2740,6 +4035,127 @@
           "$ref": "#/components/schemas/MatchSchema"
         }
       },
+      "PlayerVoteStateSchema": {
+        "type": "object",
+        "properties": {
+          "phase": {
+            "type": "string",
+            "enum": [
+              "unavailable",
+              "open",
+              "closed"
+            ]
+          },
+          "closesAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "canVote": {
+            "type": "boolean"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerVotePlayerSchema"
+            }
+          },
+          "myNomineeUserId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "winner": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "userName": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "userId",
+                  "userName"
+                ],
+                "additionalProperties": false,
+                "title": "PlayerVotePlayerSchema"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isTie": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "phase",
+          "canVote",
+          "candidates",
+          "winner",
+          "isTie"
+        ],
+        "additionalProperties": false,
+        "title": "PlayerVoteStateSchema"
+      },
+      "PlayerVotePlayerSchema": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "userId",
+          "userName"
+        ],
+        "additionalProperties": false,
+        "title": "PlayerVotePlayerSchema"
+      },
       "AttendanceSchema": {
         "type": "object",
         "properties": {
@@ -2761,9 +4177,23 @@
           "userName": {
             "type": "string"
           },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "status": {
             "type": "string",
-            "enum": ["present", "absent", "pending"]
+            "enum": [
+              "present",
+              "absent",
+              "pending"
+            ]
           },
           "respondedAt": {
             "anyOf": [
@@ -2776,7 +4206,13 @@
             ]
           }
         },
-        "required": ["id", "matchId", "userId", "userName", "status"],
+        "required": [
+          "id",
+          "matchId",
+          "userId",
+          "userName",
+          "status"
+        ],
         "additionalProperties": false,
         "title": "AttendanceSchema"
       },
@@ -2807,12 +4243,31 @@
           "userName": {
             "type": "string"
           },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "team": {
             "type": "string",
-            "enum": ["blue", "red"]
+            "enum": [
+              "blue",
+              "red"
+            ]
           }
         },
-        "required": ["id", "matchId", "userId", "userName", "team"],
+        "required": [
+          "id",
+          "matchId",
+          "userId",
+          "userName",
+          "team"
+        ],
         "additionalProperties": false,
         "title": "LineupSchema"
       },
@@ -2832,95 +4287,6 @@
         "type": "array",
         "items": {
           "$ref": "#/components/schemas/LineupSchema"
-        }
-      },
-      "MatchCostSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-          },
-          "matchId": {
-            "type": "string",
-            "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-          },
-          "pitchCostCents": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "extrasCostCents": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "perPlayerCents": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
-          },
-          "presentCount": {
-            "type": "integer",
-            "minimum": -9007199254740991,
-            "maximum": 9007199254740991
-          }
-        },
-        "required": ["id", "matchId", "pitchCostCents", "extrasCostCents"],
-        "additionalProperties": false,
-        "title": "MatchCostSchema"
-      },
-      "SessionFeeSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-          },
-          "matchId": {
-            "type": "string",
-            "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-          },
-          "userName": {
-            "type": "string"
-          },
-          "amountCents": {
-            "type": "integer",
-            "minimum": -9007199254740991,
-            "maximum": 9007199254740991
-          },
-          "status": {
-            "type": "string",
-            "enum": ["owed", "paid", "waived"]
-          },
-          "paidAt": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "required": ["id", "matchId", "userId", "userName", "amountCents", "status"],
-        "additionalProperties": false,
-        "title": "SessionFeeSchema"
-      },
-      "Get_matches__matchId_fees": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/SessionFeeSchema"
         }
       },
       "SeasonSchema": {
@@ -2954,13 +4320,23 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "closed"]
+            "enum": [
+              "active",
+              "closed"
+            ]
           },
           "createdAt": {
             "type": "string"
           }
         },
-        "required": ["id", "organizationId", "name", "startsAt", "status", "createdAt"],
+        "required": [
+          "id",
+          "organizationId",
+          "name",
+          "startsAt",
+          "status",
+          "createdAt"
+        ],
         "additionalProperties": false,
         "title": "SeasonSchema"
       },
@@ -2985,6 +4361,16 @@
           "userName": {
             "type": "string"
           },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "goals": {
             "type": "integer",
             "minimum": 0,
@@ -2996,7 +4382,14 @@
             "maximum": 9007199254740991
           }
         },
-        "required": ["id", "matchId", "userId", "userName", "goals", "assists"],
+        "required": [
+          "id",
+          "matchId",
+          "userId",
+          "userName",
+          "goals",
+          "assists"
+        ],
         "additionalProperties": false,
         "title": "MatchStatSchema"
       },
@@ -3023,6 +4416,16 @@
           "userName": {
             "type": "string"
           },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "goals": {
             "type": "integer",
             "minimum": -9007199254740991,
@@ -3039,7 +4442,13 @@
             "maximum": 9007199254740991
           }
         },
-        "required": ["userId", "userName", "goals", "assists", "matchesPlayed"],
+        "required": [
+          "userId",
+          "userName",
+          "goals",
+          "assists",
+          "matchesPlayed"
+        ],
         "additionalProperties": false,
         "title": "SeasonPlayerStatSchema"
       },
@@ -3066,7 +4475,10 @@
                     "type": "string"
                   }
                 },
-                "required": ["id", "name"],
+                "required": [
+                  "id",
+                  "name"
+                ],
                 "additionalProperties": false
               },
               {
@@ -3081,7 +4493,11 @@
             "$ref": "#/components/schemas/PersonalHomeStatsSchema"
           }
         },
-        "required": ["season", "club", "me"],
+        "required": [
+          "season",
+          "club",
+          "me"
+        ],
         "additionalProperties": false,
         "title": "SeasonHomeStatsSchema"
       },
@@ -3106,13 +4522,27 @@
                   "userName": {
                     "type": "string"
                   },
+                  "image": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
                   "value": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 9007199254740991
                   }
                 },
-                "required": ["userId", "userName", "value"],
+                "required": [
+                  "userId",
+                  "userName",
+                  "value"
+                ],
                 "additionalProperties": false,
                 "title": "PlayerHighlightSchema"
               },
@@ -3134,13 +4564,27 @@
                   "userName": {
                     "type": "string"
                   },
+                  "image": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
                   "value": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 9007199254740991
                   }
                 },
-                "required": ["userId", "userName", "value"],
+                "required": [
+                  "userId",
+                  "userName",
+                  "value"
+                ],
                 "additionalProperties": false,
                 "title": "PlayerHighlightSchema"
               },
@@ -3162,13 +4606,27 @@
                   "userName": {
                     "type": "string"
                   },
+                  "image": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
                   "value": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 9007199254740991
                   }
                 },
-                "required": ["userId", "userName", "value"],
+                "required": [
+                  "userId",
+                  "userName",
+                  "value"
+                ],
                 "additionalProperties": false,
                 "title": "PlayerHighlightSchema"
               },
@@ -3192,9 +4650,22 @@
                       },
                       "userName": {
                         "type": "string"
+                      },
+                      "image": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       }
                     },
-                    "required": ["userId", "userName"],
+                    "required": [
+                      "userId",
+                      "userName"
+                    ],
                     "additionalProperties": false,
                     "title": "PlayerRefSchema"
                   },
@@ -3208,9 +4679,22 @@
                       },
                       "userName": {
                         "type": "string"
+                      },
+                      "image": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       }
                     },
-                    "required": ["userId", "userName"],
+                    "required": [
+                      "userId",
+                      "userName"
+                    ],
                     "additionalProperties": false,
                     "title": "PlayerRefSchema"
                   },
@@ -3220,7 +4704,11 @@
                     "maximum": 9007199254740991
                   }
                 },
-                "required": ["playerA", "playerB", "matchesTogether"],
+                "required": [
+                  "playerA",
+                  "playerB",
+                  "matchesTogether"
+                ],
                 "additionalProperties": false,
                 "title": "PlayedTogetherSchema"
               },
@@ -3228,9 +4716,65 @@
                 "type": "null"
               }
             ]
+          },
+          "lastElectedPlayer": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "userName": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "userId",
+                  "userName"
+                ],
+                "additionalProperties": false,
+                "title": "PlayerRefSchema"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "openPlayerVoteMatchId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
-        "required": ["matchesPlayed", "topScorer", "mostWins", "mostLosses", "mostPlayedTogether"],
+        "required": [
+          "matchesPlayed",
+          "topScorer",
+          "mostWins",
+          "mostLosses",
+          "mostPlayedTogether",
+          "lastElectedPlayer",
+          "openPlayerVoteMatchId"
+        ],
         "additionalProperties": false,
         "title": "ClubHomeStatsSchema"
       },
@@ -3258,9 +4802,307 @@
             "maximum": 9007199254740991
           }
         },
-        "required": ["matchesPlayed", "goals", "wins", "losses"],
+        "required": [
+          "matchesPlayed",
+          "goals",
+          "wins",
+          "losses"
+        ],
         "additionalProperties": false,
         "title": "PersonalHomeStatsSchema"
+      },
+      "PlayerDetailSchema": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "admin",
+              "member"
+            ]
+          },
+          "memberSince": {
+            "type": "string"
+          },
+          "season": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stats": {
+            "$ref": "#/components/schemas/PlayerSeasonStatsSchema"
+          },
+          "skillRatings": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "sportType": {
+                    "type": "string",
+                    "enum": [
+                      "football",
+                      "futsal",
+                      "basketball",
+                      "volleyball",
+                      "tennis",
+                      "padel",
+                      "badminton",
+                      "other"
+                    ]
+                  },
+                  "skills": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "enum": [
+                            "defense",
+                            "attack",
+                            "passing",
+                            "shooting",
+                            "vision",
+                            "endurance",
+                            "physical",
+                            "goalkeeping",
+                            "dribbling",
+                            "rebounding",
+                            "speed",
+                            "serve",
+                            "reception",
+                            "setting",
+                            "block",
+                            "positioning",
+                            "reading",
+                            "forehand",
+                            "backhand",
+                            "volley",
+                            "smash",
+                            "footwork",
+                            "consistency",
+                            "bandeja",
+                            "walls",
+                            "clear",
+                            "drop",
+                            "netPlay"
+                          ]
+                        },
+                        "value": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 10
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "value"
+                      ],
+                      "additionalProperties": false,
+                      "title": "PlayerSkillRatingSchema"
+                    }
+                  }
+                },
+                "required": [
+                  "sportType",
+                  "skills"
+                ],
+                "additionalProperties": false,
+                "title": "PlayerSkillRatingsSchema"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "userId",
+          "name",
+          "email",
+          "role",
+          "memberSince",
+          "season",
+          "stats",
+          "skillRatings"
+        ],
+        "additionalProperties": false,
+        "title": "PlayerDetailSchema"
+      },
+      "PlayerSeasonStatsSchema": {
+        "type": "object",
+        "properties": {
+          "matchesPlayed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "goals": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "assists": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "wins": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "losses": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "matchesPlayed",
+          "goals",
+          "assists",
+          "wins",
+          "losses"
+        ],
+        "additionalProperties": false,
+        "title": "PlayerSeasonStatsSchema"
+      },
+      "PlayerSkillRatingsSchema": {
+        "type": "object",
+        "properties": {
+          "sportType": {
+            "type": "string",
+            "enum": [
+              "football",
+              "futsal",
+              "basketball",
+              "volleyball",
+              "tennis",
+              "padel",
+              "badminton",
+              "other"
+            ]
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerSkillRatingSchema"
+            }
+          }
+        },
+        "required": [
+          "sportType",
+          "skills"
+        ],
+        "additionalProperties": false,
+        "title": "PlayerSkillRatingsSchema"
+      },
+      "PlayerSkillRatingSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "defense",
+              "attack",
+              "passing",
+              "shooting",
+              "vision",
+              "endurance",
+              "physical",
+              "goalkeeping",
+              "dribbling",
+              "rebounding",
+              "speed",
+              "serve",
+              "reception",
+              "setting",
+              "block",
+              "positioning",
+              "reading",
+              "forehand",
+              "backhand",
+              "volley",
+              "smash",
+              "footwork",
+              "consistency",
+              "bandeja",
+              "walls",
+              "clear",
+              "drop",
+              "netPlay"
+            ]
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ],
+        "additionalProperties": false,
+        "title": "PlayerSkillRatingSchema"
+      },
+      "PaymentController_organizationId": {
+        "type": "string"
       },
       "ChatController_organizationId": {
         "type": "string"
@@ -3269,9 +5111,6 @@
         "type": "string"
       },
       "MatchController_organizationId": {
-        "type": "string"
-      },
-      "PaymentController_organizationId": {
         "type": "string"
       },
       "SeasonController_organizationId": {

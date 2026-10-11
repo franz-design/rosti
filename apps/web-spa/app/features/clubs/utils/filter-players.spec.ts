@@ -25,7 +25,9 @@ describe('filterPlayersByName', () => {
   })
 
   it('requires every word of the query', () => {
-    expect(filterPlayersByName(inputPlayers, 'marie curie').map((player) => player.id)).toEqual(['3'])
+    expect(filterPlayersByName(inputPlayers, 'marie curie').map((player) => player.id)).toEqual([
+      '3',
+    ])
     expect(filterPlayersByName(inputPlayers, 'jean martin')).toEqual([])
   })
 })

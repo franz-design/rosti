@@ -2,7 +2,7 @@ import { Badge } from '@rosti/ui/components/primitives/badge'
 import { TabsList, TabsTrigger } from '@rosti/ui/components/primitives/tabs'
 import { useTranslation } from 'react-i18next'
 
-export const MATCH_DETAIL_TABS = ['summary', 'chat', 'stats'] as const
+export const MATCH_DETAIL_TABS = ['summary', 'chat', 'stats', 'payments'] as const
 export type MatchTab = (typeof MATCH_DETAIL_TABS)[number]
 export const DEFAULT_MATCH_DETAIL_TAB: MatchTab = 'summary'
 
@@ -14,7 +14,7 @@ export function MatchDetailTabsList({ unreadMessageCount }: MatchDetailTabsListP
   const { t } = useTranslation()
 
   return (
-    <TabsList className="h-9 w-full justify-start gap-1 rounded-lg border border-border bg-muted p-1">
+    <TabsList className="no-scrollbar h-9 w-full justify-start gap-1 overflow-x-auto rounded-lg border border-border bg-muted p-1">
       <TabsTrigger value="summary" className="px-3">
         {t('matches.detail.tabs.summary')}
       </TabsTrigger>
@@ -26,6 +26,9 @@ export function MatchDetailTabsList({ unreadMessageCount }: MatchDetailTabsListP
       </TabsTrigger>
       <TabsTrigger value="stats" className="px-3">
         {t('matches.detail.tabs.stats')}
+      </TabsTrigger>
+      <TabsTrigger value="payments" className="px-3">
+        {t('matches.detail.tabs.payments')}
       </TabsTrigger>
     </TabsList>
   )

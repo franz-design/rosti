@@ -43,6 +43,7 @@ function toClubDto(o: Organization): ClubDto {
     defaultMaxCapacity: o.defaultMaxCapacity,
     matchInviteLeadDays: o.matchInviteLeadDays,
     matchInviteReminderLeadDays: o.matchInviteReminderLeadDays,
+    feeReminderDelaysDays: o.feeReminderDelaysDays,
     createdAt: o.createdAt,
   }
 }

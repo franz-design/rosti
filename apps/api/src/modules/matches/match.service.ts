@@ -4,6 +4,8 @@ import { Organization, User } from '../auth/auth.entity'
 import { OrganizationService } from '../auth/organization.service'
 import { ScheduledJobType } from '../notifications/contracts/notification.contract'
 import { NotificationService } from '../notifications/notification.service'
+import { MatchCost } from '../payments/match-cost.entity'
+import { PaymentService } from '../payments/payment.service'
 import { Season } from '../seasons/season.entity'
 import {
   CancelMatchInput,
@@ -29,6 +31,7 @@ export class MatchService {
     private readonly organizationService: OrganizationService,
     private readonly notificationService: NotificationService,
     private readonly playerVoteService: PlayerVoteService,
+    private readonly paymentService: PaymentService,
   ) {}
 
   async create(organizationId: string, userId: string, data: CreateMatchInput): Promise<Match[]> {
@@ -78,6 +81,12 @@ export class MatchService {
       match.createdBy = createdBy
       match.status = MatchStatus.Scheduled
       this.em.persist(match)
+      if (data.pitchCostCents != null && data.pitchCostCents > 0) {
+        const cost = new MatchCost()
+        cost.match = match
+        cost.pitchCostCents = data.pitchCostCents
+        this.em.persist(cost)
+      }
       matches.push(match)
     }
 
@@ -86,6 +95,7 @@ export class MatchService {
     for (const match of matches) {
       await this.seedPendingAttendances(match)
       await this.notificationService.scheduleScoreReminder(match)
+      await this.notificationService.scheduleFeeRequest(match)
     }
     await this.notificationService.syncUpcomingMatchInvites(organization.id)
 
@@ -276,6 +286,7 @@ export class MatchService {
     attendance.status = data.status
     attendance.respondedAt = new Date()
     await this.em.flush()
+    await this.paymentService.recomputeFees(matchId)
     return attendance
   }
 
@@ -337,6 +348,7 @@ export class MatchService {
 
     await this.em.flush()
     await this.playerVoteService.sync(match)
+    await this.paymentService.recomputeFees(matchId)
     return attendance
   }
 
@@ -372,6 +384,7 @@ export class MatchService {
     }
     await this.em.flush()
     await this.playerVoteService.sync(match)
+    await this.paymentService.recomputeFees(matchId)
     return lineups
   }
 
@@ -429,6 +442,7 @@ export class MatchService {
 
     await this.em.flush()
     await this.playerVoteService.sync(match)
+    await this.paymentService.recomputeFees(matchId)
     return this.listLineups(organizationId, adminUserId, matchId)
   }
 

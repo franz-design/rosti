@@ -9,13 +9,13 @@ Hosts, DNS, and the three Dokploy services are described in [Production infrastr
 
 ## Architecture
 
-| Service | Image / artifact | Role |
-|---------|------------------|------|
-| `api` | `ghcr.io/fan17-design/rosti-api` | NestJS API + Better Auth + jobs |
-| `web-spa` | `ghcr.io/fan17-design/rosti-web-spa` | Authenticated app, installable as a PWA |
-| `db` | PostgreSQL in Dokploy | Primary data store, internal only |
-| SMTP | Resend | Transactional email |
-| Redis (optional) | Dokploy | Future BullMQ; current jobs use `@nestjs/schedule` + `scheduled_job` table |
+| Service          | Image / artifact                     | Role                                                                       |
+| ---------------- | ------------------------------------ | -------------------------------------------------------------------------- |
+| `api`            | `ghcr.io/fan17-design/rosti-api`     | NestJS API + Better Auth + jobs                                            |
+| `web-spa`        | `ghcr.io/fan17-design/rosti-web-spa` | Authenticated app, installable as a PWA                                    |
+| `db`             | PostgreSQL in Dokploy                | Primary data store, internal only                                          |
+| SMTP             | Resend                               | Transactional email                                                        |
+| Redis (optional) | Dokploy                              | Future BullMQ; current jobs use `@nestjs/schedule` + `scheduled_job` table |
 
 Pipeline: merge to `main` builds a SHA image (`push-to-ghcr.yml`). Production moves when you run **Promote**. There is no staging environment.
 

@@ -1,4 +1,11 @@
-import { Entity, Index, ManyToOne, PrimaryKey, Property, Unique } from '@mikro-orm/decorators/legacy'
+import {
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryKey,
+  Property,
+  Unique,
+} from '@mikro-orm/decorators/legacy'
 import { Match } from '../matches/match.entity'
 
 /** Per-match cost configuration (pitch + extras), split across present players. */
@@ -19,6 +26,10 @@ export class MatchCost {
   /** Extra (balls, bibs, etc.) in cents */
   @Property({ default: 0 })
   extrasCostCents: number = 0
+
+  /** Set once the payment request email has been sent. Blocks a second send. */
+  @Property({ fieldName: 'feesNotifiedAt', nullable: true })
+  feesNotifiedAt?: Date
 
   @Property()
   createdAt: Date = new Date()

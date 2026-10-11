@@ -37,9 +37,7 @@ export function MatchesList({
         icon={<CalendarDays className="size-6 text-muted-foreground" />}
         title={variant === 'upcoming' ? t('matches.emptyTitle') : t('matches.emptyPastTitle')}
         description={
-          variant === 'upcoming'
-            ? t('matches.emptyDescription')
-            : t('matches.emptyPastDescription')
+          variant === 'upcoming' ? t('matches.emptyDescription') : t('matches.emptyPastDescription')
         }
         action={emptyAction}
       />

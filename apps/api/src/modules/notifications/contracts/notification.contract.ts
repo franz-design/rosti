@@ -10,6 +10,8 @@ export enum ScheduledJobType {
   MatchInvite = 'match_invite',
   RsvpReminder = 'rsvp_reminder',
   ScoreReminder = 'score_reminder',
+  FeeRequest = 'fee_request',
+  FeeReminder = 'fee_reminder',
 }
 
 export enum ScheduledJobStatus {
@@ -30,6 +32,7 @@ export const notificationPreferenceSchema = z
     notifyChatMention: z.boolean(),
     notifyAllChatMessages: z.boolean(),
     notifyPlayerVote: z.boolean(),
+    notifyFeeRequest: z.boolean(),
   })
   .meta({ title: 'NotificationPreferenceSchema' })
 

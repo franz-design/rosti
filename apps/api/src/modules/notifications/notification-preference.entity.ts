@@ -34,6 +34,10 @@ export class NotificationPreference {
   @Property({ default: true })
   notifyPlayerVote: boolean = true
 
+  /** Payment request and later reminders for an unpaid share. */
+  @Property({ default: true })
+  notifyFeeRequest: boolean = true
+
   @Property()
   createdAt: Date = new Date()
 

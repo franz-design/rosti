@@ -14,6 +14,7 @@ import {
 } from './contracts/player-vote.contract'
 import {
   computePlayerVoteClosesAt,
+  countValidVotes,
   ElectedPlayer,
   hasEveryoneVoted,
   isPlayerVoteReady,
@@ -150,16 +151,25 @@ export class PlayerVoteService {
    * Elected player of the latest played match, once that vote is closed.
    * A tie leaves the home card empty.
    */
-  async findLastElectedPlayer(matches: Match[]): Promise<ElectedPlayer | null> {
+  async findLastElectedPlayer(
+    matches: Match[],
+  ): Promise<(ElectedPlayer & { voteCount: number }) | null> {
     const last = pickLatestMatch(matches)
     if (!last?.playerVoteClosedAt || last.playerVoteIsTie) return null
     await this.em.populate(last, ['playerVoteWinner'])
     const winner = last.playerVoteWinner
     if (!winner) return null
+    const present = await this.listPresent(last.id)
+    const ballots = await this.listBallots(last.id)
     return {
       userId: winner.id,
       userName: winner.name,
       image: winner.image,
+      voteCount: countValidVotes(
+        winner.id,
+        present.map((row) => row.user.id),
+        ballots,
+      ),
     }
   }
 

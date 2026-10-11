@@ -27,9 +27,7 @@ export function MatchStatusMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={<Button variant="outline" size="sm" disabled={disabled} />}
-      >
+      <DropdownMenuTrigger render={<Button variant="outline" size="sm" disabled={disabled} />}>
         {t('matches.statusMenu')}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-52">
