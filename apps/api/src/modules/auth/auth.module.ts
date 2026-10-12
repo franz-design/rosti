@@ -9,6 +9,7 @@ import { toNodeHandler } from 'better-auth/node'
 import { config } from '../../config/env.config'
 import { EmailModule } from '../email/email.module'
 import { EmailService } from '../email/email.service'
+import { resolveAuthCookieDomain } from './auth-cookie-domain'
 import { invitationEmail, resetPasswordEmail, verificationEmail } from './auth-email'
 import { BetterAuthType, createBetterAuth } from './auth.config'
 import { AFTER_HOOK_KEY, BEFORE_HOOK_KEY, HOOK_KEY } from './auth.decorator'
@@ -53,6 +54,7 @@ import { OrganizationService } from './organization.service'
           baseUrl: config.api.baseUrl,
           secret: config.betterAuth.secret,
           trustedOrigins: config.betterAuth.trustedOrigins,
+          cookieDomain: resolveAuthCookieDomain(config.api.baseUrl, config.clients.webApp.url),
           orm,
           sendResetPassword: async (data) => {
             return emailService.sendEmail({

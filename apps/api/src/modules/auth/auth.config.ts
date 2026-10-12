@@ -29,6 +29,7 @@ interface BetterAuthOptionsDynamic {
   afterHook?: BetterAuthHooks['after']
   databaseHooks?: BetterAuthOptions['databaseHooks']
   baseUrl: string
+  cookieDomain?: string
 }
 
 export type BetterAuthSession = Awaited<
@@ -86,6 +87,14 @@ export function createBetterAuth(options: BetterAuthOptionsDynamic): BetterAuthT
       database: {
         generateId: false,
       },
+      ...(options.cookieDomain
+        ? {
+            crossSubDomainCookies: {
+              enabled: true,
+              domain: options.cookieDomain,
+            },
+          }
+        : {}),
     },
     rateLimit: {
       window: 50,

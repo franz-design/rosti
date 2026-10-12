@@ -45,7 +45,7 @@ export function ScoreEditor({ score, canEdit, onChange, onSave }: ScoreEditorPro
         <ScoreSide
           className="w-full sm:w-1/2 rounded-lg bg-team-blue p-4 sm:p-8"
           label={t('matches.detail.stats.teamBlue')}
-          labelClassName="text-team-blue"
+          labelClassName="text-white"
           value={score.blue}
           canEdit={canEdit}
           tone="blue"
@@ -54,7 +54,7 @@ export function ScoreEditor({ score, canEdit, onChange, onSave }: ScoreEditorPro
         <ScoreSide
           className="w-full sm:w-1/2 rounded-lg bg-primary p-4 sm:p-8"
           label={t('matches.detail.stats.teamRed')}
-          labelClassName="text-primary"
+          labelClassName="text-white"
           value={score.red}
           canEdit={canEdit}
           tone="red"

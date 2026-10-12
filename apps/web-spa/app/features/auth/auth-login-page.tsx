@@ -25,10 +25,11 @@ export default function Login() {
     error,
   } = useMutation({
     mutationFn: async (data: AuthLoginFormData) => {
+      // No callbackURL. Better Auth follows it with a full page load, and
+      // iPhone Chrome does not keep the session across that reload.
       const response = await authClient.signIn.email({
         email: data.email,
         password: data.password,
-        callbackURL: '/',
         rememberMe: true,
       })
 
@@ -39,8 +40,8 @@ export default function Login() {
       toast.success(t('auth.login.loggedInSuccess'))
       return response.data
     },
-    onSuccess: (data) => {
-      navigate(data.url || '/')
+    onSuccess: () => {
+      navigate('/')
     },
   })
 

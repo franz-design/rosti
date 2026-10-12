@@ -5,6 +5,7 @@ import { PlayerLink } from '@/common/components/player-link'
 import type { Attendance } from '@/lib/rosti-api'
 import { QuantityStepper } from '../quantity-stepper'
 import type { PlayerStatDraft } from '../player-stat-draft'
+import { cn } from '@rosti/ui/lib/utils'
 
 const STATS_SAVE_DELAY_MS = 750
 
@@ -56,16 +57,19 @@ export function PlayerStatsList({
         <span className="w-[6.75rem] text-center">{t('matches.detail.stats.goals')}</span>
         <span className="w-[6.75rem] text-center">{t('matches.detail.stats.assists')}</span>
       </div>
-      <ul className="space-y-2">
-        {players.map((player) => {
+      <ul className="flex flex-col border rounded-lg overflow-hidden">
+        {players.map((player, index) => {
           const draft = drafts[player.userId] ?? { goals: 0, assists: 0 }
           return (
             <li
               key={player.userId}
-              className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2"
+              className={cn(
+                'grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-b px-2 py-2 hover:bg-muted/60',
+                index === players.length - 1 && 'border-b-0',
+              )}
             >
               <PlayerLink userId={player.userId} className="flex min-w-0 items-center gap-2">
-                <PlayerAvatar name={player.userName} imageUrl={player.image} size="sm" />
+                <PlayerAvatar name={player.userName} imageUrl={player.image} />
                 <span className="truncate text-sm group-hover:underline">{player.userName}</span>
               </PlayerLink>
               {canEdit ? (

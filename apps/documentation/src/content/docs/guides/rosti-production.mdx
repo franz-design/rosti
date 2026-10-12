@@ -28,7 +28,7 @@ Pipeline: merge to `main` builds a SHA image (`push-to-ghcr.yml`). Production mo
 API:
 
 - `DATABASE_*`, `BETTER_AUTH_SECRET`, `TRUSTED_ORIGINS`
-- `CLIENTS_WEB_APP_URL`, `API_BASE_URL`
+- `CLIENTS_WEB_APP_URL`, `API_BASE_URL`. The session cookie is set on the parent domain those two hosts share (`lesk.fr` here). Chrome on iPhone drops a cookie that only belongs to `rosti-api.lesk.fr`, and login reloads back to the form.
 - `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASSWORD`, `EMAIL_FROM`
 - `SENTRY_DSN` (recommended)
 - Mount a volume at `/data/avatars` on `api` before avatars are used. `AVATAR_STORAGE_DIR` defaults to that path. `API_BASE_URL` must be `https://rosti-api.lesk.fr` so stored photo URLs stay valid.

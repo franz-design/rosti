@@ -11,7 +11,6 @@ interface ScoreSideProps {
   value: number
   canEdit: boolean
   onChange?: (value: number) => void
-  valueClassName?: string
   className?: string
   tone?: ScoreTone
 }
@@ -22,7 +21,6 @@ export function ScoreSide({
   value,
   canEdit,
   onChange,
-  valueClassName,
   className,
   tone = 'blue',
 }: ScoreSideProps) {
@@ -48,7 +46,7 @@ export function ScoreSide({
           onChange={(next) => onChange?.(next)}
         />
       ) : (
-        <p className={cn('text-4xl font-semibold tabular-nums', valueClassName)}>{value}</p>
+        <p className={cn('text-4xl font-semibold tabular-num text-white')}>{value}</p>
       )}
     </div>
   )

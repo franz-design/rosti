@@ -19,6 +19,9 @@ const { createMikroOrmOptions } = require('../db/db.config.ts') as {
 const { config } = require('../../config/env.config.ts') as {
   config: typeof import('../../config/env.config.js').config
 }
+const { resolveAuthCookieDomain } = require('./auth-cookie-domain.ts') as {
+  resolveAuthCookieDomain: typeof import('./auth-cookie-domain.js').resolveAuthCookieDomain
+}
 
 function importEntity(path: string): Promise<unknown> {
   return Promise.resolve(require(path.startsWith('file://') ? fileURLToPath(path) : path))
@@ -36,4 +39,5 @@ export const auth = createBetterAuth({
   baseUrl: config.api.baseUrl,
   secret: config.betterAuth.secret,
   trustedOrigins: config.betterAuth.trustedOrigins,
+  cookieDomain: resolveAuthCookieDomain(config.api.baseUrl, config.clients.webApp.url),
 })
