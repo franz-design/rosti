@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router'
 import useTheme from '@/hooks/useTheme'
 import { authClient } from '@/lib/auth-client'
+import { removeThisBrowserPushSubscription } from '@/lib/web-push'
 import { useI18nStore } from '@/lib/i18n/i18n-client'
 
 interface AppUserMenuProps {
@@ -32,6 +33,11 @@ export function AppUserMenu({ variant = 'sidebar' }: AppUserMenuProps) {
   const [theme, setTheme] = useTheme()
 
   const handleLogout = async () => {
+    try {
+      await removeThisBrowserPushSubscription()
+    } catch {
+      // Sign-out still has to finish if this browser cannot reach the API.
+    }
     await authClient.signOut()
     navigate('/login')
   }

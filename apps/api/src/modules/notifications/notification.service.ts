@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/core'
 import { CreateRequestContext } from '@mikro-orm/decorators/legacy'
-import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common'
+import { Inject, Injectable, Logger, NotFoundException, forwardRef } from '@nestjs/common'
 import { config } from '../../config/env.config'
 import { Member, Organization, User } from '../auth/auth.entity'
 import { EmailService } from '../email/email.service'
@@ -14,11 +14,14 @@ import { MatchCost } from '../payments/match-cost.entity'
 import { buildPaymentUrl } from '../payments/payment-link'
 import { PaymentService } from '../payments/payment.service'
 import { SessionFee } from '../payments/session-fee.entity'
+import { chatPush, type ChatPushPayload } from './chat-push'
 import {
   DevicePlatform,
+  RegisterWebPushInput,
   ScheduledJobStatus,
   ScheduledJobType,
 } from './contracts/notification.contract'
+import { deliverWebPush } from './web-push-sender'
 import { DeviceToken } from './device-token.entity'
 import { NotificationPreference } from './notification-preference.entity'
 import { ScheduledJob } from './scheduled-job.entity'
@@ -55,9 +58,17 @@ import {
   scoreReminderEmail,
 } from './notification-email'
 
+interface StoredWebPush {
+  id: string
+  endpoint: string
+  p256dh: string
+  auth: string
+}
+
 @Injectable()
 export class NotificationService {
   private readonly logger = new Logger(NotificationService.name)
+  private warnedMissingVapid = false
 
   constructor(
     private readonly em: EntityManager,
@@ -116,6 +127,45 @@ export class NotificationService {
     device.platform = platform
     await this.em.flush()
     return device
+  }
+
+  getWebPushPublicKey(): string | null {
+    return config.vapid?.publicKey ?? null
+  }
+
+  async registerWebPush(userId: string, input: RegisterWebPushInput): Promise<DeviceToken> {
+    const user = await this.em.findOne(User, { id: userId })
+    if (!user) throw new NotFoundException('User not found')
+
+    const byInstallation = await this.em.findOne(DeviceToken, {
+      installationId: input.installationId,
+    })
+    const byEndpoint = await this.em.findOne(DeviceToken, { token: input.endpoint })
+    const device = byInstallation ?? byEndpoint ?? new DeviceToken()
+    if (!byInstallation && !byEndpoint) this.em.persist(device)
+    if (byInstallation && byEndpoint && byInstallation.id !== byEndpoint.id) {
+      this.em.remove(byEndpoint)
+    }
+
+    device.user = user
+    device.platform = DevicePlatform.Web
+    device.token = input.endpoint
+    device.p256dh = input.p256dh
+    device.authSecret = input.auth
+    device.installationId = input.installationId
+    await this.em.flush()
+    return device
+  }
+
+  async removeWebPush(userId: string, installationId: string): Promise<boolean> {
+    const device = await this.em.findOne(DeviceToken, {
+      installationId,
+      user: { id: userId },
+    })
+    if (!device) return false
+    this.em.remove(device)
+    await this.em.flush()
+    return true
   }
 
   async scheduleMatchReminders(match: Match, options?: { resetInvite?: boolean }): Promise<void> {
@@ -290,33 +340,30 @@ export class NotificationService {
       if (member.user.id === author.id) continue
       const prefs = await this.getOrCreatePreferences(member.user.id)
       const isMentioned = mentionedUserIds.includes(member.user.id)
-      if (isMentioned && prefs.notifyChatMention) {
-        await this.deliver(
-          member.user,
-          prefs,
-          chatMentionEmail({
-            appUrl: config.clients.webApp.url,
-            matchId: match.id,
-            matchTitle: match.title,
-            authorName: author.name,
-            body,
-          }),
-        )
-        continue
+      const isMention = isMentioned && prefs.notifyChatMention
+      const isChatMessage = !isMention && prefs.notifyAllChatMessages
+      if (!isMention && !isChatMessage) continue
+
+      const emailInput = {
+        appUrl: config.clients.webApp.url,
+        matchId: match.id,
+        matchTitle: match.title,
+        authorName: author.name,
+        body,
       }
-      if (prefs.notifyAllChatMessages) {
-        await this.deliver(
-          member.user,
-          prefs,
-          chatMessageEmail({
-            appUrl: config.clients.webApp.url,
-            matchId: match.id,
-            matchTitle: match.title,
-            authorName: author.name,
-            body,
-          }),
-        )
-      }
+      await this.deliver(
+        member.user,
+        prefs,
+        isMention ? chatMentionEmail(emailInput) : chatMessageEmail(emailInput),
+        chatPush({
+          isMention,
+          organizationId: match.organization.id,
+          matchId: match.id,
+          matchTitle: match.title,
+          authorName: author.name,
+          body,
+        }),
+      )
     }
   }
 
@@ -641,6 +688,7 @@ export class NotificationService {
     user: User,
     prefs: NotificationPreference,
     email: NotificationEmailCopy,
+    push?: ChatPushPayload,
   ): Promise<void> {
     if (prefs.emailEnabled) {
       await this.emailService.sendEmail({
@@ -651,7 +699,9 @@ export class NotificationService {
         unsubscribeUrl: buildUnsubscribeUrl(user.id),
       })
     }
-    if (prefs.pushEnabled) {
+    if (!prefs.pushEnabled) return
+
+    if (!push) {
       const devices = await this.em.find(DeviceToken, {
         user: { id: user.id },
       })
@@ -660,7 +710,72 @@ export class NotificationService {
           `Push to ${device.platform} token ${device.token.slice(0, 8)}…: ${email.subject}`,
         )
       }
+      return
     }
+
+    const devices = await this.em.find(DeviceToken, {
+      user: { id: user.id },
+      platform: DevicePlatform.Web,
+    })
+    const subscriptions = devices.flatMap((device): StoredWebPush[] => {
+      if (!device.p256dh || !device.authSecret) return []
+      return [
+        {
+          id: device.id,
+          endpoint: device.token,
+          p256dh: device.p256dh,
+          auth: device.authSecret,
+        },
+      ]
+    })
+    this.dispatchWebPush(subscriptions, push)
+  }
+
+  /**
+   * The message is already saved. A slow push service must not hold the chat request.
+   */
+  private dispatchWebPush(subscriptions: StoredWebPush[], push: ChatPushPayload): void {
+    if (subscriptions.length === 0) return
+    const vapid = config.vapid
+    if (!vapid) {
+      if (!this.warnedMissingVapid) {
+        this.warnedMissingVapid = true
+        this.logger.warn('Web Push is not configured. Chat pushes are skipped.')
+      }
+      return
+    }
+
+    const em = this.em.fork()
+    void this.sendWebPushes(em, subscriptions, push, vapid).catch((err: unknown) => {
+      this.logger.error('Web push failed', err)
+    })
+  }
+
+  private async sendWebPushes(
+    em: EntityManager,
+    subscriptions: StoredWebPush[],
+    push: ChatPushPayload,
+    vapid: NonNullable<typeof config.vapid>,
+  ): Promise<void> {
+    const goneIds: string[] = []
+    await Promise.all(
+      subscriptions.map(async (subscription) => {
+        const result = await deliverWebPush({
+          vapid,
+          subscription,
+          payload: JSON.stringify(push),
+        })
+        if (result === 'gone') goneIds.push(subscription.id)
+        if (result === 'failed') {
+          this.logger.warn(`Web push failed for device ${subscription.id}`)
+        }
+      }),
+    )
+    if (goneIds.length === 0) return
+
+    const devices = await em.find(DeviceToken, { id: { $in: goneIds } })
+    for (const device of devices) em.remove(device)
+    await em.flush()
   }
 }
 

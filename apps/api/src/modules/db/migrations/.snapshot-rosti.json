@@ -263,6 +263,23 @@
       "name": "device_token",
       "schema": "public",
       "columns": {
+        "authSecret": {
+          "name": "authSecret",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
         "createdAt": {
           "name": "createdAt",
           "type": "timestamptz(6)",
@@ -297,6 +314,40 @@
           "enumItems": [],
           "mappedType": "uuid"
         },
+        "installationId": {
+          "name": "installationId",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "p256dh": {
+          "name": "p256dh",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
         "platform": {
           "name": "platform",
           "type": "text",
@@ -320,20 +371,20 @@
         },
         "token": {
           "name": "token",
-          "type": "varchar(255)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "unique": false,
-          "length": 255,
+          "length": null,
           "precision": null,
           "scale": null,
           "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "text"
         },
         "updatedAt": {
           "name": "updatedAt",
@@ -371,6 +422,16 @@
         }
       },
       "indexes": [
+        {
+          "columnNames": [
+            "installationId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "device_token_installationId_index",
+          "primary": false,
+          "unique": false
+        },
         {
           "columnNames": [
             "id"

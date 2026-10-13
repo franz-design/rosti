@@ -2,7 +2,9 @@ import type { MikroORM } from '@mikro-orm/core'
 import type { BetterAuthOptions, User } from 'better-auth'
 import type { BetterAuthType } from './auth.client-types'
 import { betterAuth } from 'better-auth'
+import { createAuthMiddleware } from 'better-auth/api'
 import { openAPI, organization } from 'better-auth/plugins'
+import { legacyAuthCookieClears } from './auth-cookie-domain'
 import { mikroOrmAdapter } from './auth-db.adapter'
 
 type BetterAuthHooks = NonNullable<BetterAuthOptions['hooks']>
@@ -89,6 +91,8 @@ export function createBetterAuth(options: BetterAuthOptionsDynamic): BetterAuthT
       },
       ...(options.cookieDomain
         ? {
+            // New name so a leftover better-auth cookie is not the one we read.
+            cookiePrefix: 'rosti',
             crossSubDomainCookies: {
               enabled: true,
               domain: options.cookieDomain,
@@ -102,7 +106,19 @@ export function createBetterAuth(options: BetterAuthOptionsDynamic): BetterAuthT
     },
     hooks: {
       before: options?.beforeHook,
-      after: options?.afterHook,
+      after: createAuthMiddleware(async (ctx) => {
+        if (options.afterHook) await options.afterHook(ctx)
+        const parentDomain = options.cookieDomain
+        const responseHeaders = ctx.context.responseHeaders
+        if (!parentDomain || !responseHeaders) return
+        const sessionCookieName = ctx.context.authCookies.sessionToken.name
+        const setCookies = responseHeaders.getSetCookie?.() ?? []
+        const setsSession = setCookies.some((entry) => entry.startsWith(`${sessionCookieName}=`))
+        if (!setsSession) return
+        for (const header of legacyAuthCookieClears(parentDomain)) {
+          responseHeaders.append('set-cookie', header)
+        }
+      }),
     },
     plugins: [
       openAPI(),

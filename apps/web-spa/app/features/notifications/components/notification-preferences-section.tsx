@@ -1,13 +1,16 @@
 import { AppLoader } from '@rosti/ui/components/app'
 import { toast } from '@rosti/ui/components/primitives/sonner'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { rostiApi, type NotificationPreference } from '@/lib/rosti-api'
 import { NotificationToggleList } from './notification-toggle-list'
+import { PushDeviceStatus } from './push-device-status'
 
 export function NotificationPreferencesSection() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
+  const enablePushRef = useRef<(() => void) | null>(null)
   const { data: prefs, isLoading } = useQuery({
     queryKey: ['notification-preferences'],
     queryFn: () => rostiApi.getNotificationPreferences(),
@@ -27,9 +30,13 @@ export function NotificationPreferencesSection() {
   return (
     <div className="max-w-lg space-y-4">
       <p className="text-sm text-muted-foreground">{t('profile.notifications.description')}</p>
+      <PushDeviceStatus pushEnabled={prefs.pushEnabled} enableRef={enablePushRef} />
       <NotificationToggleList
         prefs={prefs}
-        onToggle={(key, nextValue) => update.mutate({ [key]: nextValue })}
+        onToggle={(key, nextValue) => {
+          update.mutate({ [key]: nextValue })
+          if (key === 'pushEnabled' && nextValue) enablePushRef.current?.()
+        }}
       />
     </div>
   )

@@ -217,6 +217,22 @@ export const rostiApi = {
       method: 'POST',
       body: JSON.stringify({ token, platform }),
     }),
+  getWebPushPublicKey: () =>
+    request<{ publicKey: string | null }>('/notifications/web-push/public-key'),
+  registerWebPush: (body: {
+    endpoint: string
+    p256dh: string
+    auth: string
+    installationId: string
+  }) =>
+    request<{ id: string; installationId: string }>('/notifications/web-push', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+  removeWebPush: (installationId: string) =>
+    request<{ removed: boolean }>(`/notifications/web-push/${installationId}`, {
+      method: 'DELETE',
+    }),
 
   getMatchCost: (orgId: string, matchId: string) =>
     request<MatchCost>(`/clubs/${orgId}/matches/${matchId}/cost`),

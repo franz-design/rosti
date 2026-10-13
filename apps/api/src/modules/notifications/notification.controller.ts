@@ -1,14 +1,20 @@
-import { TypedBody, TypedController, TypedRoute } from '@lonestone/nzoth/server'
+import { TypedBody, TypedController, TypedParam, TypedRoute } from '@lonestone/nzoth/server'
 import { UseGuards } from '@nestjs/common'
+import { z } from 'zod'
 import { LoggedInBetterAuthSession } from '../auth/auth.config'
 import { Session } from '../auth/auth.decorator'
 import { AuthGuard } from '../auth/auth.guard'
 import {
   notificationPreferenceSchema,
   RegisterDeviceInput,
+  RegisterWebPushInput,
   registerDeviceSchema,
+  registerWebPushSchema,
+  removeWebPushResultSchema,
   UpdateNotificationPreferenceInput,
   updateNotificationPreferenceSchema,
+  webPushPublicKeySchema,
+  webPushSubscriptionSchema,
 } from './contracts/notification.contract'
 import { NotificationService } from './notification.service'
 
@@ -65,5 +71,28 @@ export class NotificationController {
       body.platform,
     )
     return { id: device.id, platform: device.platform }
+  }
+
+  @TypedRoute.Get('web-push/public-key', webPushPublicKeySchema)
+  getWebPushPublicKey() {
+    return { publicKey: this.notificationService.getWebPushPublicKey() }
+  }
+
+  @TypedRoute.Post('web-push', webPushSubscriptionSchema)
+  async registerWebPush(
+    @Session() session: LoggedInBetterAuthSession,
+    @TypedBody(registerWebPushSchema) body: RegisterWebPushInput,
+  ) {
+    const device = await this.notificationService.registerWebPush(session.user.id, body)
+    return { id: device.id, installationId: body.installationId }
+  }
+
+  @TypedRoute.Delete('web-push/:installationId', removeWebPushResultSchema)
+  async removeWebPush(
+    @Session() session: LoggedInBetterAuthSession,
+    @TypedParam('installationId', z.string().uuid()) installationId: string,
+  ) {
+    const removed = await this.notificationService.removeWebPush(session.user.id, installationId)
+    return { removed }
   }
 }

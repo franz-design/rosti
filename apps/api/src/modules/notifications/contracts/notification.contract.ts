@@ -53,3 +53,33 @@ export const registerDeviceSchema = z
   .meta({ title: 'RegisterDeviceSchema' })
 
 export type RegisterDeviceInput = z.infer<typeof registerDeviceSchema>
+
+export const registerWebPushSchema = z
+  .object({
+    endpoint: z.string().min(1),
+    p256dh: z.string().min(1),
+    auth: z.string().min(1),
+    installationId: z.string().uuid(),
+  })
+  .meta({ title: 'RegisterWebPushSchema' })
+
+export type RegisterWebPushInput = z.infer<typeof registerWebPushSchema>
+
+export const webPushSubscriptionSchema = z
+  .object({
+    id: z.string().uuid(),
+    installationId: z.string().uuid(),
+  })
+  .meta({ title: 'WebPushSubscriptionSchema' })
+
+export const removeWebPushResultSchema = z
+  .object({
+    removed: z.boolean(),
+  })
+  .meta({ title: 'RemoveWebPushResultSchema' })
+
+export const webPushPublicKeySchema = z
+  .object({
+    publicKey: z.string().nullable(),
+  })
+  .meta({ title: 'WebPushPublicKeySchema' })

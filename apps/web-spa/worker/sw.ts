@@ -5,7 +5,7 @@ import {
   precacheAndRoute,
 } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
-import { readAppNotification, readAppPath } from './read-app-notification'
+import { PUSH_OPEN_MESSAGE, readAppNotification, readAppPath } from './read-app-notification'
 
 declare const self: ServiceWorkerGlobalScope
 
@@ -57,11 +57,16 @@ async function openAppPath(path: string): Promise<void> {
 
   for (const client of windowClients) {
     if (new URL(client.url).origin !== self.location.origin) continue
-    if (!('focus' in client)) continue
-    await client.focus()
+    if ('focus' in client) await client.focus()
     if ('navigate' in client && typeof client.navigate === 'function') {
-      await client.navigate(destination)
+      try {
+        await client.navigate(destination)
+        return
+      } catch {
+        // The open page can route itself.
+      }
     }
+    client.postMessage({ type: PUSH_OPEN_MESSAGE, url: path })
     return
   }
 

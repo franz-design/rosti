@@ -3,7 +3,7 @@ import { toast } from '@rosti/ui/components/primitives/sonner'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate, useSearchParams } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { storePendingInvitationId } from '@/features/auth/utils/pending-invitation'
 import { authClient } from '@/lib/auth-client'
 import { AuthPageHeader } from './components/auth-page-header'
@@ -11,7 +11,6 @@ import { AuthLoginForm } from './components/forms/auth-login-form'
 
 export default function Login() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const invitationId = searchParams.get('invitationId') ?? searchParams.get('invite')
 
@@ -25,8 +24,8 @@ export default function Login() {
     error,
   } = useMutation({
     mutationFn: async (data: AuthLoginFormData) => {
-      // No callbackURL. Better Auth follows it with a full page load, and
-      // iPhone Chrome does not keep the session across that reload.
+      // No callbackURL. Better Auth would treat it as its own redirect, and
+      // that redirect runs before we can replace the page ourselves.
       const response = await authClient.signIn.email({
         email: data.email,
         password: data.password,
@@ -41,7 +40,9 @@ export default function Login() {
       return response.data
     },
     onSuccess: () => {
-      navigate('/')
+      // Full load. Desktop Chrome keeps an older host-only session cookie and
+      // a client-side route change reads that one, so get-session comes back null.
+      window.location.replace('/')
     },
   })
 

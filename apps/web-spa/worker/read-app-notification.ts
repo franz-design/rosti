@@ -1,3 +1,5 @@
+export const PUSH_OPEN_MESSAGE = 'rosti-open'
+
 export interface AppNotification {
   title: string
   body: string

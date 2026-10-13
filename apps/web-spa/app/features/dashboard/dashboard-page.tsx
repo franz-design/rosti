@@ -9,6 +9,7 @@ import { AppMain } from '@/common/components/layout/app-main'
 import { AppShellProvider } from '@/common/hooks/app-shell-context'
 import { AppSidebar } from '@/common/components/layout/sidebar/app-sidebar'
 import { AppBottomNav } from '@/common/components/layout/app-bottom-nav'
+import { PushOpenListener } from '@/lib/push-open-listener'
 
 export default function DashboardPage() {
   const { data: sessionData, isPending } = authClient.useSession()
@@ -31,6 +32,7 @@ export default function DashboardPage() {
   return (
     <AppShellProvider>
       <ClubProvider>
+        <PushOpenListener />
         <AppLayout sidebar={<AppSidebar />}>
           <AppMobileHeader />
           <AppMain>

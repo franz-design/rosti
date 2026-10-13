@@ -28,7 +28,7 @@ Pipeline: merge to `main` builds a SHA image (`push-to-ghcr.yml`). Production mo
 API:
 
 - `DATABASE_*`, `BETTER_AUTH_SECRET`, `TRUSTED_ORIGINS`
-- `CLIENTS_WEB_APP_URL`, `API_BASE_URL`. The session cookie is set on the parent domain those two hosts share (`lesk.fr` here). Chrome on iPhone drops a cookie that only belongs to `rosti-api.lesk.fr`, and login reloads back to the form.
+- `CLIENTS_WEB_APP_URL`, `API_BASE_URL`. The session cookie is set on the parent domain those two hosts share (`lesk.fr` here), under the name `rosti`. Chrome on iPhone drops a cookie that only belongs to `rosti-api.lesk.fr`. Desktop Chrome still sends that older cookie first, and login then looks signed out.
 - `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASSWORD`, `EMAIL_FROM`
 - `SENTRY_DSN` (recommended)
 - Mount a volume at `/data/avatars` on `api` before avatars are used. `AVATAR_STORAGE_DIR` defaults to that path. `API_BASE_URL` must be `https://rosti-api.lesk.fr` so stored photo URLs stay valid.
@@ -36,12 +36,13 @@ API:
 SPA (Dokploy **runtime** env on the `web-spa` service — CI images embed `__VITE_*__` placeholders):
 
 - `VITE_API_URL` = `https://rosti-api.lesk.fr` (no trailing `/api`)
-- `VITE_VAPID_PUBLIC_KEY` once Web Push is enabled. This key is public. The private key stays on `api`
+- `VITE_VAPID_PUBLIC_KEY` is optional. The app reads the public key from the API. Set it only as a fallback, with the same value as `VAPID_PUBLIC_KEY`
 
-Web Push (API, once [PWA and push notifications](/lonestone-boilerplate/guides/pwa-and-push) reaches Phase 5):
+Web Push (API, required before a phone can receive a chat notification):
 
-- `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`
+- `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (`mailto:…`)
 - Generate the pair outside the repo. Do not commit it
+- Chat mentions send once these are set and the member allows push on that browser. Other events still wait. See [PWA and push notifications](/lonestone-boilerplate/guides/pwa-and-push)
 
 `VITE_APP_STORE_URL` and `VITE_PLAY_STORE_URL` belong to the paused store release. Leave them unset.
 
@@ -52,7 +53,7 @@ Web Push (API, once [PWA and push notifications](/lonestone-boilerplate/guides/p
 3. Deploy `web-spa` with correct `VITE_*` URLs
 4. DNS is already pointed: `rosti.lesk.fr` (app) and `rosti-api.lesk.fr` (API)
 5. Create first owner account, create a club, send a test invite
-6. Install `https://rosti.lesk.fr` to a phone home screen and check login. Push comes later, in [PWA and push notifications](/lonestone-boilerplate/guides/pwa-and-push). Store binaries stay paused: [Mobile store release](/lonestone-boilerplate/guides/mobile-store)
+6. Install `https://rosti.lesk.fr` to a phone home screen and check login. Chat push needs the VAPID keys above, then the member turns push on in their profile. Store binaries stay paused: [Mobile store release](/lonestone-boilerplate/guides/mobile-store)
 7. Soft launch with one real club
 
 ## Payments note

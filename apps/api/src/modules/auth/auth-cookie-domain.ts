@@ -34,6 +34,28 @@ function isIpAddress(hostname: string): boolean {
   return /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)
 }
 
+const LEGACY_AUTH_COOKIE_NAMES = [
+  '__Secure-better-auth.session_token',
+  '__Secure-better-auth.session_data',
+  '__Secure-better-auth.dont_remember',
+  '__Secure-better-auth.account_data',
+] as const
+
+/**
+ * Expire the previous session cookies, both the host-only ones and the
+ * ones already set on the parent domain.
+ *
+ * Desktop Chrome still has the host-only cookie from before the parent
+ * domain change. The API reads the first cookie of a given name, so that
+ * stale cookie hides the new session and get-session returns null.
+ */
+export function legacyAuthCookieClears(parentDomain: string): string[] {
+  return LEGACY_AUTH_COOKIE_NAMES.flatMap((name) => [
+    `${name}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax`,
+    `${name}=; Max-Age=0; Path=/; Domain=${parentDomain}; HttpOnly; Secure; SameSite=Lax`,
+  ])
+}
+
 function sharedParentLabels(left: string, right: string): string[] {
   const leftLabels = left.split('.')
   const rightLabels = right.split('.')

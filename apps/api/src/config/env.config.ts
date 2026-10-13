@@ -63,6 +63,12 @@ export const configValidationSchema = z.object({
   // Sentry
   SENTRY_DSN: z.string().optional(),
 
+  // Web Push. All three are required before a phone can receive a notification.
+  // Empty values count as unset so a blank Dokploy field does not stop the API.
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_SUBJECT: z.string().optional(),
+
   // Avatar files. Empty means the default for the current environment.
   AVATAR_STORAGE_DIR: z.preprocess(
     (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
@@ -121,7 +127,20 @@ export const config = {
       configParsed.data.AVATAR_STORAGE_DIR,
     ),
   },
+  vapid: readVapid(configParsed.data),
 } as const
+
+function readVapid(data: ConfigSchema): {
+  publicKey: string
+  privateKey: string
+  subject: string
+} | null {
+  const publicKey = data.VAPID_PUBLIC_KEY?.trim()
+  const privateKey = data.VAPID_PRIVATE_KEY?.trim()
+  const subject = data.VAPID_SUBJECT?.trim()
+  if (!publicKey || !privateKey || !subject) return null
+  return { publicKey, privateKey, subject }
+}
 
 function resolveAvatarStorageDir(nodeEnv: ConfigSchema['NODE_ENV'], configured?: string): string {
   if (configured) return configured

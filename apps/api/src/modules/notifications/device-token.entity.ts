@@ -11,11 +11,23 @@ export class DeviceToken {
   @Index()
   user!: User
 
-  @Property()
+  /** Native device token, or the Web Push endpoint. Endpoints are longer than 255 characters. */
+  @Property({ type: 'text' })
   token!: string
 
   @Enum({ items: () => DevicePlatform })
   platform!: DevicePlatform
+
+  @Property({ type: 'text', nullable: true })
+  p256dh: string | null = null
+
+  @Property({ type: 'text', nullable: true })
+  authSecret: string | null = null
+
+  /** One browser installation. Logout deletes only this row. */
+  @Property({ type: 'uuid', nullable: true })
+  @Index()
+  installationId: string | null = null
 
   @Property()
   createdAt: Date = new Date()

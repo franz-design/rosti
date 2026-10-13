@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { resolveAuthCookieDomain } from './auth-cookie-domain'
+import { legacyAuthCookieClears, resolveAuthCookieDomain } from './auth-cookie-domain'
 
 describe('resolveAuthCookieDomain', () => {
   it('shares the cookie on the parent of the production hosts', () => {
@@ -34,5 +34,20 @@ describe('resolveAuthCookieDomain', () => {
 
   it('ignores values that are not URLs', () => {
     expect(resolveAuthCookieDomain('not a url', 'https://rosti.lesk.fr')).toBeUndefined()
+  })
+})
+
+describe('legacyAuthCookieClears', () => {
+  it('expires the old host-only cookie and the old parent-domain cookie', () => {
+    expect(legacyAuthCookieClears('lesk.fr')).toEqual([
+      '__Secure-better-auth.session_token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax',
+      '__Secure-better-auth.session_token=; Max-Age=0; Path=/; Domain=lesk.fr; HttpOnly; Secure; SameSite=Lax',
+      '__Secure-better-auth.session_data=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax',
+      '__Secure-better-auth.session_data=; Max-Age=0; Path=/; Domain=lesk.fr; HttpOnly; Secure; SameSite=Lax',
+      '__Secure-better-auth.dont_remember=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax',
+      '__Secure-better-auth.dont_remember=; Max-Age=0; Path=/; Domain=lesk.fr; HttpOnly; Secure; SameSite=Lax',
+      '__Secure-better-auth.account_data=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax',
+      '__Secure-better-auth.account_data=; Max-Age=0; Path=/; Domain=lesk.fr; HttpOnly; Secure; SameSite=Lax',
+    ])
   })
 })

@@ -24,7 +24,7 @@ Do not cache club, match, chat, or profile data in the service worker. The first
 - [x] Notification preferences, including `pushEnabled` and one flag per event
 - [x] `device_token` table and `POST /api/notifications/devices` for `ios`, `android`, and `web`
 - [x] Email delivery for new matches, RSVP reminders, cancellations, chat, and score reminders
-- [x] A `deliver()` hook that reads push preferences and device rows, then only writes a log line
+- [x] A `deliver()` hook that sends a Web Push for chat, and still only logs the other events
 - [x] HTTPS in production: `https://rosti.lesk.fr` for the app and `https://rosti-api.lesk.fr` for the API
 
 ## Phase 1 — Installable app
@@ -49,13 +49,13 @@ Goal: a signed-in user can turn push on for the current browser, and turn it off
 
 Ask for permission from the notification settings, after the user turns push on. Do not ask on the first page load. The current Capacitor bootstrap asks immediately. That path stays unused while the native apps are on standby.
 
-- [ ] Show four states in the notification settings: off, not asked, allowed on this browser, and blocked by the browser
-- [ ] When the user turns push on and the browser allows it, create a push subscription and send it to the API
-- [ ] Store the Web Push endpoint, `p256dh` key, and `auth` secret. A single token string is not enough for Web Push
-- [ ] Keep a per-browser installation id so logout removes this browser only
-- [ ] Delete this browser's subscription on logout
-- [ ] If the user blocks notifications, leave `pushEnabled` unchanged for their other browsers and show that this browser cannot register
-- [ ] Expose only the public VAPID key to the SPA. The private key stays on the API
+- [x] Show four states in the notification settings: off, not asked, allowed on this browser, and blocked by the browser
+- [x] When the user turns push on and the browser allows it, create a push subscription and send it to the API
+- [x] Store the Web Push endpoint, `p256dh` key, and `auth` secret. A single token string is not enough for Web Push
+- [x] Keep a per-browser installation id so logout removes this browser only
+- [x] Delete this browser's subscription on logout
+- [x] If the user blocks notifications, leave `pushEnabled` unchanged for their other browsers and show that this browser cannot register
+- [x] Expose only the public VAPID key to the SPA. The private key stays on the API
 
 Account deletion already removes `device_token` rows through the user foreign key. Keep that cascade when the stored shape changes.
 
@@ -65,12 +65,14 @@ Goal: the events that already send email also send a push when the user allowed 
 
 The email copy and the push copy are different. A push carries a short title, a short body, the event type, `organizationId`, `matchId`, and the URL to open.
 
-- [ ] Add a Web Push sender behind the existing `deliver()` method
-- [ ] Send only to `web` subscriptions, and only when `pushEnabled` and the matching event flag are true
-- [ ] Keep email. A push does not replace the email
-- [ ] Delete a subscription when the push service says it is gone. Do not retry that subscription
-- [ ] Log a temporary provider failure and continue. A failed push must not fail match creation, cancellation, or chat
-- [ ] Skip stored `ios` and `android` tokens until the store plan resumes
+Chat mentions and full chat messages are the first event that sends. The other events still only write a log line. A mention uses `notifyChatMention`. Every other message uses `notifyAllChatMessages`, which stays off until the member turns it on.
+
+- [x] Add a Web Push sender behind the existing `deliver()` method
+- [x] Send only to `web` subscriptions, and only when `pushEnabled` and the matching event flag are true
+- [x] Keep email. A push does not replace the email
+- [x] Delete a subscription when the push service says it is gone. Do not retry that subscription
+- [x] Log a temporary provider failure and continue. A failed push must not fail match creation, cancellation, or chat
+- [x] Skip stored `ios` and `android` tokens until the store plan resumes
 
 Suggested payload:
 
@@ -91,10 +93,10 @@ The service worker displays `title` and `body`, and stores the rest on the notif
 
 Goal: tapping a notification opens the match, including when the app was closed.
 
-- [ ] On `notificationclick`, focus an existing Rösti window or open one
-- [ ] Navigate to the match URL from the payload
-- [ ] Select the club from `organizationId` before loading the match. The open club may be a different one
-- [ ] Ignore a payload that has no usable URL
+- [x] On `notificationclick`, focus an existing Rösti window or open one
+- [x] Navigate to the match URL from the payload
+- [x] Select the club from `organizationId` before loading the match. The open club may be a different one
+- [x] Ignore a payload that has no usable URL
 
 iOS delivers Web Push only to a PWA that was added to the Home Screen, and only on iOS 16.4 or newer. Safari in a normal tab will not show these notifications. The settings screen needs to say that.
 

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router'
 import { authClient } from '@/lib/auth-client'
 import { rostiApi, type Club, type ClubMember } from '@/lib/rosti-api'
 
@@ -24,6 +25,7 @@ function isAdminRole(role: ClubRole | undefined): boolean {
 
 export function ClubProvider({ children }: { children: ReactNode }) {
   const { data: session } = authClient.useSession()
+  const [searchParams] = useSearchParams()
   const [activeClubId, setActiveClubIdState] = useState<string | null>(() =>
     localStorage.getItem('rosti.activeClubId'),
   )
@@ -56,6 +58,15 @@ export function ClubProvider({ children }: { children: ReactNode }) {
     if (!activeClub?.id) return
     void authClient.organization.setActive({ organizationId: activeClub.id })
   }, [activeClub?.id])
+
+  useEffect(() => {
+    const organizationId = searchParams.get('organizationId')
+    if (!organizationId || organizationId === activeClubId) return
+    if (!clubs.some((club) => club.id === organizationId)) return
+    setActiveClubIdState(organizationId)
+    localStorage.setItem('rosti.activeClubId', organizationId)
+    void authClient.organization.setActive({ organizationId })
+  }, [activeClubId, clubs, searchParams])
 
   const { data: members = [], isLoading: isMembershipLoading } = useQuery({
     queryKey: ['club-members', activeClub?.id, session?.user?.id],
