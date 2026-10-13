@@ -24,7 +24,7 @@ Do not cache club, match, chat, or profile data in the service worker. The first
 - [x] Notification preferences, including `pushEnabled` and one flag per event
 - [x] `device_token` table and `POST /api/notifications/devices` for `ios`, `android`, and `web`
 - [x] Email delivery for new matches, RSVP reminders, cancellations, chat, and score reminders
-- [x] A `deliver()` hook that sends a Web Push for chat, and still only logs the other events
+- [x] A `deliver()` hook that sends a Web Push for chat, match registration, the RSVP reminder, the score reminder, and the best-player vote. Cancellation and payment emails still only log a push
 - [x] HTTPS in production: `https://rosti.lesk.fr` for the app and `https://rosti-api.lesk.fr` for the API
 
 ## Phase 1 — Installable app
@@ -47,7 +47,7 @@ React Router writes `index.html` after Vite finishes, so the service worker buil
 
 Goal: a signed-in user can turn push on for the current browser, and turn it off again.
 
-Ask for permission from the notification settings, after the user turns push on. Do not ask on the first page load. The current Capacitor bootstrap asks immediately. That path stays unused while the native apps are on standby.
+Ask for permission from a button tap. The installed app explains push the first time it opens, and again one week after the user chooses later. A normal browser tab does not show that message. The notification settings still let the user turn push on for the current browser. The Capacitor bootstrap asks immediately. That path stays unused while the native apps are on standby.
 
 - [x] Show four states in the notification settings: off, not asked, allowed on this browser, and blocked by the browser
 - [x] When the user turns push on and the browser allows it, create a push subscription and send it to the API
@@ -56,6 +56,7 @@ Ask for permission from the notification settings, after the user turns push on.
 - [x] Delete this browser's subscription on logout
 - [x] If the user blocks notifications, leave `pushEnabled` unchanged for their other browsers and show that this browser cannot register
 - [x] Expose only the public VAPID key to the SPA. The private key stays on the API
+- [x] On the first open of the installed app, explain push and ask from a button. Remember "later" for seven days. Do not show this in a browser tab
 
 Account deletion already removes `device_token` rows through the user foreign key. Keep that cascade when the stored shape changes.
 
@@ -65,7 +66,7 @@ Goal: the events that already send email also send a push when the user allowed 
 
 The email copy and the push copy are different. A push carries a short title, a short body, the event type, `organizationId`, `matchId`, and the URL to open.
 
-Chat mentions and full chat messages are the first event that sends. The other events still only write a log line. A mention uses `notifyChatMention`. Every other message uses `notifyAllChatMessages`, which stays off until the member turns it on.
+Chat, match registration, the RSVP reminder, the score reminder, and the best-player vote send a push. Cancellation and payment emails still only write a log line. A mention uses `notifyChatMention`. Every other message uses `notifyAllChatMessages`, which stays off until the member turns it on. Registration uses `notifyNewMatch`. The RSVP reminder uses `notifyRsvpReminder`. The vote uses `notifyPlayerVote`.
 
 - [x] Add a Web Push sender behind the existing `deliver()` method
 - [x] Send only to `web` subscriptions, and only when `pushEnabled` and the matching event flag are true

@@ -12,14 +12,18 @@ import {
 const NOW = new Date('2026-10-12T12:00:00.000Z')
 
 describe('computeFeeRequestRunAt', () => {
-  it('schedules 90 minutes after kickoff when that is still in the future', () => {
-    const actual = computeFeeRequestRunAt(new Date('2026-10-12T12:00:00.000Z'), new Date('2026-10-12T10:00:00.000Z'))
+  it('schedules 15 minutes after the configured duration', () => {
+    const actual = computeFeeRequestRunAt(
+      new Date('2026-10-12T12:00:00.000Z'),
+      90,
+      new Date('2026-10-12T10:00:00.000Z'),
+    )
 
-    expect(actual.toISOString()).toBe('2026-10-12T13:30:00.000Z')
+    expect(actual.toISOString()).toBe('2026-10-12T13:45:00.000Z')
   })
 
   it('runs immediately when the session already ended', () => {
-    const actual = computeFeeRequestRunAt(new Date('2026-10-12T08:00:00.000Z'), NOW)
+    const actual = computeFeeRequestRunAt(new Date('2026-10-12T08:00:00.000Z'), 90, NOW)
 
     expect(actual.toISOString()).toBe(NOW.toISOString())
   })

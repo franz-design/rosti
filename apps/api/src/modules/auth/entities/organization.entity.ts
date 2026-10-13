@@ -1,4 +1,5 @@
 import { Entity, Enum, PrimaryKey, Property, Unique } from '@mikro-orm/decorators/legacy'
+import { DEFAULT_MATCH_DURATION_MINUTES } from '../../notifications/match-end'
 
 export enum SportType {
   Football = 'football',
@@ -42,6 +43,17 @@ export class Organization {
 
   @Property({ nullable: true, type: 'int' })
   defaultMaxCapacity?: number
+
+  /**
+   * How long a match lasts, in minutes.
+   * The score reminder and the payment request go out 15 minutes after this.
+   */
+  @Property({
+    fieldName: 'matchDurationMinutes',
+    type: 'int',
+    default: DEFAULT_MATCH_DURATION_MINUTES,
+  })
+  matchDurationMinutes: number = DEFAULT_MATCH_DURATION_MINUTES
 
   /** Days before kickoff when the next match registration email is sent. */
   @Property({ fieldName: 'matchInviteLeadDays', type: 'int', default: 5 })

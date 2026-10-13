@@ -14,7 +14,8 @@ import { MatchCost } from '../payments/match-cost.entity'
 import { buildPaymentUrl } from '../payments/payment-link'
 import { PaymentService } from '../payments/payment.service'
 import { SessionFee } from '../payments/session-fee.entity'
-import { chatPush, type ChatPushPayload } from './chat-push'
+import { type AppPushPayload } from './app-push'
+import { chatPush } from './chat-push'
 import {
   DevicePlatform,
   RegisterWebPushInput,
@@ -27,18 +28,23 @@ import { NotificationPreference } from './notification-preference.entity'
 import { ScheduledJob } from './scheduled-job.entity'
 import {
   canRemindFee,
-  computeFeeRequestRunAt,
-  FEE_REQUEST_DELAY_MS,
   planFeeReminderRunAts,
   shouldScheduleFeeRequest,
   shouldSendFeeRequest,
 } from './fee-request'
 import {
-  canRemindScore,
-  CLUB_ADMIN_ROLES,
-  computeScoreReminderRunAt,
-  SCORE_REMINDER_DELAY_MS,
-} from './score-reminder'
+  computeMatchEndNotificationRunAt,
+  earliestMatchEndKickoff,
+  readMatchDurationMinutes,
+} from './match-end'
+import {
+  matchInvitePush,
+  playerVoteOpenedPush,
+  playerVoteResultPush,
+  rsvpReminderPush,
+  scoreReminderPush,
+} from './match-push'
+import { canRemindScore, CLUB_ADMIN_ROLES } from './score-reminder'
 import {
   DEFAULT_MATCH_INVITE_LEAD_DAYS,
   planMatchInviteJobs,
@@ -235,16 +241,36 @@ export class NotificationService {
     ) {
       return
     }
-    await this.enqueue(match, ScheduledJobType.FeeRequest, computeFeeRequestRunAt(match.startsAt))
+    await this.enqueue(match, ScheduledJobType.FeeRequest, await this.matchEndRunAt(match))
   }
 
   async scheduleScoreReminder(match: Match): Promise<void> {
     if (!canRemindScore(match)) return
-    await this.enqueue(
-      match,
-      ScheduledJobType.ScoreReminder,
-      computeScoreReminderRunAt(match.startsAt),
+    await this.enqueue(match, ScheduledJobType.ScoreReminder, await this.matchEndRunAt(match))
+  }
+
+  /**
+   * Moves pending score and payment jobs to the club's new match length.
+   * A notification that already went out stays sent.
+   */
+  async rescheduleMatchEndNotifications(organizationId: string): Promise<void> {
+    const organization = await this.em.findOne(Organization, { id: organizationId })
+    if (!organization) return
+    const durationMinutes = readMatchDurationMinutes(organization.matchDurationMinutes)
+    const now = new Date()
+    const jobs = await this.em.find(
+      ScheduledJob,
+      {
+        status: ScheduledJobStatus.Pending,
+        type: { $in: [ScheduledJobType.ScoreReminder, ScheduledJobType.FeeRequest] },
+        match: { organization: { id: organizationId } },
+      },
+      { populate: ['match'] },
     )
+    for (const job of jobs) {
+      job.runAt = computeMatchEndNotificationRunAt(job.match.startsAt, durationMinutes, now)
+    }
+    if (jobs.length > 0) await this.em.flush()
   }
 
   private async enqueue(
@@ -276,16 +302,22 @@ export class NotificationService {
     for (const member of members) {
       const prefs = await this.getOrCreatePreferences(member.user.id)
       if (!prefs.notifyNewMatch) continue
-      await this.deliver(member.user, prefs, newMatchEmail(match, config.clients.webApp.url))
+      await this.deliver(
+        member.user,
+        prefs,
+        newMatchEmail(match, config.clients.webApp.url),
+        matchInvitePush(matchPushSource(match)),
+      )
     }
   }
 
   async notifyPlayerVoteOpened(match: Match, users: User[]): Promise<void> {
     const email = playerVoteOpenedEmail(match, config.clients.webApp.url)
+    const push = playerVoteOpenedPush(matchPushSource(match))
     for (const user of users) {
       const prefs = await this.getOrCreatePreferences(user.id)
       if (!prefs.notifyPlayerVote) continue
-      await this.deliver(user, prefs, email)
+      await this.deliver(user, prefs, email, push)
     }
   }
 
@@ -301,10 +333,15 @@ export class NotificationService {
       input.winnerName,
       input.isTie,
     )
+    const push = playerVoteResultPush({
+      ...matchPushSource(input.match),
+      winnerName: input.winnerName,
+      isTie: input.isTie,
+    })
     for (const user of input.users) {
       const prefs = await this.getOrCreatePreferences(user.id)
       if (!prefs.notifyPlayerVote) continue
-      await this.deliver(user, prefs, email)
+      await this.deliver(user, prefs, email, push)
     }
   }
 
@@ -403,16 +440,13 @@ export class NotificationService {
 
   private async ensureFeeRequests(): Promise<void> {
     const now = new Date()
-    const latestKickoff = new Date(now.getTime() - FEE_REQUEST_DELAY_MS)
-    const earliestKickoff = new Date(latestKickoff.getTime() - 6 * 60 * 60 * 1000)
-
     const matches = await this.em.find(
       Match,
       {
         status: { $ne: MatchStatus.Cancelled },
-        startsAt: { $gt: earliestKickoff, $lte: latestKickoff },
+        startsAt: { $gt: earliestMatchEndKickoff(now), $lte: now },
       },
-      { limit: 50 },
+      { populate: ['organization'], limit: 50 },
     )
 
     for (const match of matches) {
@@ -426,6 +460,7 @@ export class NotificationService {
       ) {
         continue
       }
+      if (!this.hasMatchEnded(match, now)) continue
       const existing = await this.em.count(ScheduledJob, {
         match: { id: match.id },
         type: ScheduledJobType.FeeRequest,
@@ -511,20 +546,18 @@ export class NotificationService {
 
   private async ensureScoreReminders(): Promise<void> {
     const now = new Date()
-    const latestKickoff = new Date(now.getTime() - SCORE_REMINDER_DELAY_MS)
-    const earliestKickoff = new Date(latestKickoff.getTime() - 6 * 60 * 60 * 1000)
-
     const matches = await this.em.find(
       Match,
       {
         status: { $ne: MatchStatus.Cancelled },
-        startsAt: { $gt: earliestKickoff, $lte: latestKickoff },
+        startsAt: { $gt: earliestMatchEndKickoff(now), $lte: now },
       },
       { populate: ['organization'], limit: 50 },
     )
 
     for (const match of matches) {
       if (!canRemindScore(match)) continue
+      if (!this.hasMatchEnded(match, now)) continue
       const existing = await this.em.count(ScheduledJob, {
         match: { id: match.id },
         type: ScheduledJobType.ScoreReminder,
@@ -547,7 +580,12 @@ export class NotificationService {
     )
     for (const member of admins) {
       const prefs = await this.getOrCreatePreferences(member.user.id)
-      await this.deliver(member.user, prefs, scoreReminderEmail(match, config.clients.webApp.url))
+      await this.deliver(
+        member.user,
+        prefs,
+        scoreReminderEmail(match, config.clients.webApp.url),
+        scoreReminderPush(matchPushSource(match)),
+      )
     }
   }
 
@@ -568,7 +606,12 @@ export class NotificationService {
       if (!shouldSendRsvpReminder(statusByUserId.get(member.user.id))) continue
       const prefs = await this.getOrCreatePreferences(member.user.id)
       if (!prefs.notifyRsvpReminder) continue
-      await this.deliver(member.user, prefs, rsvpReminderEmail(match, config.clients.webApp.url))
+      await this.deliver(
+        member.user,
+        prefs,
+        rsvpReminderEmail(match, config.clients.webApp.url),
+        rsvpReminderPush(matchPushSource(match)),
+      )
     }
   }
 
@@ -684,11 +727,29 @@ export class NotificationService {
     })
   }
 
+  private async matchEndRunAt(match: Match, now: Date = new Date()): Promise<Date> {
+    await this.em.populate(match, ['organization'])
+    return computeMatchEndNotificationRunAt(
+      match.startsAt,
+      readMatchDurationMinutes(match.organization.matchDurationMinutes),
+      now,
+    )
+  }
+
+  private hasMatchEnded(match: Match, now: Date): boolean {
+    const dueAt = computeMatchEndNotificationRunAt(
+      match.startsAt,
+      readMatchDurationMinutes(match.organization.matchDurationMinutes),
+      now,
+    )
+    return dueAt.getTime() <= now.getTime()
+  }
+
   private async deliver(
     user: User,
     prefs: NotificationPreference,
     email: NotificationEmailCopy,
-    push?: ChatPushPayload,
+    push?: AppPushPayload,
   ): Promise<void> {
     if (prefs.emailEnabled) {
       await this.emailService.sendEmail({
@@ -734,13 +795,13 @@ export class NotificationService {
   /**
    * The message is already saved. A slow push service must not hold the chat request.
    */
-  private dispatchWebPush(subscriptions: StoredWebPush[], push: ChatPushPayload): void {
+  private dispatchWebPush(subscriptions: StoredWebPush[], push: AppPushPayload): void {
     if (subscriptions.length === 0) return
     const vapid = config.vapid
     if (!vapid) {
       if (!this.warnedMissingVapid) {
         this.warnedMissingVapid = true
-        this.logger.warn('Web Push is not configured. Chat pushes are skipped.')
+        this.logger.warn('Web Push is not configured. Pushes are skipped.')
       }
       return
     }
@@ -754,7 +815,7 @@ export class NotificationService {
   private async sendWebPushes(
     em: EntityManager,
     subscriptions: StoredWebPush[],
-    push: ChatPushPayload,
+    push: AppPushPayload,
     vapid: NonNullable<typeof config.vapid>,
   ): Promise<void> {
     const goneIds: string[] = []
@@ -776,6 +837,18 @@ export class NotificationService {
     const devices = await em.find(DeviceToken, { id: { $in: goneIds } })
     for (const device of devices) em.remove(device)
     await em.flush()
+  }
+}
+
+function matchPushSource(match: Match): {
+  organizationId: string
+  matchId: string
+  matchTitle: string
+} {
+  return {
+    organizationId: match.organization.id,
+    matchId: match.id,
+    matchTitle: match.title,
   }
 }
 

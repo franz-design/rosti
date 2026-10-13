@@ -6,6 +6,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common'
+import { isMatchDurationMinutes } from '../notifications/match-end'
 import { ClubRole, Member, Organization, SportType } from './auth.entity'
 
 export interface UpdateOrganizationInput {
@@ -13,6 +14,7 @@ export interface UpdateOrganizationInput {
   venue?: string | null
   sportType?: SportType | null
   defaultMaxCapacity?: number | null
+  matchDurationMinutes?: number
   matchInviteLeadDays?: number
   matchInviteReminderLeadDays?: number | null
   feeReminderDelaysDays?: number[]
@@ -131,6 +133,12 @@ export class OrganizationService {
     if (data.sportType !== undefined) org.sportType = data.sportType ?? undefined
     if (data.defaultMaxCapacity !== undefined) {
       org.defaultMaxCapacity = data.defaultMaxCapacity ?? undefined
+    }
+    if (data.matchDurationMinutes !== undefined) {
+      if (!isMatchDurationMinutes(data.matchDurationMinutes)) {
+        throw new BadRequestException('Choose 45, 60, 75, 90, 105, or 120 minutes')
+      }
+      org.matchDurationMinutes = data.matchDurationMinutes
     }
     if (data.matchInviteLeadDays !== undefined || data.matchInviteReminderLeadDays !== undefined) {
       const leadDays = data.matchInviteLeadDays ?? org.matchInviteLeadDays

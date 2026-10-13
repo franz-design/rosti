@@ -1,14 +1,7 @@
+import type { AppPushPayload } from './app-push'
+
 const MAX_TITLE_LENGTH = 80
 const MAX_BODY_LENGTH = 140
-
-export interface ChatPushPayload {
-  title: string
-  body: string
-  event: 'chat_mention' | 'chat_message'
-  organizationId: string
-  matchId: string
-  url: string
-}
 
 export function chatPush(input: {
   isMention: boolean
@@ -17,7 +10,7 @@ export function chatPush(input: {
   matchTitle: string
   authorName: string
   body: string
-}): ChatPushPayload {
+}): AppPushPayload {
   const author = oneLine(input.authorName) || 'Un joueur'
   const excerpt = oneLine(input.body)
   const title = input.isMention ? `${author} te mentionne` : author

@@ -1,6 +1,8 @@
 {
   "name": "public",
-  "namespaces": ["public"],
+  "namespaces": [
+    "public"
+  ],
   "tables": [
     {
       "name": "account",
@@ -230,7 +232,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "account_pkey",
@@ -242,10 +246,14 @@
       "triggers": [],
       "foreignKeys": {
         "account_userId_foreign": {
-          "columnNames": ["userId"],
+          "columnNames": [
+            "userId"
+          ],
           "constraintName": "account_userId_foreign",
           "localTableName": "public.account",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user"
         }
       },
@@ -255,6 +263,23 @@
       "name": "device_token",
       "schema": "public",
       "columns": {
+        "authSecret": {
+          "name": "authSecret",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
         "createdAt": {
           "name": "createdAt",
           "type": "timestamptz(6)",
@@ -289,6 +314,40 @@
           "enumItems": [],
           "mappedType": "uuid"
         },
+        "installationId": {
+          "name": "installationId",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "p256dh": {
+          "name": "p256dh",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
         "platform": {
           "name": "platform",
           "type": "text",
@@ -303,25 +362,29 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": ["ios", "android", "web"],
+          "enumItems": [
+            "ios",
+            "android",
+            "web"
+          ],
           "mappedType": "enum"
         },
         "token": {
           "name": "token",
-          "type": "varchar(255)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "unique": false,
-          "length": 255,
+          "length": null,
           "precision": null,
           "scale": null,
           "default": null,
           "comment": null,
           "collation": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "text"
         },
         "updatedAt": {
           "name": "updatedAt",
@@ -360,7 +423,19 @@
       },
       "indexes": [
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "installationId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "device_token_installationId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "device_token_pkey",
@@ -368,7 +443,9 @@
           "unique": true
         },
         {
-          "columnNames": ["userId"],
+          "columnNames": [
+            "userId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "device_token_userId_index",
@@ -387,10 +464,14 @@
       "triggers": [],
       "foreignKeys": {
         "device_token_userId_foreign": {
-          "columnNames": ["userId"],
+          "columnNames": [
+            "userId"
+          ],
           "constraintName": "device_token_userId_foreign",
           "localTableName": "public.device_token",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "deleteRule": "cascade"
         }
@@ -557,7 +638,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "invitation_pkey",
@@ -569,17 +652,25 @@
       "triggers": [],
       "foreignKeys": {
         "invitation_inviterId_foreign": {
-          "columnNames": ["inviterId"],
+          "columnNames": [
+            "inviterId"
+          ],
           "constraintName": "invitation_inviterId_foreign",
           "localTableName": "public.invitation",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user"
         },
         "invitation_organizationId_foreign": {
-          "columnNames": ["organizationId"],
+          "columnNames": [
+            "organizationId"
+          ],
           "constraintName": "invitation_organizationId_foreign",
           "localTableName": "public.invitation",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.organization",
           "deleteRule": "cascade"
         }
@@ -726,6 +817,91 @@
           "enumItems": [],
           "mappedType": "uuid"
         },
+        "playerVoteClosedAt": {
+          "name": "playerVoteClosedAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "playerVoteClosesAt": {
+          "name": "playerVoteClosesAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "playerVoteIsTie": {
+          "name": "playerVoteIsTie",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "playerVoteOpenedAt": {
+          "name": "playerVoteOpenedAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "playerVoteWinnerId": {
+          "name": "playerVoteWinnerId",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
         "redScore": {
           "name": "redScore",
           "type": "int",
@@ -825,7 +1001,11 @@
           "default": "'scheduled'",
           "comment": null,
           "collation": null,
-          "enumItems": ["scheduled", "cancelled", "played"],
+          "enumItems": [
+            "scheduled",
+            "cancelled",
+            "played"
+          ],
           "mappedType": "enum"
         },
         "title": {
@@ -865,7 +1045,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["organizationId"],
+          "columnNames": [
+            "organizationId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "match_organizationId_index",
@@ -873,7 +1055,9 @@
           "unique": false
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "match_pkey",
@@ -881,7 +1065,19 @@
           "unique": true
         },
         {
-          "columnNames": ["seasonId"],
+          "columnNames": [
+            "playerVoteClosesAt"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_playerVoteClosesAt_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "seasonId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "match_seasonId_index",
@@ -889,7 +1085,9 @@
           "unique": false
         },
         {
-          "columnNames": ["startsAt"],
+          "columnNames": [
+            "startsAt"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "match_startsAt_index",
@@ -908,33 +1106,61 @@
       "triggers": [],
       "foreignKeys": {
         "match_createdById_foreign": {
-          "columnNames": ["createdById"],
+          "columnNames": [
+            "createdById"
+          ],
           "constraintName": "match_createdById_foreign",
           "localTableName": "public.match",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user"
         },
         "match_organizationId_foreign": {
-          "columnNames": ["organizationId"],
+          "columnNames": [
+            "organizationId"
+          ],
           "constraintName": "match_organizationId_foreign",
           "localTableName": "public.match",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.organization",
           "deleteRule": "cascade"
         },
+        "match_playerVoteWinnerId_foreign": {
+          "columnNames": [
+            "playerVoteWinnerId"
+          ],
+          "constraintName": "match_playerVoteWinnerId_foreign",
+          "localTableName": "public.match",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.user",
+          "deleteRule": "set null"
+        },
         "match_seasonId_foreign": {
-          "columnNames": ["seasonId"],
+          "columnNames": [
+            "seasonId"
+          ],
           "constraintName": "match_seasonId_foreign",
           "localTableName": "public.match",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.season",
           "deleteRule": "cascade"
         },
         "match_seriesId_foreign": {
-          "columnNames": ["seriesId"],
+          "columnNames": [
+            "seriesId"
+          ],
           "constraintName": "match_seriesId_foreign",
           "localTableName": "public.match",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.match_series",
           "deleteRule": "set null"
         }
@@ -1027,7 +1253,11 @@
           "default": "'pending'",
           "comment": null,
           "collation": null,
-          "enumItems": ["present", "absent", "pending"],
+          "enumItems": [
+            "present",
+            "absent",
+            "pending"
+          ],
           "mappedType": "enum"
         },
         "updatedAt": {
@@ -1067,7 +1297,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "match_attendance_matchId_index",
@@ -1075,7 +1307,10 @@
           "unique": false
         },
         {
-          "columnNames": ["matchId", "userId"],
+          "columnNames": [
+            "matchId",
+            "userId"
+          ],
           "composite": true,
           "constraint": true,
           "keyName": "match_attendance_matchId_userId_unique",
@@ -1083,7 +1318,9 @@
           "unique": true
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "match_attendance_pkey",
@@ -1091,7 +1328,9 @@
           "unique": true
         },
         {
-          "columnNames": ["userId"],
+          "columnNames": [
+            "userId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "match_attendance_userId_index",
@@ -1110,18 +1349,26 @@
       "triggers": [],
       "foreignKeys": {
         "match_attendance_matchId_foreign": {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "constraintName": "match_attendance_matchId_foreign",
           "localTableName": "public.match_attendance",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.match",
           "deleteRule": "cascade"
         },
         "match_attendance_userId_foreign": {
-          "columnNames": ["userId"],
+          "columnNames": [
+            "userId"
+          ],
           "constraintName": "match_attendance_userId_foreign",
           "localTableName": "public.match_attendance",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "deleteRule": "cascade"
         }
@@ -1165,6 +1412,23 @@
           "collation": null,
           "enumItems": [],
           "mappedType": "integer"
+        },
+        "feesNotifiedAt": {
+          "name": "feesNotifiedAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
         },
         "id": {
           "name": "id",
@@ -1237,7 +1501,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "match_cost_matchId_index",
@@ -1245,7 +1511,9 @@
           "unique": false
         },
         {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "match_cost_matchId_unique",
@@ -1253,7 +1521,9 @@
           "unique": true
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "match_cost_pkey",
@@ -1265,10 +1535,14 @@
       "triggers": [],
       "foreignKeys": {
         "match_cost_matchId_foreign": {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "constraintName": "match_cost_matchId_foreign",
           "localTableName": "public.match_cost",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.match",
           "deleteRule": "cascade"
         }
@@ -1344,7 +1618,10 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": ["blue", "red"],
+          "enumItems": [
+            "blue",
+            "red"
+          ],
           "mappedType": "enum"
         },
         "updatedAt": {
@@ -1384,7 +1661,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "match_lineup_matchId_index",
@@ -1392,7 +1671,10 @@
           "unique": false
         },
         {
-          "columnNames": ["matchId", "userId"],
+          "columnNames": [
+            "matchId",
+            "userId"
+          ],
           "composite": true,
           "constraint": true,
           "keyName": "match_lineup_matchId_userId_unique",
@@ -1400,7 +1682,9 @@
           "unique": true
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "match_lineup_pkey",
@@ -1419,18 +1703,26 @@
       "triggers": [],
       "foreignKeys": {
         "match_lineup_matchId_foreign": {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "constraintName": "match_lineup_matchId_foreign",
           "localTableName": "public.match_lineup",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.match",
           "deleteRule": "cascade"
         },
         "match_lineup_userId_foreign": {
-          "columnNames": ["userId"],
+          "columnNames": [
+            "userId"
+          ],
           "constraintName": "match_lineup_userId_foreign",
           "localTableName": "public.match_lineup",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "deleteRule": "cascade"
         }
@@ -1546,7 +1838,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "match_message_matchId_index",
@@ -1554,7 +1848,9 @@
           "unique": false
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "match_message_pkey",
@@ -1566,19 +1862,229 @@
       "triggers": [],
       "foreignKeys": {
         "match_message_authorId_foreign": {
-          "columnNames": ["authorId"],
+          "columnNames": [
+            "authorId"
+          ],
           "constraintName": "match_message_authorId_foreign",
           "localTableName": "public.match_message",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "deleteRule": "cascade"
         },
         "match_message_matchId_foreign": {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "constraintName": "match_message_matchId_foreign",
           "localTableName": "public.match_message",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.match",
+          "deleteRule": "cascade"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "match_player_vote",
+      "schema": "public",
+      "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "gen_random_uuid()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "matchId": {
+          "name": "matchId",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "nomineeId": {
+          "name": "nomineeId",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "voterId": {
+          "name": "voterId",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "matchId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_player_vote_matchId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "matchId",
+            "voterId"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "match_player_vote_matchId_voterId_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "nomineeId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_player_vote_nomineeId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "match_player_vote_pkey",
+          "primary": true,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "voterId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "match_player_vote_voterId_index",
+          "primary": false,
+          "unique": false
+        }
+      ],
+      "checks": [],
+      "triggers": [],
+      "foreignKeys": {
+        "match_player_vote_matchId_foreign": {
+          "columnNames": [
+            "matchId"
+          ],
+          "constraintName": "match_player_vote_matchId_foreign",
+          "localTableName": "public.match_player_vote",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.match",
+          "deleteRule": "cascade"
+        },
+        "match_player_vote_nomineeId_foreign": {
+          "columnNames": [
+            "nomineeId"
+          ],
+          "constraintName": "match_player_vote_nomineeId_foreign",
+          "localTableName": "public.match_player_vote",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.user",
+          "deleteRule": "cascade"
+        },
+        "match_player_vote_voterId_foreign": {
+          "columnNames": [
+            "voterId"
+          ],
+          "constraintName": "match_player_vote_voterId_foreign",
+          "localTableName": "public.match_player_vote",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.user",
           "deleteRule": "cascade"
         }
       },
@@ -1653,7 +2159,12 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": ["weekly", "monthly", "monthly_nth_weekday", "custom"],
+          "enumItems": [
+            "weekly",
+            "monthly",
+            "monthly_nth_weekday",
+            "custom"
+          ],
           "mappedType": "enum"
         },
         "id": {
@@ -1812,7 +2323,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["organizationId"],
+          "columnNames": [
+            "organizationId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "match_series_organizationId_index",
@@ -1820,7 +2333,9 @@
           "unique": false
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "match_series_pkey",
@@ -1839,25 +2354,37 @@
       "triggers": [],
       "foreignKeys": {
         "match_series_createdById_foreign": {
-          "columnNames": ["createdById"],
+          "columnNames": [
+            "createdById"
+          ],
           "constraintName": "match_series_createdById_foreign",
           "localTableName": "public.match_series",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user"
         },
         "match_series_organizationId_foreign": {
-          "columnNames": ["organizationId"],
+          "columnNames": [
+            "organizationId"
+          ],
           "constraintName": "match_series_organizationId_foreign",
           "localTableName": "public.match_series",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.organization",
           "deleteRule": "cascade"
         },
         "match_series_seasonId_foreign": {
-          "columnNames": ["seasonId"],
+          "columnNames": [
+            "seasonId"
+          ],
           "constraintName": "match_series_seasonId_foreign",
           "localTableName": "public.match_series",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.season",
           "deleteRule": "cascade"
         }
@@ -1990,7 +2517,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "match_stat_matchId_index",
@@ -1998,7 +2527,10 @@
           "unique": false
         },
         {
-          "columnNames": ["matchId", "userId"],
+          "columnNames": [
+            "matchId",
+            "userId"
+          ],
           "composite": true,
           "constraint": true,
           "keyName": "match_stat_matchId_userId_unique",
@@ -2006,7 +2538,9 @@
           "unique": true
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "match_stat_pkey",
@@ -2018,18 +2552,26 @@
       "triggers": [],
       "foreignKeys": {
         "match_stat_matchId_foreign": {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "constraintName": "match_stat_matchId_foreign",
           "localTableName": "public.match_stat",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.match",
           "deleteRule": "cascade"
         },
         "match_stat_userId_foreign": {
-          "columnNames": ["userId"],
+          "columnNames": [
+            "userId"
+          ],
           "constraintName": "match_stat_userId_foreign",
           "localTableName": "public.match_stat",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "deleteRule": "cascade"
         }
@@ -2128,7 +2670,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "member_pkey",
@@ -2140,18 +2684,26 @@
       "triggers": [],
       "foreignKeys": {
         "member_organizationId_foreign": {
-          "columnNames": ["organizationId"],
+          "columnNames": [
+            "organizationId"
+          ],
           "constraintName": "member_organizationId_foreign",
           "localTableName": "public.member",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.organization",
           "deleteRule": "cascade"
         },
         "member_userId_foreign": {
-          "columnNames": ["userId"],
+          "columnNames": [
+            "userId"
+          ],
           "constraintName": "member_userId_foreign",
           "localTableName": "public.member",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "deleteRule": "cascade"
         }
@@ -2233,7 +2785,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "message_mention_pkey",
@@ -2245,18 +2799,26 @@
       "triggers": [],
       "foreignKeys": {
         "message_mention_mentionedUserId_foreign": {
-          "columnNames": ["mentionedUserId"],
+          "columnNames": [
+            "mentionedUserId"
+          ],
           "constraintName": "message_mention_mentionedUserId_foreign",
           "localTableName": "public.message_mention",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "deleteRule": "cascade"
         },
         "message_mention_messageId_foreign": {
-          "columnNames": ["messageId"],
+          "columnNames": [
+            "messageId"
+          ],
           "constraintName": "message_mention_messageId_foreign",
           "localTableName": "public.message_mention",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.match_message",
           "deleteRule": "cascade"
         }
@@ -2352,6 +2914,23 @@
           "enumItems": [],
           "mappedType": "boolean"
         },
+        "notifyFeeRequest": {
+          "name": "notifyFeeRequest",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
         "notifyMatchCancelled": {
           "name": "notifyMatchCancelled",
           "type": "boolean",
@@ -2371,6 +2950,23 @@
         },
         "notifyNewMatch": {
           "name": "notifyNewMatch",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "notifyPlayerVote": {
+          "name": "notifyPlayerVote",
           "type": "boolean",
           "unsigned": false,
           "autoincrement": false,
@@ -2457,7 +3053,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "notification_preference_pkey",
@@ -2465,7 +3063,9 @@
           "unique": true
         },
         {
-          "columnNames": ["userId"],
+          "columnNames": [
+            "userId"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "notification_preference_userId_unique",
@@ -2477,10 +3077,14 @@
       "triggers": [],
       "foreignKeys": {
         "notification_preference_userId_foreign": {
-          "columnNames": ["userId"],
+          "columnNames": [
+            "userId"
+          ],
           "constraintName": "notification_preference_userId_foreign",
           "localTableName": "public.notification_preference",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "deleteRule": "cascade"
         }
@@ -2525,6 +3129,23 @@
           "enumItems": [],
           "mappedType": "integer"
         },
+        "feeReminderDelaysDays": {
+          "name": "feeReminderDelaysDays",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'[3,7]'",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "json"
+        },
         "id": {
           "name": "id",
           "type": "uuid",
@@ -2558,6 +3179,23 @@
           "collation": null,
           "enumItems": [],
           "mappedType": "string"
+        },
+        "matchDurationMinutes": {
+          "name": "matchDurationMinutes",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "90",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
         },
         "matchInviteLeadDays": {
           "name": "matchInviteLeadDays",
@@ -2707,7 +3345,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "organization_pkey",
@@ -2715,7 +3355,9 @@
           "unique": true
         },
         {
-          "columnNames": ["slug"],
+          "columnNames": [
+            "slug"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "organization_slug_unique",
@@ -2733,6 +3375,194 @@
       ],
       "triggers": [],
       "foreignKeys": {},
+      "comment": null
+    },
+    {
+      "name": "player_skill",
+      "schema": "public",
+      "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "gen_random_uuid()",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "organizationId": {
+          "name": "organizationId",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "skill": {
+          "name": "skill",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 255,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "value": {
+          "name": "value",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "organizationId"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "player_skill_organizationId_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "organizationId",
+            "userId",
+            "skill"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "player_skill_organizationId_userId_skill_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "player_skill_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "triggers": [],
+      "foreignKeys": {
+        "player_skill_organizationId_foreign": {
+          "columnNames": [
+            "organizationId"
+          ],
+          "constraintName": "player_skill_organizationId_foreign",
+          "localTableName": "public.player_skill",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.organization",
+          "deleteRule": "cascade"
+        },
+        "player_skill_userId_foreign": {
+          "columnNames": [
+            "userId"
+          ],
+          "constraintName": "player_skill_userId_foreign",
+          "localTableName": "public.player_skill",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.user",
+          "deleteRule": "cascade"
+        }
+      },
       "comment": null
     },
     {
@@ -2838,7 +3668,12 @@
           "default": "'pending'",
           "comment": null,
           "collation": null,
-          "enumItems": ["pending", "done", "cancelled", "failed"],
+          "enumItems": [
+            "pending",
+            "done",
+            "cancelled",
+            "failed"
+          ],
           "mappedType": "enum"
         },
         "type": {
@@ -2855,7 +3690,13 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": ["match_invite", "rsvp_reminder", "score_reminder"],
+          "enumItems": [
+            "match_invite",
+            "rsvp_reminder",
+            "score_reminder",
+            "fee_request",
+            "fee_reminder"
+          ],
           "mappedType": "enum"
         },
         "updatedAt": {
@@ -2878,7 +3719,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "scheduled_job_matchId_index",
@@ -2886,7 +3729,9 @@
           "unique": false
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "scheduled_job_pkey",
@@ -2894,7 +3739,9 @@
           "unique": true
         },
         {
-          "columnNames": ["runAt"],
+          "columnNames": [
+            "runAt"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "scheduled_job_runAt_index",
@@ -2911,18 +3758,22 @@
         },
         {
           "name": "scheduled_job_type_check",
-          "expression": "\"type\" in ('match_invite', 'rsvp_reminder', 'score_reminder')",
-          "definition": "check (\"type\" in ('match_invite', 'rsvp_reminder', 'score_reminder'))",
+          "expression": "\"type\" in ('match_invite', 'rsvp_reminder', 'score_reminder', 'fee_request', 'fee_reminder')",
+          "definition": "check (\"type\" in ('match_invite', 'rsvp_reminder', 'score_reminder', 'fee_request', 'fee_reminder'))",
           "columnName": "type"
         }
       ],
       "triggers": [],
       "foreignKeys": {
         "scheduled_job_matchId_foreign": {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "constraintName": "scheduled_job_matchId_foreign",
           "localTableName": "public.scheduled_job",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.match",
           "deleteRule": "cascade"
         }
@@ -3049,7 +3900,10 @@
           "default": "'active'",
           "comment": null,
           "collation": null,
-          "enumItems": ["active", "closed"],
+          "enumItems": [
+            "active",
+            "closed"
+          ],
           "mappedType": "enum"
         },
         "updatedAt": {
@@ -3072,7 +3926,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["organizationId"],
+          "columnNames": [
+            "organizationId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "season_organizationId_index",
@@ -3080,7 +3936,9 @@
           "unique": false
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "season_pkey",
@@ -3099,10 +3957,14 @@
       "triggers": [],
       "foreignKeys": {
         "season_organizationId_foreign": {
-          "columnNames": ["organizationId"],
+          "columnNames": [
+            "organizationId"
+          ],
           "constraintName": "season_organizationId_foreign",
           "localTableName": "public.season",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.organization",
           "deleteRule": "cascade"
         }
@@ -3269,7 +4131,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "session_pkey",
@@ -3277,7 +4141,9 @@
           "unique": true
         },
         {
-          "columnNames": ["token"],
+          "columnNames": [
+            "token"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "session_token_unique",
@@ -3289,10 +4155,14 @@
       "triggers": [],
       "foreignKeys": {
         "session_userId_foreign": {
-          "columnNames": ["userId"],
+          "columnNames": [
+            "userId"
+          ],
           "constraintName": "session_userId_foreign",
           "localTableName": "public.session",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user"
         }
       },
@@ -3353,6 +4223,23 @@
           "enumItems": [],
           "mappedType": "uuid"
         },
+        "lastRemindedAt": {
+          "name": "lastRemindedAt",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
         "matchId": {
           "name": "matchId",
           "type": "uuid",
@@ -3387,6 +4274,40 @@
           "enumItems": [],
           "mappedType": "datetime"
         },
+        "reminderCount": {
+          "name": "reminderCount",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "0",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "shares": {
+          "name": "shares",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "1",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
         "status": {
           "name": "status",
           "type": "text",
@@ -3401,7 +4322,11 @@
           "default": "'owed'",
           "comment": null,
           "collation": null,
-          "enumItems": ["owed", "paid", "waived"],
+          "enumItems": [
+            "owed",
+            "paid",
+            "waived"
+          ],
           "mappedType": "enum"
         },
         "updatedAt": {
@@ -3441,7 +4366,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "session_fee_matchId_index",
@@ -3449,7 +4376,10 @@
           "unique": false
         },
         {
-          "columnNames": ["matchId", "userId"],
+          "columnNames": [
+            "matchId",
+            "userId"
+          ],
           "composite": true,
           "constraint": true,
           "keyName": "session_fee_matchId_userId_unique",
@@ -3457,7 +4387,9 @@
           "unique": true
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "session_fee_pkey",
@@ -3476,18 +4408,26 @@
       "triggers": [],
       "foreignKeys": {
         "session_fee_matchId_foreign": {
-          "columnNames": ["matchId"],
+          "columnNames": [
+            "matchId"
+          ],
           "constraintName": "session_fee_matchId_foreign",
           "localTableName": "public.session_fee",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.match",
           "deleteRule": "cascade"
         },
         "session_fee_userId_foreign": {
-          "columnNames": ["userId"],
+          "columnNames": [
+            "userId"
+          ],
           "constraintName": "session_fee_userId_foreign",
           "localTableName": "public.session_fee",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "deleteRule": "cascade"
         }
@@ -3671,7 +4611,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["email"],
+          "columnNames": [
+            "email"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "user_email_unique",
@@ -3679,7 +4621,9 @@
           "unique": true
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "user_pkey",
@@ -3801,7 +4745,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "verification_pkey",

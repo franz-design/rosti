@@ -99,6 +99,14 @@ export const zUpdateClubSchema = z.object({
         z.int().gt(0).lte(9007199254740991),
         z.null()
     ])),
+    matchDurationMinutes: z.optional(z.union([
+        z.literal(45),
+        z.literal(60),
+        z.literal(75),
+        z.literal(90),
+        z.literal(105),
+        z.literal(120)
+    ])),
     matchInviteLeadDays: z.optional(z.int().gte(1).lte(30)),
     matchInviteReminderLeadDays: z.optional(z.union([
         z.int().gte(1).lte(29),
@@ -430,6 +438,14 @@ export const zClubSchema = z.object({
         z.int().gt(0).lte(9007199254740991),
         z.null()
     ])),
+    matchDurationMinutes: z.union([
+        z.literal(45),
+        z.literal(60),
+        z.literal(75),
+        z.literal(90),
+        z.literal(105),
+        z.literal(120)
+    ]),
     matchInviteLeadDays: z.int().gte(1).lte(30),
     matchInviteReminderLeadDays: z.optional(z.union([
         z.int().gte(1).lte(29),
@@ -1015,6 +1031,14 @@ export const zClubControllerUpdateData = z.object({
         defaultMaxCapacity: z.optional(z.union([
             z.int().gt(0).lte(9007199254740991),
             z.null()
+        ])),
+        matchDurationMinutes: z.optional(z.union([
+            z.literal(45),
+            z.literal(60),
+            z.literal(75),
+            z.literal(90),
+            z.literal(105),
+            z.literal(120)
         ])),
         matchInviteLeadDays: z.optional(z.int().gte(1).lte(30)),
         matchInviteReminderLeadDays: z.optional(z.union([

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isMatchDurationMinutes } from '../../notifications/match-end'
 
 export enum SportType {
   Football = 'football',
@@ -37,6 +38,10 @@ export const updateMemberRoleSchema = z
 
 export type UpdateMemberRoleInput = z.infer<typeof updateMemberRoleSchema>
 
+const matchDurationMinutesSchema = z.number().int().refine(isMatchDurationMinutes, {
+  message: 'Choose 45, 60, 75, 90, 105, or 120 minutes',
+})
+
 export const clubSchema = z
   .object({
     id: z.string().uuid(),
@@ -47,6 +52,7 @@ export const clubSchema = z
     venue: z.string().nullish(),
     sportType: z.nativeEnum(SportType).nullish(),
     defaultMaxCapacity: z.number().int().positive().nullish(),
+    matchDurationMinutes: matchDurationMinutesSchema,
     matchInviteLeadDays: z.number().int().min(1).max(30),
     matchInviteReminderLeadDays: z.number().int().min(1).max(29).nullish(),
     feeReminderDelaysDays: z.array(z.number().int().min(1).max(60)).max(4),
@@ -63,6 +69,7 @@ export const updateClubSchema = z
     venue: z.string().min(1).nullish(),
     sportType: z.nativeEnum(SportType).nullish(),
     defaultMaxCapacity: z.number().int().positive().nullish(),
+    matchDurationMinutes: matchDurationMinutesSchema.optional(),
     matchInviteLeadDays: z.number().int().min(1).max(30).optional(),
     matchInviteReminderLeadDays: z.number().int().min(1).max(29).nullish(),
     feeReminderDelaysDays: z.array(z.number().int().min(1).max(60)).max(4).optional(),

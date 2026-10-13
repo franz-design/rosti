@@ -72,6 +72,7 @@ export type UpdateClubSchema = {
     venue?: string | null;
     sportType?: 'football' | 'futsal' | 'basketball' | 'volleyball' | 'tennis' | 'padel' | 'badminton' | 'other' | null;
     defaultMaxCapacity?: number | null;
+    matchDurationMinutes?: number;
     matchInviteLeadDays?: number;
     matchInviteReminderLeadDays?: number | null;
     feeReminderDelaysDays?: Array<number>;
@@ -300,6 +301,7 @@ export type ClubSchema = {
     venue?: string | null;
     sportType?: 'football' | 'futsal' | 'basketball' | 'volleyball' | 'tennis' | 'padel' | 'badminton' | 'other' | null;
     defaultMaxCapacity?: number | null;
+    matchDurationMinutes: number;
     matchInviteLeadDays: number;
     matchInviteReminderLeadDays?: number | null;
     feeReminderDelaysDays: Array<number>;
@@ -689,6 +691,7 @@ export type ClubControllerUpdateData = {
         venue?: string | null;
         sportType?: 'football' | 'futsal' | 'basketball' | 'volleyball' | 'tennis' | 'padel' | 'badminton' | 'other' | null;
         defaultMaxCapacity?: number | null;
+        matchDurationMinutes?: number;
         matchInviteLeadDays?: number;
         matchInviteReminderLeadDays?: number | null;
         feeReminderDelaysDays?: Array<number>;

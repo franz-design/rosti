@@ -19,6 +19,7 @@ import { AvatarUploadExceptionFilter } from '../avatars/avatar-upload.filter'
 import { AVATAR_MAX_BYTES } from '../avatars/avatar.constants'
 import { AvatarService } from '../avatars/avatar.service'
 import { AvatarDto, avatarSchema } from '../avatars/contracts/avatar.contract'
+import { readMatchDurationMinutes } from '../notifications/match-end'
 import { NotificationService } from '../notifications/notification.service'
 import {
   ClubDto,
@@ -41,6 +42,7 @@ function toClubDto(o: Organization): ClubDto {
     venue: o.venue,
     sportType: o.sportType,
     defaultMaxCapacity: o.defaultMaxCapacity,
+    matchDurationMinutes: readMatchDurationMinutes(o.matchDurationMinutes),
     matchInviteLeadDays: o.matchInviteLeadDays,
     matchInviteReminderLeadDays: o.matchInviteReminderLeadDays,
     feeReminderDelaysDays: o.feeReminderDelaysDays,
@@ -92,6 +94,9 @@ export class ClubController {
     )
     if (body.matchInviteLeadDays !== undefined || body.matchInviteReminderLeadDays !== undefined) {
       await this.notificationService.syncUpcomingMatchInvites(organizationId)
+    }
+    if (body.matchDurationMinutes !== undefined) {
+      await this.notificationService.rescheduleMatchEndNotifications(organizationId)
     }
     return toClubDto(o)
   }

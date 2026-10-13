@@ -435,6 +435,14 @@
       "hint": "Crée, renomme ou clôture les saisons du club. Une seule est en cours.",
       "manage": "Gérer les saisons"
     },
+    "matchDuration": {
+      "title": "Durée des matchs",
+      "hint": "Le rappel de score et la demande de paiement partent 15 minutes après la fin.",
+      "label": "Durée",
+      "minutes": "{{count}} minutes",
+      "save": "Enregistrer",
+      "saved": "Durée enregistrée"
+    },
     "matchInvite": {
       "title": "Invitation aux matchs",
       "hint": "L'invitation au prochain match part au délai choisi avant la date du match.",
@@ -672,6 +680,15 @@
       "lightMode": "Passer en mode clair",
       "darkMode": "Passer en mode sombre"
     }
+  },
+  "pushPrompt": {
+    "title": "Active les notifications",
+    "description": "Rösti peut t'avertir d'un nouveau match, d'un rappel ou d'un message dans le chat, même quand l'application est fermée.",
+    "enable": "Activer les notifications",
+    "enabling": "Activation…",
+    "later": "Plus tard",
+    "enabled": "Notifications activées sur cet appareil",
+    "failed": "Impossible d'activer les notifications sur cet appareil."
   },
   "profile": {
     "eyebrow": "Compte",

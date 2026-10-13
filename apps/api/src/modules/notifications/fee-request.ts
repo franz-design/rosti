@@ -1,17 +1,18 @@
 import { MatchStatus } from '../matches/contracts/match.contract'
 import { FeeStatus } from '../payments/contracts/payment.contract'
-
-/** Same delay as the score reminder: 90 minutes after kickoff. */
-export const FEE_REQUEST_DELAY_MS = 90 * 60 * 1000
+import { computeMatchEndNotificationRunAt } from './match-end'
 
 /** A player is not reminded twice within this window, including a manual reminder. */
 export const FEE_REMINDER_COOLDOWN_MS = 20 * 60 * 60 * 1000
 
 export const DEFAULT_FEE_REMINDER_DELAYS_DAYS = [3, 7] as const
 
-export function computeFeeRequestRunAt(startsAt: Date, now: Date = new Date()): Date {
-  const dueAt = new Date(startsAt.getTime() + FEE_REQUEST_DELAY_MS)
-  return dueAt > now ? dueAt : new Date(now.getTime())
+export function computeFeeRequestRunAt(
+  startsAt: Date,
+  durationMinutes: number,
+  now: Date = new Date(),
+): Date {
+  return computeMatchEndNotificationRunAt(startsAt, durationMinutes, now)
 }
 
 /** The payment request email is sent once, and never for a cancelled match. */

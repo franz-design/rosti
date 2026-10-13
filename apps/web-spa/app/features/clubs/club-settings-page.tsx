@@ -15,6 +15,7 @@ import {
   DEFAULT_CLUB_SETTINGS_TAB,
 } from './components/settings/club-settings-tabs'
 import { InviteMembersSection } from './components/settings/invite-members-section'
+import { MatchDurationSettingsSection } from './components/settings/match-duration-settings-section'
 import { MatchInviteSettingsSection } from './components/settings/match-invite-settings-section'
 import { FeeReminderSettingsSection } from './components/settings/fee-reminder-settings-section'
 import { PaymentLinkSection } from './components/settings/payment-link-section'
@@ -104,7 +105,10 @@ export default function ClubSettingsPage() {
         </TabsContent>
 
         <TabsContent value="notifications" className="outline-none">
-          <MatchInviteSettingsSection />
+          <div className="space-y-8">
+            <MatchDurationSettingsSection />
+            <MatchInviteSettingsSection />
+          </div>
         </TabsContent>
 
         <TabsContent value="payment" className="outline-none">

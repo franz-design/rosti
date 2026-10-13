@@ -27,8 +27,28 @@ export function getOrCreatePushInstallationId(): string {
 
 export function shouldExplainIosHomeScreen(): boolean {
   if (typeof navigator === 'undefined' || typeof window === 'undefined') return false
-  if (isStandaloneDisplay()) return false
+  if (isInstalledPwa()) return false
   return isIosBrowser()
+}
+
+export function isInstalledPwa(): boolean {
+  if (typeof navigator === 'undefined' || typeof window === 'undefined') return false
+  return isStandaloneDisplay()
+}
+
+export function readConfiguredWebPushPublicKey(): string | null {
+  const value = import.meta.env.VITE_VAPID_PUBLIC_KEY
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  return trimmed || null
+}
+
+export async function waitForInstalledPushRegistration(): Promise<ServiceWorkerRegistration | null> {
+  if (!canUseWebPush()) return null
+  const existing = await navigator.serviceWorker.getRegistration()
+  if (existing) return existing
+  if (!import.meta.env.PROD) return null
+  return navigator.serviceWorker.ready
 }
 
 export async function readBrowserPushState(): Promise<BrowserPushState> {

@@ -3,20 +3,29 @@ import { MatchStatus } from '../matches/contracts/match.contract'
 import { canRemindScore, computeScoreReminderRunAt } from './score-reminder'
 
 describe('computeScoreReminderRunAt', () => {
-  it('schedules 90 minutes after kickoff when that is still in the future', () => {
+  it('schedules 15 minutes after the configured duration', () => {
     const inputStartsAt = new Date('2026-09-21T18:00:00.000Z')
     const inputNow = new Date('2026-09-21T10:00:00.000Z')
 
-    const actual = computeScoreReminderRunAt(inputStartsAt, inputNow)
+    const actual = computeScoreReminderRunAt(inputStartsAt, 90, inputNow)
 
-    expect(actual.toISOString()).toBe('2026-09-21T19:30:00.000Z')
+    expect(actual.toISOString()).toBe('2026-09-21T19:45:00.000Z')
+  })
+
+  it('uses a shorter match when the club chose one', () => {
+    const inputStartsAt = new Date('2026-09-21T18:00:00.000Z')
+    const inputNow = new Date('2026-09-21T10:00:00.000Z')
+
+    const actual = computeScoreReminderRunAt(inputStartsAt, 60, inputNow)
+
+    expect(actual.toISOString()).toBe('2026-09-21T19:15:00.000Z')
   })
 
   it('runs immediately when the match already ended', () => {
     const inputStartsAt = new Date('2026-09-21T10:00:00.000Z')
     const inputNow = new Date('2026-09-21T18:00:00.000Z')
 
-    const actual = computeScoreReminderRunAt(inputStartsAt, inputNow)
+    const actual = computeScoreReminderRunAt(inputStartsAt, 90, inputNow)
 
     expect(actual.toISOString()).toBe(inputNow.toISOString())
   })

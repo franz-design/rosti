@@ -7,6 +7,7 @@ import { rostiApi } from '@/lib/rosti-api'
 import {
   enableWebPushOnThisBrowser,
   readBrowserPushState,
+  readConfiguredWebPushPublicKey,
   shouldExplainIosHomeScreen,
   type BrowserPushState,
 } from '@/lib/web-push'
@@ -24,7 +25,7 @@ export function PushDeviceStatus({ pushEnabled, enableRef }: PushDeviceStatusPro
     queryKey: ['web-push-public-key'],
     queryFn: () => rostiApi.getWebPushPublicKey(),
   })
-  const publicKey = keyData?.publicKey || readVitePublicKey()
+  const publicKey = keyData?.publicKey || readConfiguredWebPushPublicKey()
 
   const activate = useCallback(
     async (key: string): Promise<void> => {
@@ -124,11 +125,4 @@ function resolveStatusKey(input: {
   if (input.browserState === 'allowed') return 'profile.notifications.pushStatusAllowed'
   if (input.browserState === 'failed') return 'profile.notifications.pushStatusFailed'
   return 'profile.notifications.pushStatusNotAsked'
-}
-
-function readVitePublicKey(): string | null {
-  const value = import.meta.env.VITE_VAPID_PUBLIC_KEY
-  if (typeof value !== 'string') return null
-  const trimmed = value.trim()
-  return trimmed || null
 }

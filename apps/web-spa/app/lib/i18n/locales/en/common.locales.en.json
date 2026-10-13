@@ -435,6 +435,14 @@
       "hint": "Create, rename, or close the club seasons. Only one stays active.",
       "manage": "Manage seasons"
     },
+    "matchDuration": {
+      "title": "Match length",
+      "hint": "The score reminder and the payment request go out 15 minutes after the match ends.",
+      "label": "Length",
+      "minutes": "{{count}} minutes",
+      "save": "Save",
+      "saved": "Match length saved"
+    },
     "matchInvite": {
       "title": "Match registration",
       "hint": "Invited players only receive the invitation to join the team. The registration email for the next match goes out at the delay you choose, before kickoff.",
@@ -672,6 +680,15 @@
       "lightMode": "Switch to light mode",
       "darkMode": "Switch to dark mode"
     }
+  },
+  "pushPrompt": {
+    "title": "Turn on notifications",
+    "description": "Rösti can tell you about a new match, a reminder, or a chat message, even when the app is closed.",
+    "enable": "Turn on notifications",
+    "enabling": "Turning on…",
+    "later": "Not now",
+    "enabled": "Notifications are on for this device",
+    "failed": "Could not turn on notifications on this device."
   },
   "profile": {
     "eyebrow": "Account",
