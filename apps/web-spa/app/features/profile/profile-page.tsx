@@ -13,6 +13,8 @@ import { rostiApi } from '@/lib/rosti-api'
 import { ProfileDetailsForm } from './components/profile-details-form'
 import { ProfileHeader } from './components/profile-header'
 import { ProfileIdentity } from './components/profile-identity'
+import { ProfileSkillsTab } from './components/profile-skills-tab'
+import { ProfileStatsTab } from './components/profile-stats-tab'
 import { DEFAULT_PROFILE_TAB, PROFILE_TABS, ProfileTabsList } from './components/profile-tabs'
 import {
   getNameParts,
@@ -124,6 +126,14 @@ export default function ProfilePage() {
               onSubmit={(data) => saveProfile(data)}
             />
           </div>
+        </TabsContent>
+
+        <TabsContent value="stats" className="outline-none">
+          <ProfileStatsTab />
+        </TabsContent>
+
+        <TabsContent value="skills" className="outline-none">
+          <ProfileSkillsTab />
         </TabsContent>
 
         <TabsContent value="notifications" className="outline-none">

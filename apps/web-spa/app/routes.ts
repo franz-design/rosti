@@ -12,7 +12,8 @@ export default [
     route('seasons', 'features/seasons/seasons-page.tsx'),
     route('seasons/:seasonId/stats', 'features/stats/season-stats-page.tsx'),
     route('players/:id', 'features/players/player-detail-page.tsx'),
-    route('dashboard/profile', 'features/profile/profile-page.tsx'),
+    route('profile', 'features/profile/profile-page.tsx'),
+    route('dashboard/profile', 'features/profile/profile-redirect.tsx'),
   ]),
   layout('features/auth/auth-layout.tsx', [
     route('login', 'features/auth/auth-login-page.tsx'),

@@ -115,14 +115,14 @@
     "darkMode": "Mode sombre",
     "logOut": "Se déconnecter",
     "language": "Langue",
-    "navigation": "Navigation",
-    "profile": "Profil"
+    "navigation": "Navigation"
   },
   "nav": {
     "home": "Dashboard",
     "matches": "Matchs",
+    "profile": "Profil",
     "clubSettings": "Paramètres du club",
-    "settings": "Paramètres"
+    "settings": "Le club"
   },
   "home": {
     "eyebrow": "Ton club",
@@ -556,7 +556,7 @@
     "assists": "Passes"
   },
   "playerSkills": {
-    "title": "Compétences",
+    "title": "Note chacune de tes compétences entre 0 et 10",
     "hint": "De 0 à 10.",
     "saveError": "Impossible d'enregistrer ce niveau.",
     "sports": {
@@ -725,8 +725,11 @@
     "description": "Les détails de votre compte.",
     "tabs": {
       "info": "Vos informations",
+      "stats": "Statistiques",
+      "skills": "Compétences",
       "notifications": "Préférences de notification"
     },
+    "noSkills": "Ce sport n'a pas de compétences à noter.",
     "notifications": {
       "description": "Choisis comment Rösti te contacte.",
       "saved": "Préférences enregistrées",

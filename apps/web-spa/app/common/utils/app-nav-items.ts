@@ -2,6 +2,7 @@ import { type SolarIcon } from '@rosti/ui/icons'
 import { CalendarIcon } from '@solar-icons/react/bold/calendar'
 import { HomeSmileIcon } from '@solar-icons/react/bold/home-smile'
 import { SettingsIcon } from '@solar-icons/react/bold/settings'
+import { UserRoundedIcon } from '@solar-icons/react/bold/user-rounded'
 import { useTranslation } from 'react-i18next'
 import { useClub } from '@/features/clubs/hooks/club-context'
 
@@ -23,7 +24,7 @@ export function useAppNavItems(): AppNavItem[] {
   const { t } = useTranslation()
   const { isClubAdmin } = useClub()
 
-  return [
+  const items: AppNavItem[] = [
     {
       label: t('nav.home'),
       to: '/dashboard',
@@ -35,9 +36,19 @@ export function useAppNavItems(): AppNavItem[] {
       icon: CalendarIcon,
     },
     {
-      label: t('nav.settings'),
-      to: isClubAdmin ? '/club-settings' : '/dashboard/profile',
-      icon: SettingsIcon,
+      label: t('nav.profile'),
+      to: '/profile',
+      icon: UserRoundedIcon,
     },
   ]
+
+  if (isClubAdmin) {
+    items.push({
+      label: t('nav.settings'),
+      to: '/club-settings',
+      icon: SettingsIcon,
+    })
+  }
+
+  return items
 }

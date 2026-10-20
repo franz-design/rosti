@@ -13,7 +13,7 @@ export function AppBottomNav() {
       aria-label={t('dashboard.navigation')}
       className="z-50 shrink-0 border-t border-border bg-background px-2 pt-1.5 pb-[calc(6px+var(--safe-area-bottom))] shadow-[0_-1px_15px_-3px_rgb(0_0_0/0.1),0_-2px_6px_-4px_rgb(0_0_0/0.1)] md:hidden"
     >
-      <ul className="grid grid-cols-3">
+      <ul className={cn('grid', items.length > 3 ? 'grid-cols-4' : 'grid-cols-3')}>
         {items.map((item) => {
           const isActive = isAppNavItemActive(location.pathname, item.to)
 

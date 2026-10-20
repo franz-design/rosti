@@ -47,13 +47,12 @@ export function PlayerSeasonStats({ season, stats }: PlayerSeasonStatsProps) {
   return (
     <section className="space-y-3">
       <div>
-        <h2 className="text-lg font-medium">{t('playerDetail.statsTitle')}</h2>
         {season ? (
           <Link
             to={`/seasons/${season.id}/stats`}
-            className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            className="underline-offset-4 hover:underline inline-block"
           >
-            {season.name}
+            <h2 className="text-lg font-medium">{season.name}</h2>
           </Link>
         ) : (
           <p className="text-sm text-muted-foreground">{t('playerDetail.noSeason')}</p>

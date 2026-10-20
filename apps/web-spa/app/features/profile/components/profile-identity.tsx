@@ -27,7 +27,7 @@ export function ProfileIdentity({
 
   return (
     <div className="flex items-center gap-4">
-      <Avatar size="lg" className="size-16">
+      <Avatar className="size-30">
         {imageUrl ? <AvatarImage src={imageUrl} alt="" /> : null}
         <AvatarFallback className="text-lg font-bold">{initials}</AvatarFallback>
       </Avatar>

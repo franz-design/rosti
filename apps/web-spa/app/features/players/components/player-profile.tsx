@@ -22,7 +22,7 @@ export function PlayerProfile({ player }: PlayerProfileProps) {
       <PlayerAvatar
         name={player.name}
         imageUrl={player.image}
-        className="size-[120px]"
+        className="size-30"
         fallbackClassName="text-3xl font-semibold"
       />
       <div className="min-w-0 space-y-2">

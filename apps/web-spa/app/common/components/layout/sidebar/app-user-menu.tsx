@@ -13,9 +13,9 @@ import {
   DropdownMenuTrigger,
 } from '@rosti/ui/components/primitives/dropdown-menu'
 import { SidebarMenuButton } from '@rosti/ui/components/primitives/sidebar'
-import { ChevronUp, Globe, LogOut, Moon, Sun, User } from '@rosti/ui/icons'
+import { ChevronUp, Globe, LogOut, Moon, Sun } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 import useTheme from '@/hooks/useTheme'
 import { authClient } from '@/lib/auth-client'
 import { removeThisBrowserPushSubscription } from '@/lib/web-push'
@@ -96,13 +96,6 @@ export function AppUserMenu({ variant = 'sidebar' }: AppUserMenuProps) {
         align={isCompact ? 'end' : 'start'}
         className="w-56"
       >
-        <DropdownMenuItem render={<Link to="/dashboard/profile" />}>
-          <User className="mr-2 h-4 w-4" />
-          <span>{t('dashboard.profile')}</span>
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator />
-
         <DropdownMenuItem onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
           {theme === 'dark' ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
           <span>{theme === 'dark' ? t('dashboard.lightMode') : t('dashboard.darkMode')}</span>
