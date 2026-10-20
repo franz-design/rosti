@@ -10,14 +10,18 @@
   },
   "auth": {
     "login": {
-      "title": "Connexion",
-      "description": "Entrez votre email et mot de passe pour vous connecter.",
+      "title": "Bon retour.",
+      "description": "Entre ton email et ton mot de passe.",
+      "inviteDescription": "Connecte-toi pour rejoindre {{club}}.",
+      "inviteDescriptionFallback": "Connecte-toi pour rejoindre ton club.",
       "email": "Email",
       "password": "Mot de passe",
       "forgotPassword": "Mot de passe oublié ?",
       "signIn": "Se connecter",
-      "noAccount": "Vous n'avez pas de compte ?",
+      "noAccount": "Pas de compte ?",
       "signUp": "S'inscrire",
+      "noClub": "Pas encore de club ?",
+      "createClub": "Crée le tien.",
       "loggedInSuccess": "Connexion réussie",
       "bannedUser": "Utilisateur banni",
       "badCredentials": "Identifiants incorrects"
@@ -25,9 +29,13 @@
     "register": {
       "title": "Inscription",
       "description": "Créez un compte pour commencer.",
-      "createClubTitle": "Créé ton club",
-      "createClubDescription": "Crée ton compte, puis configure ton club en quelques étapes.",
-      "joinClub": "Rejoins {{club}} sur Rösti",
+      "createClubTitle": "Crée ton club.",
+      "createClubDescription": "Crée ton compte, puis ton club en quelques étapes.",
+      "joinTitle": "Rejoins {{club}}.",
+      "joinTitleFallback": "Rejoins ton club.",
+      "joinClub": "Ton club t'attend sur Rösti.",
+      "joinSubmit": "Rejoindre {{club}}",
+      "emailLocked": "Adresse de l'invitation, non modifiable.",
       "firstName": "Prénom",
       "lastName": "Nom",
       "phone": "Téléphone",
@@ -36,7 +44,7 @@
       "password": "Mot de passe",
       "confirmPassword": "Confirmer le mot de passe",
       "signUp": "S'inscrire",
-      "hasAccount": "Vous avez déjà un compte ?",
+      "hasAccount": "Déjà un compte ?",
       "login": "Se connecter",
       "success": {
         "title": "Inscription réussie",
@@ -79,6 +87,22 @@
     "passwordVisibility": {
       "show": "Afficher le mot de passe",
       "hide": "Masquer le mot de passe"
+    },
+    "invitePill": "Invitation · {{club}}",
+    "invitePillFallback": "Invitation",
+    "photo": {
+      "regionLabel": "Rösti",
+      "loginHeadline": "Ton prochain match, déjà prêt.",
+      "loginSentence": "Crée ton club et retrouve présences, compos et frais de terrain au même endroit.",
+      "createHeadline": "Le club, c'est toi qui le lances.",
+      "createSentence": "Matchs, présences, compositions, frais de terrain. Tout le groupe au même endroit.",
+      "inviteHeadline": "{{club}} t'attendent.",
+      "inviteHeadlineFallback": "Ton club t'attend.",
+      "inviteSentence": "Dis si tu viens dimanche, vois la compo, règle ta part du terrain.",
+      "lineAttendance": "Qui vient",
+      "lineLineup": "Bleus contre rouges",
+      "lineFees": "Qui doit combien pour le terrain",
+      "alt": "Terrain de foot à cinq éclairé par des projecteurs, de nuit, avec quelques joueurs amateurs."
     }
   },
   "dashboard": {

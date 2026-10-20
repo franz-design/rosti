@@ -1,29 +1,96 @@
-import { Outlet } from 'react-router'
 import { AppToaster } from '@/common/components/app-toaster'
 import { useScrollToTop } from '@/common/hooks/use-scroll-to-top'
+import { useTranslation } from 'react-i18next'
+import { Outlet, useLocation, useSearchParams } from 'react-router'
 import { AuthBrand } from './components/auth-brand'
-import { CourtSlideshow } from './components/court-slideshow'
+import { AuthPhotoPanel } from './components/auth-photo-panel'
+
+const MARKETING_PATHS = new Set([
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+])
 
 export default function AuthLayout() {
-  const scrollRef = useScrollToTop<HTMLDivElement>()
+  const { pathname } = useLocation()
 
   return (
     <>
-      <div className="flex h-svh md:p-4">
-        <div
-          ref={scrollRef}
-          className="flex min-h-0 flex-1 flex-col gap-12 lg:gap-4 overflow-y-auto py-8 md:py-0"
-        >
-          <AuthBrand />
-          <div className="flex flex-1 items-center justify-center">
-            <div className="w-full max-w-sm">
+      {MARKETING_PATHS.has(pathname) ? <MarketingAuthShell /> : <PlainAuthShell />}
+      <AppToaster />
+    </>
+  )
+}
+
+function MarketingAuthShell() {
+  const scrollRef = useScrollToTop<HTMLElement>()
+  const photo = useMarketingPhoto()
+
+  return (
+    <div className="flex min-h-svh flex-col min-[1100px]:h-svh min-[1100px]:flex-row-reverse min-[1100px]:overflow-hidden">
+      <AuthPhotoPanel headline={photo.headline} sentence={photo.sentence} />
+      <main
+        ref={scrollRef}
+        className="flex min-h-0 flex-1 flex-col items-center px-6 pt-8 pb-12 min-w-128 min-[1100px]:flex-none min-[1100px]:overflow-y-auto min-[1100px]:px-14 min-[1100px]:py-8"
+      >
+        <AuthBrand />
+        <div className="flex w-full max-w-95 flex-1 flex-col">
+          <div className="flex flex-1 items-center pt-10 min-[1100px]:pt-8">
+            <div className="w-full">
               <Outlet />
             </div>
           </div>
         </div>
-        <CourtSlideshow />
-      </div>
-      <AppToaster />
-    </>
+      </main>
+    </div>
   )
+}
+
+function PlainAuthShell() {
+  const scrollRef = useScrollToTop<HTMLDivElement>()
+
+  return (
+    <div ref={scrollRef} className="flex h-svh flex-col overflow-y-auto px-6 py-8">
+      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-12">
+        <AuthBrand />
+        <div className="flex flex-1 items-center">
+          <div className="w-full">
+            <Outlet />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function useMarketingPhoto(): { headline: string; sentence: string } {
+  const { t } = useTranslation()
+  const { pathname } = useLocation()
+  const [searchParams] = useSearchParams()
+  const club = searchParams.get('club')
+  const invitationId = searchParams.get('invitationId') ?? searchParams.get('invite')
+  const isInvite = Boolean(club || invitationId)
+
+  if (isInvite) {
+    return {
+      headline: club
+        ? t('auth.photo.inviteHeadline', { club })
+        : t('auth.photo.inviteHeadlineFallback'),
+      sentence: t('auth.photo.inviteSentence'),
+    }
+  }
+
+  if (pathname === '/register') {
+    return {
+      headline: t('auth.photo.createHeadline'),
+      sentence: t('auth.photo.createSentence'),
+    }
+  }
+
+  return {
+    headline: t('auth.photo.loginHeadline'),
+    sentence: t('auth.photo.loginSentence'),
+  }
 }

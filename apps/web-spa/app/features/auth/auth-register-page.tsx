@@ -4,9 +4,11 @@ import { useMutation } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router'
+import { authPath } from '@/features/auth/utils/auth-continue-path'
 import { enterApp } from '@/features/auth/utils/enter-app'
 import { storePendingInvitationId } from '@/features/auth/utils/pending-invitation'
 import { authClient } from '@/lib/auth-client'
+import { AuthInvitePill } from './components/auth-invite-pill'
 import { AuthPageHeader } from './components/auth-page-header'
 import { AuthRegisterForm } from './components/forms/auth-register-form'
 
@@ -22,7 +24,7 @@ export default function Register() {
   const inviteEmail = searchParams.get('email') ?? undefined
   const invitationId = searchParams.get('invitationId') ?? searchParams.get('invite')
   const clubName = searchParams.get('club')
-  const intent = searchParams.get('intent')
+  const isInvite = Boolean(invitationId || clubName)
 
   useEffect(() => {
     if (invitationId) storePendingInvitationId(invitationId)
@@ -82,15 +84,18 @@ export default function Register() {
     },
   })
 
-  const description = clubName
-    ? t('auth.register.joinClub', { club: clubName })
-    : intent === 'create'
-      ? t('auth.register.createClubDescription')
-      : t('auth.register.description')
+  const description = isInvite
+    ? t('auth.register.joinClub')
+    : t('auth.register.createClubDescription')
+  const title = isInvite
+    ? clubName
+      ? t('auth.register.joinTitle', { club: clubName })
+      : t('auth.register.joinTitleFallback')
+    : t('auth.register.createClubTitle')
+  const submitLabel =
+    isInvite && clubName ? t('auth.register.joinSubmit', { club: clubName }) : undefined
 
-  const loginTo = invitationId
-    ? `/login?invitationId=${encodeURIComponent(invitationId)}${clubName ? `&club=${encodeURIComponent(clubName)}` : ''}`
-    : '/login'
+  const loginTo = authPath('/login', searchParams)
 
   if (isSuccess && registeredUser?.emailVerified) {
     return (
@@ -110,39 +115,43 @@ export default function Register() {
           title={t('auth.register.success.title')}
           description={t('auth.register.success.description')}
         />
-        <div className="text-sm text-center mt-4">
-          <Link to={loginTo} className="font-medium transition-colors">
+        <p className="mt-6 text-sm text-muted-foreground">
+          <Link
+            to={loginTo}
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+          >
             {t('auth.register.backToLogin')}
           </Link>
-        </div>
+        </p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <AuthPageHeader
-        title={intent === 'create' ? t('auth.register.createClubTitle') : t('auth.register.title')}
-        description={description}
-      />
+    <div>
+      {isInvite ? <AuthInvitePill club={clubName} /> : null}
+      <AuthPageHeader title={title} description={description} />
       <AuthRegisterForm
         onSubmit={(data) => register(data)}
         isPending={isPending}
         defaultEmail={inviteEmail}
         emailReadOnly={Boolean(inviteEmail)}
+        submitLabel={submitLabel}
       />
-      <div className="h-10">
-        {errorRegister ? (
-          <div className="text-sm font-medium text-red-500">
-            {registerErrorMessage(errorRegister.message, t)}
-          </div>
-        ) : null}
-      </div>
-      <div className="text-sm text-center">
-        <Link to={loginTo} className="font-medium transition-colors">
-          {t('auth.register.hasAccount')} {t('auth.register.login')}
+      {errorRegister ? (
+        <p className="mt-4 text-sm font-medium text-destructive">
+          {registerErrorMessage(errorRegister.message, t)}
+        </p>
+      ) : null}
+      <p className="mt-6 text-sm text-muted-foreground">
+        {t('auth.register.hasAccount')}{' '}
+        <Link
+          to={loginTo}
+          className="font-medium text-foreground underline-offset-4 hover:underline"
+        >
+          {t('auth.register.login')}
         </Link>
-      </div>
+      </p>
     </div>
   )
 }

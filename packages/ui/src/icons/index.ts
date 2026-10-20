@@ -42,6 +42,7 @@ export { HamburgerMenuIcon as Menu } from '@solar-icons/react/linear/hamburger-m
 export { HomeIcon as Home } from '@solar-icons/react/linear/home'
 export { InfoCircleIcon as InfoIcon } from '@solar-icons/react/linear/info-circle'
 export { LoaderIcon as Loader2, LoaderIcon as Loader2Icon } from '@solar-icons/react/linear/loader'
+export { LockIcon as Lock } from '@solar-icons/react/linear/lock'
 export { LogoutIcon as LogOut } from '@solar-icons/react/linear/logout'
 export {
   MagnifierIcon as Search,

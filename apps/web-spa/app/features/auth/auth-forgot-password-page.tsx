@@ -2,13 +2,16 @@ import type { AuthForgotPasswordFormData } from './components/forms/auth-forgot-
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
+import { authPath } from '@/features/auth/utils/auth-continue-path'
 import { authClient } from '@/lib/auth-client'
 import { AuthPageHeader } from './components/auth-page-header'
 import { AuthForgotPasswordForm } from './components/forms/auth-forgot-password-form'
 
 export default function AuthForgotPasswordPage() {
   const { t } = useTranslation()
+  const [searchParams] = useSearchParams()
+  const loginTo = authPath('/login', searchParams)
   const [isSuccess, setIsSuccess] = useState(false)
   const {
     mutate: forgotPasswordMutate,
@@ -44,7 +47,10 @@ export default function AuthForgotPasswordPage() {
       {isSuccess ? (
         <>
           <div className="text-sm text-center">
-            <Link to="/login" className="font-medium transition-colors">
+            <Link
+              to={loginTo}
+              className="font-medium text-foreground underline-offset-4 hover:underline"
+            >
               {t('auth.forgotPassword.backToLogin')}
             </Link>
           </div>
@@ -60,7 +66,10 @@ export default function AuthForgotPasswordPage() {
             ) : null}
           </div>
           <div className="text-sm text-center">
-            <Link to="/login" className="font-medium transition-colors">
+            <Link
+              to={loginTo}
+              className="font-medium text-foreground underline-offset-4 hover:underline"
+            >
               {t('auth.forgotPassword.backToLogin')}
             </Link>
           </div>

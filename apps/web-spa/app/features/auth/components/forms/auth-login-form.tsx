@@ -9,11 +9,12 @@ import {
 } from '@rosti/ui/components/primitives/form'
 import { Input } from '@rosti/ui/components/primitives/input'
 import { PasswordInput } from '@/common/components/password-input'
+import { authPath } from '@/features/auth/utils/auth-continue-path'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { z } from 'zod'
 
 const loginSchema = z.object({
@@ -30,13 +31,14 @@ interface AuthLoginFormProps {
 
 export const AuthLoginForm: React.FC<AuthLoginFormProps> = ({ onSubmit, isPending }) => {
   const { t } = useTranslation()
+  const [searchParams] = useSearchParams()
   const form = useForm<AuthLoginFormData>({
     resolver: zodResolver(loginSchema),
   })
 
   return (
     <Form {...form}>
-      <form className="mt-8 space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+      <form className="mt-8 flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="email"
@@ -49,7 +51,7 @@ export const AuthLoginForm: React.FC<AuthLoginFormProps> = ({ onSubmit, isPendin
                   {...field}
                   type="email"
                   autoComplete="email"
-                  placeholder="your@email.com"
+                  className="h-10 px-3 py-0 text-sm"
                 />
               </FormControl>
               <FormMessage />
@@ -63,7 +65,10 @@ export const AuthLoginForm: React.FC<AuthLoginFormProps> = ({ onSubmit, isPendin
             <FormItem>
               <div className="flex justify-between">
                 <FormLabel htmlFor="password">{t('auth.login.password')}</FormLabel>
-                <Link className="text-sm text-muted-foreground" to="/forgot-password">
+                <Link
+                  className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                  to={authPath('/forgot-password', searchParams)}
+                >
                   {t('auth.login.forgotPassword')}
                 </Link>
               </div>
@@ -72,7 +77,7 @@ export const AuthLoginForm: React.FC<AuthLoginFormProps> = ({ onSubmit, isPendin
                   id="password"
                   {...field}
                   autoComplete="current-password"
-                  placeholder="••••••••"
+                  className="h-10 py-0 text-sm"
                 />
               </FormControl>
               <FormMessage />
@@ -80,7 +85,12 @@ export const AuthLoginForm: React.FC<AuthLoginFormProps> = ({ onSubmit, isPendin
           )}
         />
 
-        <Button className="w-full" type="submit" disabled={isPending} loading={isPending}>
+        <Button
+          className="mt-2 h-10 w-full py-0"
+          type="submit"
+          disabled={isPending}
+          loading={isPending}
+        >
           {t('auth.login.signIn')}
         </Button>
       </form>

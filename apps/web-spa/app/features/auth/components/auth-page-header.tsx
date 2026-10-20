@@ -6,8 +6,10 @@ interface AuthPageHeaderProps {
 }
 
 export const AuthPageHeader: React.FC<AuthPageHeaderProps> = ({ title, description }) => (
-  <div className="mb-6 space-y-4">
-    <h1 className="text-5xl font-black">{title}</h1>
-    <p className="text-xl text-muted-foreground">{description}</p>
+  <div className="space-y-2">
+    <h1 className="font-logo text-[1.75rem] leading-tight font-medium tracking-tight text-foreground">
+      {title}
+    </h1>
+    <p className="text-sm text-muted-foreground">{description}</p>
   </div>
 )

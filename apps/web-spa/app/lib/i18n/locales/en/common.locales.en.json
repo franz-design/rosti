@@ -10,14 +10,18 @@
   },
   "auth": {
     "login": {
-      "title": "Sign in",
-      "description": "Enter your email and password to sign in.",
+      "title": "Welcome back.",
+      "description": "Enter your email and password.",
+      "inviteDescription": "Sign in to join {{club}}.",
+      "inviteDescriptionFallback": "Sign in to join your club.",
       "email": "Email",
       "password": "Password",
       "forgotPassword": "Forgot your password?",
       "signIn": "Sign in",
-      "noAccount": "Don't have an account?",
+      "noAccount": "No account?",
       "signUp": "Sign up",
+      "noClub": "No club yet?",
+      "createClub": "Create yours.",
       "loggedInSuccess": "Successfully signed in",
       "bannedUser": "Banned user",
       "badCredentials": "Incorrect credentials"
@@ -25,9 +29,13 @@
     "register": {
       "title": "Register",
       "description": "Create an account to get started.",
-      "createClubTitle": "Create your club",
-      "createClubDescription": "Create your account, then set up your club in a few steps.",
-      "joinClub": "Join {{club}} on Rösti",
+      "createClubTitle": "Create your club.",
+      "createClubDescription": "Create your account, then your club in a few steps.",
+      "joinTitle": "Join {{club}}.",
+      "joinTitleFallback": "Join your club.",
+      "joinClub": "Your club is waiting for you on Rösti.",
+      "joinSubmit": "Join {{club}}",
+      "emailLocked": "Invitation address, cannot be edited.",
       "firstName": "First name",
       "lastName": "Last name",
       "phone": "Phone",
@@ -79,6 +87,22 @@
     "passwordVisibility": {
       "show": "Show password",
       "hide": "Hide password"
+    },
+    "invitePill": "Invitation · {{club}}",
+    "invitePillFallback": "Invitation",
+    "photo": {
+      "regionLabel": "Rösti",
+      "loginHeadline": "Your next match, already set.",
+      "loginSentence": "Create your club and keep attendance, lineups and pitch fees in one place.",
+      "createHeadline": "The club starts with you.",
+      "createSentence": "Matches, attendance, lineups, pitch fees. The whole group in one place.",
+      "inviteHeadline": "{{club}} is waiting for you.",
+      "inviteHeadlineFallback": "Your club is waiting for you.",
+      "inviteSentence": "Say if you're coming Sunday, see the lineup, settle your share of the pitch.",
+      "lineAttendance": "Who's coming",
+      "lineLineup": "Blues against reds",
+      "lineFees": "Who owes what for the pitch",
+      "alt": "Amateur five-a-side pitch at night, under floodlights, with a few players."
     }
   },
   "dashboard": {

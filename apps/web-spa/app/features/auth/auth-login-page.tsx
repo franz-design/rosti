@@ -4,9 +4,11 @@ import { useMutation } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router'
+import { authPath } from '@/features/auth/utils/auth-continue-path'
 import { enterApp } from '@/features/auth/utils/enter-app'
 import { storePendingInvitationId } from '@/features/auth/utils/pending-invitation'
 import { authClient } from '@/lib/auth-client'
+import { AuthInvitePill } from './components/auth-invite-pill'
 import { AuthPageHeader } from './components/auth-page-header'
 import { AuthLoginForm } from './components/forms/auth-login-form'
 
@@ -14,6 +16,8 @@ export default function Login() {
   const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const invitationId = searchParams.get('invitationId') ?? searchParams.get('invite')
+  const clubName = searchParams.get('club')
+  const isInvite = Boolean(invitationId || clubName)
 
   useEffect(() => {
     if (invitationId) storePendingInvitationId(invitationId)
@@ -49,28 +53,34 @@ export default function Login() {
     loginMutate(data)
   }
 
-  const registerTo = invitationId
-    ? `/register?invitationId=${encodeURIComponent(invitationId)}`
-    : '/register'
+  const registerTo = authPath('/register', searchParams)
+  const description = isInvite
+    ? clubName
+      ? t('auth.login.inviteDescription', { club: clubName })
+      : t('auth.login.inviteDescriptionFallback')
+    : t('auth.login.description')
 
   return (
-    <div className="space-y-6">
-      <AuthPageHeader title={t('auth.login.title')} description={t('auth.login.description')} />
+    <div>
+      {isInvite ? <AuthInvitePill club={clubName} /> : null}
+      <AuthPageHeader title={t('auth.login.title')} description={description} />
       <AuthLoginForm onSubmit={handleLogin} isPending={isLoginPending} />
-      <div className="h-10">
-        {error ? (
-          <div className="text-sm font-medium text-red-500">
-            {error.message === 'BANNED_USER'
-              ? t('auth.login.bannedUser')
-              : t('auth.login.badCredentials')}
-          </div>
-        ) : null}
-      </div>
-      <div className="text-sm text-center">
-        <Link to={registerTo} className="font-medium transition-colors">
-          {t('auth.login.noAccount')} {t('auth.login.signUp')}
+      {error ? (
+        <p className="mt-4 text-sm font-medium text-destructive">
+          {error.message === 'BANNED_USER'
+            ? t('auth.login.bannedUser')
+            : t('auth.login.badCredentials')}
+        </p>
+      ) : null}
+      <p className="mt-6 text-sm text-muted-foreground">
+        {isInvite ? t('auth.login.noAccount') : t('auth.login.noClub')}{' '}
+        <Link
+          to={registerTo}
+          className="font-medium text-foreground underline-offset-4 hover:underline"
+        >
+          {isInvite ? t('auth.login.signUp') : t('auth.login.createClub')}
         </Link>
-      </div>
+      </p>
     </div>
   )
 }
