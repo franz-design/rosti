@@ -11,6 +11,7 @@ import { EmailModule } from '../email/email.module'
 import { EmailService } from '../email/email.service'
 import { resolveAuthCookieDomain } from './auth-cookie-domain'
 import { invitationEmail, resetPasswordEmail, verificationEmail } from './auth-email'
+import { createInvitationSignupHooks } from './invitation-signup'
 import { BetterAuthType, createBetterAuth } from './auth.config'
 import { AFTER_HOOK_KEY, BEFORE_HOOK_KEY, HOOK_KEY } from './auth.decorator'
 import { AuthModuleOptions, ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } from './auth.definition'
@@ -50,12 +51,15 @@ import { OrganizationService } from './organization.service'
         emailService: EmailService,
         orm: MikroORM,
       ): AuthModuleOptions<BetterAuthType> => {
+        const invitationSignup = createInvitationSignupHooks(orm)
         const betterAuth = createBetterAuth({
           baseUrl: config.api.baseUrl,
           secret: config.betterAuth.secret,
           trustedOrigins: config.betterAuth.trustedOrigins,
           cookieDomain: resolveAuthCookieDomain(config.api.baseUrl, config.clients.webApp.url),
           orm,
+          beforeHook: invitationSignup.beforeHook,
+          databaseHooks: invitationSignup.databaseHooks,
           sendResetPassword: async (data) => {
             return emailService.sendEmail({
               to: data.user.email,
@@ -67,6 +71,7 @@ import { OrganizationService } from './organization.service'
             })
           },
           sendVerificationEmail: async (data) => {
+            if (data.user.emailVerified) return
             return emailService.sendEmail({
               to: data.user.email,
               ...verificationEmail({

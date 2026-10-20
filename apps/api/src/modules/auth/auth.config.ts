@@ -50,6 +50,8 @@ export function createBetterAuth(options: BetterAuthOptionsDynamic): BetterAuthT
     trustedOrigins: options.trustedOrigins,
     emailAndPassword: {
       enabled: true,
+      // A normal signup stays signed out until the confirmation link.
+      // An invitation signup is signed in by the app after the account is created.
       autoSignIn: false,
       sendResetPassword: async (data, request) => {
         if (!options?.sendResetPassword) return
@@ -58,6 +60,7 @@ export function createBetterAuth(options: BetterAuthOptionsDynamic): BetterAuthT
     },
     emailVerification: {
       sendOnSignUp: true,
+      autoSignInAfterVerification: true,
       expiresIn: 60 * 60 * 24 * 10,
       sendVerificationEmail: async (data, request) => {
         if (!options?.sendVerificationEmail) return

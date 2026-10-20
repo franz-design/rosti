@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router'
+import { enterApp } from '@/features/auth/utils/enter-app'
 import { storePendingInvitationId } from '@/features/auth/utils/pending-invitation'
 import { authClient } from '@/lib/auth-client'
 import { AuthPageHeader } from './components/auth-page-header'
@@ -40,9 +41,7 @@ export default function Login() {
       return response.data
     },
     onSuccess: () => {
-      // Full load. Desktop Chrome keeps an older host-only session cookie and
-      // a client-side route change reads that one, so get-session comes back null.
-      window.location.replace('/')
+      enterApp()
     },
   })
 

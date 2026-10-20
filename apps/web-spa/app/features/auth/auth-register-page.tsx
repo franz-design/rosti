@@ -4,10 +4,17 @@ import { useMutation } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router'
+import { enterApp } from '@/features/auth/utils/enter-app'
 import { storePendingInvitationId } from '@/features/auth/utils/pending-invitation'
 import { authClient } from '@/lib/auth-client'
 import { AuthPageHeader } from './components/auth-page-header'
 import { AuthRegisterForm } from './components/forms/auth-register-form'
+
+function registerErrorMessage(code: string, translate: (key: string) => string): string {
+  if (code === 'USER_ALREADY_EXISTS') return translate('auth.register.alreadyExists')
+  if (code === 'SIGN_IN_FAILED') return translate('auth.register.signInFailed')
+  return translate('auth.register.failedToRegister')
+}
 
 export default function Register() {
   const { t } = useTranslation()
@@ -25,6 +32,7 @@ export default function Register() {
     mutate: register,
     isPending,
     isSuccess,
+    data: registeredUser,
     error: errorRegister,
   } = useMutation({
     mutationFn: async (data: AuthRegisterFormData) => {
@@ -37,6 +45,7 @@ export default function Register() {
         firstName: data.firstName,
         lastName: data.lastName,
         phone: data.phone,
+        invitationId,
         callbackURL: '/',
       })
 
@@ -44,10 +53,28 @@ export default function Register() {
         throw new Error(response.error.code)
       }
 
-      return response.data
+      const user = response.data?.user
+      if (!user) {
+        throw new Error('FAILED_TO_CREATE_USER')
+      }
+
+      if (user.emailVerified && invitationId) {
+        const signIn = await authClient.signIn.email({
+          email: data.email,
+          password: data.password,
+          rememberMe: true,
+        })
+        if (signIn.error) {
+          throw new Error('SIGN_IN_FAILED')
+        }
+        enterApp()
+      }
+
+      return user
     },
-    onSuccess: (data) => {
-      const nextParams: Record<string, string> = { email: data.user.email }
+    onSuccess: (user) => {
+      if (user.emailVerified) return
+      const nextParams: Record<string, string> = { email: user.email }
       if (invitationId) nextParams.invitationId = invitationId
       if (clubName) nextParams.club = clubName
       setSearchParams(nextParams)
@@ -64,6 +91,17 @@ export default function Register() {
   const loginTo = invitationId
     ? `/login?invitationId=${encodeURIComponent(invitationId)}${clubName ? `&club=${encodeURIComponent(clubName)}` : ''}`
     : '/login'
+
+  if (isSuccess && registeredUser?.emailVerified) {
+    return (
+      <div>
+        <AuthPageHeader
+          title={t('auth.register.signingInTitle')}
+          description={t('auth.register.signingInDescription')}
+        />
+      </div>
+    )
+  }
 
   if (isSuccess) {
     return (
@@ -91,11 +129,12 @@ export default function Register() {
         onSubmit={(data) => register(data)}
         isPending={isPending}
         defaultEmail={inviteEmail}
+        emailReadOnly={Boolean(inviteEmail)}
       />
       <div className="h-10">
         {errorRegister ? (
           <div className="text-sm font-medium text-red-500">
-            {t('auth.register.failedToRegister')}
+            {registerErrorMessage(errorRegister.message, t)}
           </div>
         ) : null}
       </div>

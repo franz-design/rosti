@@ -40,8 +40,12 @@
       "login": "Sign in",
       "success": {
         "title": "Registration successful",
-        "description": "Check your email for the activation link."
+        "description": "Open the email we just sent. The link signs you in."
       },
+      "signingInTitle": "Signing in",
+      "signingInDescription": "Your account is ready. Taking you into the app.",
+      "alreadyExists": "You already have an account. Sign in to join the club.",
+      "signInFailed": "Account created. Sign in with the password you just chose.",
       "backToLogin": "Back to sign in",
       "registrationSuccessful": "Registration successful",
       "failedToRegister": "Failed to register"
@@ -67,9 +71,10 @@
       "description": "Check your email to activate your account.",
       "verifying": "Verifying email",
       "verified": "Email verified",
-      "redirecting": "Redirecting to sign in...",
+      "redirecting": "Signing you in…",
       "pleaseWait": "Please wait...",
-      "redirectNow": "Redirect now"
+      "failed": "This confirmation link is invalid or has expired.",
+      "backToLogin": "Go to sign in"
     },
     "passwordVisibility": {
       "show": "Show password",

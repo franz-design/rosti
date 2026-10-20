@@ -10,7 +10,10 @@ export default function AuthLayout() {
   return (
     <>
       <div className="flex h-svh md:p-4">
-        <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col gap-12 lg:gap-4 overflow-y-auto py-8">
+        <div
+          ref={scrollRef}
+          className="flex min-h-0 flex-1 flex-col gap-12 lg:gap-4 overflow-y-auto py-8 md:py-0"
+        >
           <AuthBrand />
           <div className="flex flex-1 items-center justify-center">
             <div className="w-full max-w-sm">

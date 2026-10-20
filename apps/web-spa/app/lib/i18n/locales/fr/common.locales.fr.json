@@ -40,8 +40,12 @@
       "login": "Se connecter",
       "success": {
         "title": "Inscription réussie",
-        "description": "Vérifiez votre email pour le lien d'activation."
+        "description": "Ouvre l'email qu'on vient de t'envoyer. Le lien te connecte directement."
       },
+      "signingInTitle": "Connexion",
+      "signingInDescription": "Ton compte est prêt. On t'emmène dans l'app.",
+      "alreadyExists": "Tu as déjà un compte. Connecte-toi pour rejoindre le club.",
+      "signInFailed": "Compte créé. Connecte-toi avec le mot de passe que tu viens de choisir.",
       "backToLogin": "Retour à la connexion",
       "registrationSuccessful": "Inscription réussie",
       "failedToRegister": "Échec de l'inscription"
@@ -67,9 +71,10 @@
       "description": "Vérifiez votre email pour activer votre compte.",
       "verifying": "Vérification de l'email",
       "verified": "Email vérifié",
-      "redirecting": "Redirection vers la connexion...",
+      "redirecting": "Connexion en cours…",
       "pleaseWait": "Veuillez patienter...",
-      "redirectNow": "Rediriger maintenant"
+      "failed": "Ce lien de confirmation est invalide ou a expiré.",
+      "backToLogin": "Aller à la connexion"
     },
     "passwordVisibility": {
       "show": "Afficher le mot de passe",

@@ -37,12 +37,14 @@ interface AuthRegisterFormProps {
   onSubmit: (data: AuthRegisterFormData) => void
   isPending: boolean
   defaultEmail?: string
+  emailReadOnly?: boolean
 }
 
 export const AuthRegisterForm: React.FC<AuthRegisterFormProps> = ({
   onSubmit,
   isPending,
   defaultEmail,
+  emailReadOnly = false,
 }) => {
   const { t } = useTranslation()
   const registerSchema = getRegisterSchema(t)
@@ -116,6 +118,8 @@ export const AuthRegisterForm: React.FC<AuthRegisterFormProps> = ({
                   type="email"
                   autoComplete="email"
                   placeholder="your@email.com"
+                  readOnly={emailReadOnly}
+                  className={emailReadOnly ? 'bg-muted' : undefined}
                 />
               </FormControl>
               <FormMessage />
