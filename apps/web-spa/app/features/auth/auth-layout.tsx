@@ -33,7 +33,7 @@ function MarketingAuthShell() {
       <AuthPhotoPanel headline={photo.headline} sentence={photo.sentence} />
       <main
         ref={scrollRef}
-        className="flex min-h-0 flex-1 flex-col items-center px-6 pt-8 pb-12 min-w-lg min-[1100px]:flex-none min-[1100px]:overflow-y-auto min-[1100px]:px-8 min-[1100px]:py-8"
+        className="flex min-h-0 flex-1 flex-col items-center px-6 pt-8 pb-12 md:min-w-lg min-[1100px]:flex-none min-[1100px]:overflow-y-auto min-[1100px]:px-8 min-[1100px]:py-8"
       >
         <AuthBrand />
         <div className="flex w-full max-w-lg flex-1 flex-col">
