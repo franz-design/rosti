@@ -634,17 +634,26 @@
   },
   "onboarding": {
     "title": "Set up your club",
-    "stepOf": "Step {{current}} of {{total}}",
+    "stepsLabel": "Steps",
     "next": "Continue",
     "back": "Back",
     "done": "Your club is ready!",
+    "steps": {
+      "club": "Club",
+      "sport": "Sport",
+      "schedule": "Schedule",
+      "invites": "Invites"
+    },
     "errors": {
       "requiredFields": "Please fill in all fields.",
       "createClub": "Could not create the club.",
       "missingClub": "Club not found. Start again.",
       "maxPlayers": "You need at least 2 players.",
       "seasonEndBeforeStart": "The season end must be on or after the start.",
-      "matchOutsideSeason": "The first match must fall within the season."
+      "matchOutsideSeason": "The first match must fall within the season.",
+      "nameTaken": "This name is already taken.",
+      "nameInvalid": "The name needs letters or numbers.",
+      "checkName": "Could not check this name."
     },
     "sports": {
       "football": "Football",

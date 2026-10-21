@@ -11,6 +11,7 @@ const MARKETING_PATHS = new Set([
   '/forgot-password',
   '/reset-password',
   '/verify-email',
+  '/onboarding',
 ])
 
 export default function AuthLayout() {
@@ -82,7 +83,7 @@ function useMarketingPhoto(): { headline: string; sentence: string } {
     }
   }
 
-  if (pathname === '/register') {
+  if (pathname === '/register' || pathname === '/onboarding') {
     return {
       headline: t('auth.photo.createHeadline'),
       sentence: t('auth.photo.createSentence'),

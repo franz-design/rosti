@@ -289,12 +289,6 @@
     letter-spacing: -0.02em;
   }
 
-  .bg-gradient-bg {
-    background-image:
-      radial-gradient(at 61% 77%, oklch(0.95 0.18 105 / 7%) 0px, transparent 50%),
-      radial-gradient(at 10% 3%, oklch(0.95 0.18 105 / 8%) 0px, transparent 50%);
-  }
-
   /* ── Premium texture & details ──────────────────────────────────────── */
 
   /* Brand text selection */

@@ -17,7 +17,7 @@ export function AppLoader({ className }: AppLoaderProps) {
     <AnimatePresence>
       <motion.div
         className={cn(
-          'fixed inset-0 z-50 flex items-center justify-center bg-background bg-gradient-bg',
+          'fixed inset-0 z-50 flex items-center justify-center bg-background',
           className,
         )}
         initial={{ opacity: 0 }}

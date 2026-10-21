@@ -72,7 +72,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="bg-gradient-bg">
+      <body>
         {children}
         <ScrollRestoration />
         <Scripts />
