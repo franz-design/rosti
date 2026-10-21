@@ -41,7 +41,7 @@ export function OnboardingHeader({
                       'w-full truncate text-center text-sm transition-colors font-semibold',
                       isCurrent
                         ? 'text-foreground'
-                        : 'text-muted-foreground/50 ',
+                        : 'text-muted-foreground/50',
                       isEnabled && 'text-foreground group-hover:text-foreground',
                       !isEnabled && 'opacity-40',
                     )}

@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router'
 import { HomeHeader } from './components/home/home-header'
+import { HomeInstallLink } from './components/home/home-install-link'
 import { HomeMatchSection } from './components/home/home-match-section'
 import { useClub } from './hooks/club-context'
 
@@ -36,7 +37,13 @@ export default function ClubsPage() {
 
   return (
     <div className="min-w-0 flex flex-col gap-12">
-      <HomeHeader clubName={activeClub?.name ?? t('home.fallbackClub')} venue={activeClub?.venue} />
+      <div className="flex flex-col gap-3">
+        <HomeHeader
+          clubName={activeClub?.name ?? t('home.fallbackClub')}
+          venue={activeClub?.venue}
+        />
+        <HomeInstallLink />
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <HomeMatchSection

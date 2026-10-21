@@ -1,7 +1,7 @@
 import { Button } from '@rosti/ui/components/primitives/button'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
-import { useBrowserInstallPrompt } from '@/features/clubs/hooks/use-browser-install-prompt'
+import { useBrowserInstallPrompt } from '@/lib/browser-install-prompt'
 import { isIosDevice } from '@/features/clubs/utils/is-ios-device'
 
 interface InviteInstallInstructionsProps {

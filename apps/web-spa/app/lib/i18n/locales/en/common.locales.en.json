@@ -135,6 +135,29 @@
     "noPast": "No past matches yet.",
     "goToMatches": "Go to matches",
     "allMatches": "All matches",
+    "install": {
+      "link": "Add the app to your phone",
+      "title": "Add the app to your phone",
+      "description": "Here is how to add it to your home screen.",
+      "android": {
+        "title": "On Android (Google Chrome)",
+        "steps": {
+          "open": "Open the site in the Chrome browser.",
+          "menu": "Tap the three dots at the top right.",
+          "choose": "Choose “Add to Home screen” or “Install app”.",
+          "confirm": "Confirm by tapping “Add” or “Install”."
+        }
+      },
+      "ios": {
+        "title": "On iPhone and iPad (Safari)",
+        "steps": {
+          "open": "Open the site in the Safari browser.",
+          "share": "Tap the share button (the square with an upward arrow) at the bottom of the screen.",
+          "choose": "Scroll the menu and select “Add to Home Screen”.",
+          "confirm": "Confirm by tapping “Add” at the top right."
+        }
+      }
+    },
     "stats": {
       "clubTitle": "The club this season",
       "personalTitle": "Your stats",

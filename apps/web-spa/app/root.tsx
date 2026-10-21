@@ -5,6 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { useEffect, useLayoutEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
+import { captureBrowserInstallPrompt } from '@/lib/browser-install-prompt'
 import { useI18nStore } from '@/lib/i18n/i18n-client'
 import { iosViewportResetScript } from '@/lib/ios-viewport-reset'
 import { queryClient } from '@/lib/query-client'
@@ -13,6 +14,8 @@ import useTheme, { applyStoredTheme, themeInitScript } from './hooks/useTheme'
 import '@/lib/i18n/i18n-client'
 import '@fontsource/source-sans-pro'
 import '@rosti/ui/globals.css'
+
+captureBrowserInstallPrompt()
 
 client.setConfig({
   baseUrl: import.meta.env.VITE_API_URL,

@@ -135,6 +135,29 @@
     "noPast": "Aucun match passé pour le moment.",
     "goToMatches": "Aller aux matchs",
     "allMatches": "Tous les matchs",
+    "install": {
+      "link": "Ajoute l'app à ton téléphone",
+      "title": "Ajoute l'app à ton téléphone",
+      "description": "Voici comment l'ajouter à l'écran d'accueil.",
+      "android": {
+        "title": "Sur Android (Google Chrome)",
+        "steps": {
+          "open": "Ouvre le site dans le navigateur Chrome.",
+          "menu": "Appuie sur les trois petits points en haut à droite.",
+          "choose": "Choisis « Ajouter à l'écran d'accueil » ou « Installer l'application ».",
+          "confirm": "Valide en appuyant sur « Ajouter » ou « Installer »."
+        }
+      },
+      "ios": {
+        "title": "Sur iPhone et iPad (Safari)",
+        "steps": {
+          "open": "Ouvre le site dans le navigateur Safari.",
+          "share": "Touche le bouton de partage (le carré avec une flèche vers le haut) en bas de l'écran.",
+          "choose": "Fais défiler le menu et sélectionne « Sur l'écran d'accueil ».",
+          "confirm": "Confirme en appuyant sur « Ajouter » en haut à droite."
+        }
+      }
+    },
     "stats": {
       "clubTitle": "Le club cette saison",
       "personalTitle": "Tes stats",

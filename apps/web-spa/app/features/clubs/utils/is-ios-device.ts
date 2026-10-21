@@ -1,4 +1,4 @@
-interface IosDeviceInput {
+export interface IosDeviceInput {
   userAgent: string
   platform: string
   maxTouchPoints: number
