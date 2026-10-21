@@ -2,13 +2,13 @@ import type { Route } from './+types/root'
 import { getHtmlLang, normalizeLocale } from '@rosti/i18n/config'
 import { client } from '@rosti/openapi-generator'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
 import { useI18nStore } from '@/lib/i18n/i18n-client'
 import { queryClient } from '@/lib/query-client'
 import { registerProductionServiceWorker } from '@/lib/register-service-worker'
-import useTheme from './hooks/useTheme'
+import useTheme, { applyStoredTheme, themeInitScript } from './hooks/useTheme'
 import '@/lib/i18n/i18n-client'
 import '@fontsource/source-sans-pro'
 import '@rosti/ui/globals.css'
@@ -41,8 +41,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const activeLocale = normalizeLocale(i18n.language || language)
   const htmlLang = getHtmlLang(activeLocale)
 
-  useEffect(() => {
-    document.body.classList.toggle('dark', theme === 'dark')
+  useLayoutEffect(() => {
+    applyStoredTheme()
   }, [theme])
 
   useEffect(() => {
@@ -50,8 +50,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
   }, [htmlLang])
 
   return (
-    <html lang={htmlLang}>
+    <html lang={htmlLang} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <title>Rösti</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -69,7 +70,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="dark bg-gradient-bg">
+      <body className="bg-gradient-bg">
         {children}
         <ScrollRestoration />
         <Scripts />

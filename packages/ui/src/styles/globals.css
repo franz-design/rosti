@@ -24,6 +24,7 @@
 ──────────────────────────────────────────────────────────────────────────── */
 
 :root {
+  color-scheme: light;
   --header-height: 3rem;
   --safe-area-top: env(safe-area-inset-top, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
@@ -126,6 +127,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   /* ── Dark mode ──────────────────────────────────────────────────────── */
   --background: oklch(0.097 0 0);
   /* #0a0a0a             */
