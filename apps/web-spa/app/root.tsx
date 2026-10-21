@@ -5,7 +5,6 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
-import { IosStandaloneStatusBar } from '@/common/components/ios-standalone-status-bar'
 import { useI18nStore } from '@/lib/i18n/i18n-client'
 import { queryClient } from '@/lib/query-client'
 import { registerProductionServiceWorker } from '@/lib/register-service-worker'
@@ -59,7 +58,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="theme-color" content="#c74209" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Rösti" />
         <meta name="author" content="Rösti" />
         <meta name="keywords" content="Rösti, club, match, RSVP, sport" />
@@ -72,7 +70,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className="dark bg-gradient-bg">
-        <IosStandaloneStatusBar />
         {children}
         <ScrollRestoration />
         <Scripts />
