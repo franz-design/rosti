@@ -6,6 +6,7 @@ import { useEffect, useLayoutEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
 import { useI18nStore } from '@/lib/i18n/i18n-client'
+import { iosViewportResetScript } from '@/lib/ios-viewport-reset'
 import { queryClient } from '@/lib/query-client'
 import { registerProductionServiceWorker } from '@/lib/register-service-worker'
 import useTheme, { applyStoredTheme, themeInitScript } from './hooks/useTheme'
@@ -56,6 +57,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <title>Rösti</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <script dangerouslySetInnerHTML={{ __html: iosViewportResetScript }} />
         <meta name="theme-color" content="#c74209" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

@@ -51,7 +51,7 @@ export const AuthLoginForm: React.FC<AuthLoginFormProps> = ({ onSubmit, isPendin
                   {...field}
                   type="email"
                   autoComplete="email"
-                  className="h-10 px-3 py-0 text-sm"
+                  className="h-10 px-3 py-0"
                 />
               </FormControl>
               <FormMessage />
@@ -77,7 +77,7 @@ export const AuthLoginForm: React.FC<AuthLoginFormProps> = ({ onSubmit, isPendin
                   id="password"
                   {...field}
                   autoComplete="current-password"
-                  className="h-10 py-0 text-sm"
+                  className="h-10 py-0"
                 />
               </FormControl>
               <FormMessage />

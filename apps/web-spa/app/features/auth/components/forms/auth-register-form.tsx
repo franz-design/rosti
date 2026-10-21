@@ -35,7 +35,7 @@ function getRegisterSchema(t: (key: string) => string) {
 
 export type AuthRegisterFormData = z.infer<typeof baseRegisterSchema>
 
-const authFieldClass = 'h-10 px-3 py-0 text-sm'
+const authFieldClass = 'h-10 px-3 py-0'
 
 interface AuthRegisterFormProps {
   onSubmit: (data: AuthRegisterFormData) => void
@@ -151,7 +151,7 @@ export const AuthRegisterForm: React.FC<AuthRegisterFormProps> = ({
                   id="password"
                   {...field}
                   autoComplete="new-password"
-                  className="h-10 py-0 text-sm"
+                  className="h-10 py-0"
                 />
               </FormControl>
               <FormMessage />
@@ -169,7 +169,7 @@ export const AuthRegisterForm: React.FC<AuthRegisterFormProps> = ({
                   id="confirmPassword"
                   {...field}
                   autoComplete="new-password"
-                  className="h-10 py-0 text-sm"
+                  className="h-10 py-0"
                 />
               </FormControl>
               <FormMessage />
