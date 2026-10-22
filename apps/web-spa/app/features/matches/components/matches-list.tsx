@@ -1,8 +1,8 @@
 import { EmptyState } from '@rosti/ui/components/app'
-import { CalendarDays } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
 import type { Match } from '@/lib/rosti-api'
+import { EmptyMatchArt } from './empty-match-art'
 import MatchCard from './match-card'
 
 interface MatchesListProps {
@@ -34,7 +34,9 @@ export function MatchesList({
   if (matches.length === 0) {
     return (
       <EmptyState
-        icon={<CalendarDays className="size-6 text-muted-foreground" />}
+        illustration={
+          <EmptyMatchArt name={variant === 'upcoming' ? 'ball' : 'bench'} className="h-40" />
+        }
         title={variant === 'upcoming' ? t('matches.emptyTitle') : t('matches.emptyPastTitle')}
         description={
           variant === 'upcoming' ? t('matches.emptyDescription') : t('matches.emptyPastDescription')

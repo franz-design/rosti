@@ -10,6 +10,7 @@ interface EmptyStateAction {
 
 interface EmptyStateProps {
   icon?: ReactNode
+  illustration?: ReactNode
   title: string
   description?: string
   action?: EmptyStateAction
@@ -27,12 +28,20 @@ interface EmptyStateProps {
  *   action={{ label: 'Create item', onClick: handleCreate }}
  * />
  */
-export function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
+export function EmptyState({
+  icon,
+  illustration,
+  title,
+  description,
+  action,
+  className,
+}: EmptyStateProps) {
   return (
     <div
       className={cn('flex flex-col items-center justify-center py-12 px-6 text-center', className)}
     >
-      {icon ? <div className="mb-4 p-3 rounded-full bg-muted">{icon}</div> : null}
+      {illustration ? <div className="mb-5">{illustration}</div> : null}
+      {!illustration && icon ? <div className="mb-4 p-3 rounded-full bg-muted">{icon}</div> : null}
       <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
       {description ? (
         <p className="text-sm text-muted-foreground mb-6 max-w-sm">{description}</p>

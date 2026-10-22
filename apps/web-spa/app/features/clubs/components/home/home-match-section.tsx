@@ -1,6 +1,7 @@
 import { Button } from '@rosti/ui/components/primitives/button'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
+import { EmptyMatchArt } from '@/features/matches/components/empty-match-art'
 import MatchCard from '@/features/matches/components/match-card'
 import type { Match } from '@/lib/rosti-api'
 import { HomeMatchRsvp } from './home-match-rsvp'
@@ -50,6 +51,7 @@ export function HomeMatchSection({
         </div>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-xl border border-dashed p-6 text-center">
+          <EmptyMatchArt name={variant === 'past' ? 'bench' : 'whistle'} />
           <p className="text-muted-foreground">{emptyLabel}</p>
           {showGoToMatches ? (
             <Button variant="outline" render={<Link to="/matches" />}>
