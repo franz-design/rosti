@@ -1,3 +1,4 @@
+import { Button } from '@rosti/ui/components/primitives/button'
 import {
   Sheet,
   SheetContent,
@@ -51,13 +52,9 @@ function HomeInstallOffer({ platform }: { platform: InstallPlatform }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => void handleOpen()}
-        className="w-fit cursor-pointer text-left text-sm font-medium text-primary underline-offset-4 hover:underline"
-      >
+      <Button type="button" variant="outline" onClick={() => void handleOpen()}>
         {t('home.install.link')}
-      </button>
+      </Button>
       <Sheet open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
         <SheetContent
           side="bottom"

@@ -11,6 +11,7 @@ import { Navigate } from 'react-router'
 import { HomeHeader } from './components/home/home-header'
 import { HomeInstallLink } from './components/home/home-install-link'
 import { HomeMatchSection } from './components/home/home-match-section'
+import { HomeSkillsPrompt } from './components/home/home-skills-prompt'
 import { useClub } from './hooks/club-context'
 
 export default function ClubsPage() {
@@ -42,7 +43,10 @@ export default function ClubsPage() {
           clubName={activeClub?.name ?? t('home.fallbackClub')}
           venue={activeClub?.venue}
         />
-        <HomeInstallLink />
+        <div className="flex flex-wrap items-center gap-2">
+          <HomeSkillsPrompt />
+          <HomeInstallLink />
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
