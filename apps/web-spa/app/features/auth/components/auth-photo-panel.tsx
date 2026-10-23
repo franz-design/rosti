@@ -1,5 +1,6 @@
 import authPicture from '@/assets/images/auth/auth-picture.png'
 import { useTranslation } from 'react-i18next'
+import { AuthSportList } from './auth-sport-list'
 
 const FEATURE_LINE_KEYS = [
   'auth.photo.lineAttendance',
@@ -10,9 +11,10 @@ const FEATURE_LINE_KEYS = [
 interface AuthPhotoPanelProps {
   headline: string
   sentence: string
+  showSports?: boolean
 }
 
-export function AuthPhotoPanel({ headline, sentence }: AuthPhotoPanelProps) {
+export function AuthPhotoPanel({ headline, sentence, showSports = false }: AuthPhotoPanelProps) {
   const { t } = useTranslation()
 
   return (
@@ -47,6 +49,9 @@ export function AuthPhotoPanel({ headline, sentence }: AuthPhotoPanelProps) {
         >
           {sentence}
         </p>
+        {showSports ? (
+          <AuthSportList tone="onDark" className="mt-4 hidden max-w-md min-[1100px]:flex" />
+        ) : null}
         <ul className="mt-8 hidden max-w-xs min-[1100px]:block">
           {FEATURE_LINE_KEYS.map((key) => (
             <li key={key} className="border-t border-white/20 py-2.5 text-sm text-white/85">

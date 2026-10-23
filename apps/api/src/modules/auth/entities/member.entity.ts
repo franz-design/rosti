@@ -1,10 +1,11 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/decorators/legacy'
+import { Entity, ManyToOne, PrimaryKey, Property, Unique } from '@mikro-orm/decorators/legacy'
 import { Organization } from './organization.entity'
 import { User } from './user.entity'
 
 export type ClubRole = 'owner' | 'admin' | 'member'
 
 @Entity({ tableName: 'member' })
+@Unique({ properties: ['user', 'organization'] })
 export class Member {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id!: string

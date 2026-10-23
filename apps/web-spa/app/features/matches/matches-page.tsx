@@ -77,6 +77,7 @@ export default function MatchesPage() {
             isLoading={isLoading}
             dateLocale={dateLocale}
             variant="upcoming"
+            sportType={activeClub.sportType}
             emptyAction={{
               label: t('matches.create'),
               onClick: () => navigate('/matches/new'),

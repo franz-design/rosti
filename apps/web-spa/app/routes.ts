@@ -22,6 +22,7 @@ export default [
     route('forgot-password', 'features/auth/auth-forgot-password-page.tsx'),
     route('reset-password', 'features/auth/auth-reset-password-page.tsx'),
     route('rejoindre', 'features/clubs/join-club-page.tsx'),
+    route('choose-club', 'features/clubs/choose-club-page.tsx'),
     route('onboarding', 'features/onboarding/onboarding-page.tsx'),
   ]),
   route('invite/:invitationId', 'features/clubs/invite-page.tsx'),

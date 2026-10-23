@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Navigate, useNavigate } from 'react-router'
 import { acceptPendingInvitations } from '@/features/auth/utils/pending-invitation'
+import { storeActiveClubId } from '@/features/clubs/utils/club-session'
 import { combineDateAndTime } from '@/features/matches/utils/match-schedule-utils'
 import {
   clampMatchDateToSeason,
@@ -294,7 +295,7 @@ export default function OnboardingPage() {
       }
 
       await authClient.organization.setActive({ organizationId: clubId })
-      localStorage.setItem('rosti.activeClubId', clubId)
+      storeActiveClubId(clubId)
 
       await rostiApi.updateClub(clubId, {
         name,

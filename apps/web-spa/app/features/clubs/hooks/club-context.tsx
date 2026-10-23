@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useSearchParams } from 'react-router'
+import { Navigate, useSearchParams } from 'react-router'
 import { authClient } from '@/lib/auth-client'
 import { rostiApi, type Club, type ClubMember } from '@/lib/rosti-api'
+import { readStoredClubId, storeActiveClubId } from '../utils/club-session'
 
 type ClubRole = ClubMember['role']
 
@@ -26,9 +27,7 @@ function isAdminRole(role: ClubRole | undefined): boolean {
 export function ClubProvider({ children }: { children: ReactNode }) {
   const { data: session } = authClient.useSession()
   const [searchParams] = useSearchParams()
-  const [activeClubId, setActiveClubIdState] = useState<string | null>(() =>
-    localStorage.getItem('rosti.activeClubId'),
-  )
+  const [activeClubId, setActiveClubIdState] = useState<string | null>(() => readStoredClubId())
 
   const {
     data: clubs = [],
@@ -40,19 +39,25 @@ export function ClubProvider({ children }: { children: ReactNode }) {
     enabled: !!session?.user,
   })
 
+  const requestedClubId = searchParams.get('organizationId')
+  const requestedClub = clubs.find((club) => club.id === requestedClubId) ?? null
+
   useEffect(() => {
-    if (!activeClubId && clubs.length > 0) {
-      const firstId = clubs[0].id
-      setActiveClubIdState(firstId)
-      localStorage.setItem('rosti.activeClubId', firstId)
-      void authClient.organization.setActive({ organizationId: firstId })
-    }
+    if (clubs.length !== 1) return
+    const onlyId = clubs[0].id
+    if (activeClubId === onlyId) return
+    setActiveClubIdState(onlyId)
+    storeActiveClubId(onlyId)
+    void authClient.organization.setActive({ organizationId: onlyId })
   }, [clubs, activeClubId])
 
-  const activeClub = useMemo(
-    () => clubs.find((c) => c.id === activeClubId) ?? clubs[0] ?? null,
-    [clubs, activeClubId],
-  )
+  const activeClub = useMemo(() => {
+    if (requestedClub) return requestedClub
+    const stored = clubs.find((club) => club.id === activeClubId)
+    if (stored) return stored
+    if (clubs.length === 1) return clubs[0]
+    return null
+  }, [clubs, activeClubId, requestedClub])
 
   useEffect(() => {
     if (!activeClub?.id) return
@@ -60,13 +65,11 @@ export function ClubProvider({ children }: { children: ReactNode }) {
   }, [activeClub?.id])
 
   useEffect(() => {
-    const organizationId = searchParams.get('organizationId')
-    if (!organizationId || organizationId === activeClubId) return
-    if (!clubs.some((club) => club.id === organizationId)) return
-    setActiveClubIdState(organizationId)
-    localStorage.setItem('rosti.activeClubId', organizationId)
-    void authClient.organization.setActive({ organizationId })
-  }, [activeClubId, clubs, searchParams])
+    if (!requestedClub) return
+    setActiveClubIdState((current) => (current === requestedClub.id ? current : requestedClub.id))
+    storeActiveClubId(requestedClub.id)
+    void authClient.organization.setActive({ organizationId: requestedClub.id })
+  }, [requestedClub])
 
   const { data: members = [], isLoading: isMembershipLoading } = useQuery({
     queryKey: ['club-members', activeClub?.id, session?.user?.id],
@@ -75,16 +78,26 @@ export function ClubProvider({ children }: { children: ReactNode }) {
   })
 
   const myMembership = useMemo(
-    () => members.find((m) => m.userId === session?.user?.id) ?? null,
+    () => members.find((member) => member.userId === session?.user?.id) ?? null,
     [members, session?.user?.id],
   )
 
   const isClubAdmin = isAdminRole(myMembership?.role)
 
   const setActiveClubId = async (id: string) => {
+    const result = await authClient.organization.setActive({ organizationId: id })
+    if (result.error) {
+      throw new Error(result.error.message ?? '')
+    }
     setActiveClubIdState(id)
-    localStorage.setItem('rosti.activeClubId', id)
-    await authClient.organization.setActive({ organizationId: id })
+    storeActiveClubId(id)
+  }
+
+  const storedClubIsMember = clubs.some((club) => club.id === activeClubId)
+  const needsChoice = !isLoading && clubs.length > 1 && !storedClubIsMember && !requestedClub
+
+  if (needsChoice) {
+    return <Navigate to="/choose-club" replace />
   }
 
   return (

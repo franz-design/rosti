@@ -31,7 +31,11 @@ function MarketingAuthShell() {
 
   return (
     <div className="flex min-h-svh flex-col min-[1100px]:h-svh min-[1100px]:flex-row-reverse min-[1100px]:overflow-hidden">
-      <AuthPhotoPanel headline={photo.headline} sentence={photo.sentence} />
+      <AuthPhotoPanel
+        headline={photo.headline}
+        sentence={photo.sentence}
+        showSports={photo.showSports}
+      />
       <main
         ref={scrollRef}
         className="flex min-h-0 flex-1 flex-col items-center px-6 pt-8 pb-12 md:min-w-lg min-[1100px]:flex-none min-[1100px]:overflow-y-auto min-[1100px]:px-8 min-[1100px]:py-8"
@@ -66,7 +70,7 @@ function PlainAuthShell() {
   )
 }
 
-function useMarketingPhoto(): { headline: string; sentence: string } {
+function useMarketingPhoto(): { headline: string; sentence: string; showSports: boolean } {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const [searchParams] = useSearchParams()
@@ -80,6 +84,7 @@ function useMarketingPhoto(): { headline: string; sentence: string } {
         ? t('auth.photo.inviteHeadline', { club })
         : t('auth.photo.inviteHeadlineFallback'),
       sentence: t('auth.photo.inviteSentence'),
+      showSports: false,
     }
   }
 
@@ -87,11 +92,13 @@ function useMarketingPhoto(): { headline: string; sentence: string } {
     return {
       headline: t('auth.photo.createHeadline'),
       sentence: t('auth.photo.createSentence'),
+      showSports: pathname === '/register',
     }
   }
 
   return {
     headline: t('auth.photo.loginHeadline'),
     sentence: t('auth.photo.loginSentence'),
+    showSports: pathname === '/login',
   }
 }

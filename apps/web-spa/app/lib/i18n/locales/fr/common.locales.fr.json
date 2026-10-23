@@ -90,6 +90,9 @@
     },
     "invitePill": "Invitation · {{club}}",
     "invitePillFallback": "Invitation",
+    "sports": {
+      "label": "Sports pour créer un club"
+    },
     "photo": {
       "regionLabel": "Rösti",
       "loginHeadline": "Ton prochain match, déjà prêt.",
@@ -394,6 +397,15 @@
       "missingClub": "Club introuvable.",
       "matchOutsideSeason": "La date du premier match est en dehors de la saison."
     }
+  },
+  "chooseClub": {
+    "title": "Choisis ton club",
+    "description": "Tu fais partie de plusieurs clubs. Choisis celui que tu veux ouvrir.",
+    "error": "Impossible d'ouvrir ce club."
+  },
+  "clubSwitcher": {
+    "label": "Changer de club",
+    "error": "Impossible de changer de club."
   },
   "join": {
     "title": "Rejoins ton club",

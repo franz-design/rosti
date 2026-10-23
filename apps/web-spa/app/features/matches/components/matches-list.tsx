@@ -1,7 +1,7 @@
 import { EmptyState } from '@rosti/ui/components/app'
 import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
-import type { Match } from '@/lib/rosti-api'
+import type { Match, SportType } from '@/lib/rosti-api'
 import { EmptyMatchArt } from './empty-match-art'
 import MatchCard from './match-card'
 
@@ -10,6 +10,7 @@ interface MatchesListProps {
   isLoading: boolean
   dateLocale: string
   variant: 'upcoming' | 'past'
+  sportType?: SportType | null
   emptyAction?: {
     label: string
     onClick: () => void
@@ -22,6 +23,7 @@ export function MatchesList({
   isLoading,
   dateLocale,
   variant,
+  sportType,
   emptyAction,
   renderActions,
 }: MatchesListProps) {
@@ -37,6 +39,7 @@ export function MatchesList({
         illustration={
           <EmptyMatchArt
             name={variant === 'upcoming' ? 'ball' : 'bench'}
+            sportType={sportType}
             className={
               variant === 'upcoming' ? 'mx-auto w-full max-w-md' : 'mx-auto w-full max-w-2xl'
             }

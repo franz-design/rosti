@@ -23,7 +23,6 @@ export function HomeMatchSection({
   match,
   dateLocale,
   variant,
-  emptyLabel,
   promptEnterScore,
   showGoToMatches,
 }: HomeMatchSectionProps) {

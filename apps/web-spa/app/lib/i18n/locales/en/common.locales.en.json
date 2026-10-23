@@ -90,6 +90,9 @@
     },
     "invitePill": "Invitation · {{club}}",
     "invitePillFallback": "Invitation",
+    "sports": {
+      "label": "Sports you can start a club for"
+    },
     "photo": {
       "regionLabel": "Rösti",
       "loginHeadline": "Your next match, already set.",
@@ -394,6 +397,15 @@
       "missingClub": "Club not found.",
       "matchOutsideSeason": "The first match date is outside the season."
     }
+  },
+  "chooseClub": {
+    "title": "Choose your club",
+    "description": "You belong to more than one club. Choose the one you want to open.",
+    "error": "Could not open this club."
+  },
+  "clubSwitcher": {
+    "label": "Switch club",
+    "error": "Could not switch club."
   },
   "join": {
     "title": "Join your club",

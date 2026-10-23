@@ -1,3 +1,4 @@
+import { storeActiveClubId } from '@/features/clubs/utils/club-session'
 import { authClient } from '@/lib/auth-client'
 
 const PENDING_INVITATION_KEY = 'rosti.pendingInvitationId'
@@ -47,7 +48,7 @@ export async function acceptPendingInvitations(): Promise<string | null> {
   clearPendingInvitationId()
 
   if (acceptedOrganizationId) {
-    localStorage.setItem('rosti.activeClubId', acceptedOrganizationId)
+    storeActiveClubId(acceptedOrganizationId)
     await authClient.organization.setActive({ organizationId: acceptedOrganizationId })
   }
 
