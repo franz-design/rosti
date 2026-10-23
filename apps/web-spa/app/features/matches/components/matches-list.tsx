@@ -35,7 +35,12 @@ export function MatchesList({
     return (
       <EmptyState
         illustration={
-          <EmptyMatchArt name={variant === 'upcoming' ? 'ball' : 'bench'} className="h-40" />
+          <EmptyMatchArt
+            name={variant === 'upcoming' ? 'ball' : 'bench'}
+            className={
+              variant === 'upcoming' ? 'mx-auto w-full max-w-md' : 'mx-auto w-full max-w-2xl'
+            }
+          />
         }
         title={variant === 'upcoming' ? t('matches.emptyTitle') : t('matches.emptyPastTitle')}
         description={

@@ -30,7 +30,7 @@ export function HomeMatchSection({
   const { t } = useTranslation()
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex min-w-0 flex-col gap-3">
       <h2 className="text-lg font-medium">{title}</h2>
       {isLoading ? (
         <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
@@ -50,9 +50,8 @@ export function HomeMatchSection({
           />
         </div>
       ) : (
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-xl border border-dashed p-6 text-center">
-          <EmptyMatchArt name={variant === 'past' ? 'bench' : 'whistle'} />
-          <p className="text-muted-foreground">{emptyLabel}</p>
+        <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed p-6 text-center overflow-hidden gap-6">
+          <EmptyMatchArt name={variant === 'past' ? 'bench' : 'whistle'} className="w-full" />
           {showGoToMatches ? (
             <Button variant="outline" render={<Link to="/matches" />}>
               {t('home.goToMatches')}
