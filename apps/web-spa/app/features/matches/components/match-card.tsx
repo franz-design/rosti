@@ -45,6 +45,7 @@ interface MatchCardProps {
   footer?: ReactNode
   promptEnterScore?: boolean
   className?: string
+  page?: 'list' | 'home'
 }
 
 export default function MatchCard({
@@ -55,6 +56,7 @@ export default function MatchCard({
   footer,
   promptEnterScore = false,
   className,
+  page = 'list',
 }: MatchCardProps) {
   const { t } = useTranslation()
   const startsAt = new Date(match.startsAt)
@@ -73,7 +75,7 @@ export default function MatchCard({
   const resultClass = getCardResultClass(match)
   const cardClassName = cn(
     'rounded-xl border bg-card p-2 overflow-hidden',
-    { 'bg-sidebar border-none': !showScore },
+    { 'bg-sidebar border-none': !showScore, 'xl:px-8': variant === 'upcoming' && page === 'home' },
     resultClass,
     className,
   )

@@ -1,4 +1,5 @@
 import { Button } from '@rosti/ui/components/primitives/button'
+import { Plus } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { EmptyMatchArt } from '@/features/matches/components/empty-match-art'
@@ -14,7 +15,7 @@ interface HomeMatchSectionProps {
   variant: 'upcoming' | 'past'
   emptyLabel: string
   promptEnterScore?: boolean
-  showGoToMatches?: boolean
+  showCreateMatch?: boolean
 }
 
 export function HomeMatchSection({
@@ -24,7 +25,7 @@ export function HomeMatchSection({
   dateLocale,
   variant,
   promptEnterScore,
-  showGoToMatches,
+  showCreateMatch,
 }: HomeMatchSectionProps) {
   const { t } = useTranslation()
 
@@ -36,6 +37,7 @@ export function HomeMatchSection({
       ) : match ? (
         <div className="flex flex-1 flex-col">
           <MatchCard
+            page="home"
             className="h-full"
             match={match}
             dateLocale={dateLocale}
@@ -50,10 +52,15 @@ export function HomeMatchSection({
         </div>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed p-6 text-center overflow-hidden gap-6">
-          <EmptyMatchArt name={variant === 'past' ? 'bench' : 'whistle'} className="w-full" />
-          {showGoToMatches ? (
-            <Button variant="outline" render={<Link to="/matches" />}>
-              {t('home.goToMatches')}
+          <EmptyMatchArt
+            name={variant === 'past' ? 'bench' : 'whistle'}
+            className="w-full"
+            page="home"
+          />
+          {showCreateMatch ? (
+            <Button render={<Link to="/matches/new" />}>
+              <Plus className="size-4" />
+              {t('matches.create')}
             </Button>
           ) : null}
         </div>

@@ -27,7 +27,7 @@ const ART = {
   bench: {
     light: bench,
     dark: benchDark,
-    className: '-mr-26 -mt-4 -mb-4',
+    className: '-mr-16 -mt-4 -mb-4 max-w-128',
   },
   whistle: {
     light: whistle,
@@ -57,6 +57,7 @@ interface EmptyMatchArtProps {
   contained?: boolean
   /** Size of the area. The picture's own classes place it inside. */
   className?: string
+  page?: 'list' | 'home'
 }
 
 export function EmptyMatchArt({
@@ -64,12 +65,16 @@ export function EmptyMatchArt({
   sportType,
   contained = false,
   className,
+  page = 'list',
 }: EmptyMatchArtProps) {
   const ballKind = name === 'ball' ? emptyBallKindForSport(sportType) : null
   const ball = ballKind ? BALLS[ballKind] : null
   const art = ball
     ? { light: ball.light, dark: ball.dark, className: cn(ART.ball.className, ball.className) }
     : ART[name]
+  const artClassName = cn(art.className, {
+    'max-w-92': page === 'home',
+  })
   // Sport balls other than football are opaque white or black rectangles.
   // Blending hides that rectangle on the page background.
   const blendOpaque = ballKind !== null && ballKind !== 'football'
@@ -81,7 +86,7 @@ export function EmptyMatchArt({
         alt=""
         className={cn(
           'w-full dark:hidden',
-          !contained && art.className,
+          !contained && artClassName,
           blendOpaque && 'mix-blend-darken',
         )}
       />
@@ -90,7 +95,7 @@ export function EmptyMatchArt({
         alt=""
         className={cn(
           'hidden w-full dark:block',
-          !contained && art.className,
+          !contained && artClassName,
           blendOpaque && 'mix-blend-lighten',
         )}
       />

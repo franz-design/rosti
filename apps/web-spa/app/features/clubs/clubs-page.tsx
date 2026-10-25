@@ -67,7 +67,7 @@ export default function ClubsPage() {
           dateLocale={dateLocale}
           variant="upcoming"
           emptyLabel={t('home.noUpcoming')}
-          showGoToMatches
+          showCreateMatch
         />
       </div>
 
