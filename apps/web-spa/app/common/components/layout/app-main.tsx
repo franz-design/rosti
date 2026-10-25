@@ -25,11 +25,18 @@ export function AppMain({ children }: { children: ReactNode }) {
       aria-busy={isRefreshing || undefined}
       className={cn(
         'flex min-h-0 min-w-0 flex-1 flex-col',
-        isFullBleed ? 'overflow-hidden' : 'overflow-auto overscroll-y-none p-3 sm:p-6',
+        isFullBleed
+          ? 'overflow-hidden'
+          : 'overflow-auto overscroll-y-none px-3 pt-3 sm:px-6 sm:pt-6',
       )}
     >
       <div
-        className={cn('relative flex w-full min-w-0 flex-col', isFullBleed && 'min-h-0 flex-1')}
+        className={cn(
+          'relative flex w-full min-w-0 flex-col',
+          // Bottom padding lives on the content. On the flex scroller it is not part of
+          // the scroll height, so the last row sits against the edge on mobile.
+          isFullBleed ? 'min-h-0 flex-1' : 'pb-3 sm:pb-6',
+        )}
         style={
           isFullBleed
             ? undefined
