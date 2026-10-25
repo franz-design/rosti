@@ -819,6 +819,7 @@
     "user": "Utilisateur",
     "active": "Actif",
     "error": "Erreur",
-    "loading": "Chargement…"
+    "loading": "Chargement…",
+    "refreshing": "Actualisation…"
   }
 }

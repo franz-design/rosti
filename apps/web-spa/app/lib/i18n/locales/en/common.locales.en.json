@@ -819,6 +819,7 @@
     "user": "User",
     "active": "Active",
     "error": "Error",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "refreshing": "Refreshing…"
   }
 }
