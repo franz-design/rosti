@@ -50,20 +50,50 @@ type EmptyMatchArtName = keyof typeof ART
 interface EmptyMatchArtProps {
   name: EmptyMatchArtName
   sportType?: SportType | null
+  /**
+   * Skip the crop offsets tuned for the large empty cards.
+   * Use this when the picture sits beside real content.
+   */
+  contained?: boolean
   /** Size of the area. The picture's own classes place it inside. */
   className?: string
 }
 
-export function EmptyMatchArt({ name, sportType, className }: EmptyMatchArtProps) {
-  const ball = name === 'ball' ? BALLS[emptyBallKindForSport(sportType)] : null
+export function EmptyMatchArt({
+  name,
+  sportType,
+  contained = false,
+  className,
+}: EmptyMatchArtProps) {
+  const ballKind = name === 'ball' ? emptyBallKindForSport(sportType) : null
+  const ball = ballKind ? BALLS[ballKind] : null
   const art = ball
     ? { light: ball.light, dark: ball.dark, className: cn(ART.ball.className, ball.className) }
     : ART[name]
+  // Sport balls other than football are opaque white or black rectangles.
+  // Blending hides that rectangle on the page background.
+  const blendOpaque = ballKind !== null && ballKind !== 'football'
 
   return (
     <div className={cn('relative flex items-center justify-center', className)}>
-      <img src={art.light} alt="" className={cn('w-full dark:hidden', art.className)} />
-      <img src={art.dark} alt="" className={cn('hidden w-full dark:block', art.className)} />
+      <img
+        src={art.light}
+        alt=""
+        className={cn(
+          'w-full dark:hidden',
+          !contained && art.className,
+          blendOpaque && 'mix-blend-darken',
+        )}
+      />
+      <img
+        src={art.dark}
+        alt=""
+        className={cn(
+          'hidden w-full dark:block',
+          !contained && art.className,
+          blendOpaque && 'mix-blend-lighten',
+        )}
+      />
     </div>
   )
 }

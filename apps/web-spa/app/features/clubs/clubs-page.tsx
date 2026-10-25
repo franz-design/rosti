@@ -42,6 +42,7 @@ export default function ClubsPage() {
         <HomeHeader
           clubName={activeClub?.name ?? t('home.fallbackClub')}
           venue={activeClub?.venue}
+          sportType={activeClub?.sportType}
         />
         <div className="flex flex-wrap items-center gap-2">
           <HomeSkillsPrompt />

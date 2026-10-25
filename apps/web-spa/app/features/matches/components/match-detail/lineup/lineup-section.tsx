@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { PlayerAvatar } from '@/common/components/player-avatar'
 import { PlayerLink } from '@/common/components/player-link'
+import { EmptyMatchArt } from '@/features/matches/components/empty-match-art'
 import type { Lineup } from '@/lib/rosti-api'
 
 interface LineupSectionProps {
@@ -17,7 +18,10 @@ export function LineupSection({ lineups, title }: LineupSectionProps) {
     return (
       <section className="space-y-2">
         {title ? <h2 className="text-base font-medium">{title}</h2> : null}
-        <p className="text-sm text-muted-foreground">{t('matches.detail.summary.noLineup')}</p>
+        <div className="flex flex-col items-center gap-1 overflow-hidden rounded-xl border border-dashed px-6 py-4 text-center">
+          <EmptyMatchArt name="bench" className="w-full max-w-md" />
+          <p className="text-sm text-muted-foreground">{t('matches.detail.summary.noLineup')}</p>
+        </div>
       </section>
     )
   }
