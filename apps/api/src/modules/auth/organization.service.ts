@@ -18,6 +18,7 @@ export interface UpdateOrganizationInput {
   matchInviteLeadDays?: number
   matchInviteReminderLeadDays?: number | null
   feeReminderDelaysDays?: number[]
+  defaultPitchCostCents?: number
 }
 
 @Injectable()
@@ -160,6 +161,9 @@ export class OrganizationService {
       org.feeReminderDelaysDays = [...new Set(data.feeReminderDelaysDays)].sort(
         (left, right) => left - right,
       )
+    }
+    if (data.defaultPitchCostCents !== undefined) {
+      org.defaultPitchCostCents = data.defaultPitchCostCents
     }
 
     await this.em.flush()

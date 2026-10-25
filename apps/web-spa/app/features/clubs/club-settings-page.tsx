@@ -19,7 +19,7 @@ import { MatchDurationSettingsSection } from './components/settings/match-durati
 import { MatchInviteSettingsSection } from './components/settings/match-invite-settings-section'
 import { FeeReminderSettingsSection } from './components/settings/fee-reminder-settings-section'
 import { PaymentLinkSection } from './components/settings/payment-link-section'
-import { SeasonsSettingsSection } from './components/settings/seasons-settings-section'
+import { MatchSettingsSection } from './components/settings/match-settings-section'
 import { useClub } from './hooks/club-context'
 
 export default function ClubSettingsPage() {
@@ -100,8 +100,8 @@ export default function ClubSettingsPage() {
           />
         </TabsContent>
 
-        <TabsContent value="seasons" className="outline-none">
-          <SeasonsSettingsSection />
+        <TabsContent value="matches" className="outline-none">
+          <MatchSettingsSection />
         </TabsContent>
 
         <TabsContent value="notifications" className="outline-none">

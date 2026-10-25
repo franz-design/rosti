@@ -10,6 +10,7 @@ import { Season } from '../seasons/season.entity'
 import {
   CancelMatchInput,
   CreateMatchInput,
+  RenameMatchesInput,
   RespondAttendanceInput,
   SetAttendanceInput,
   SetLineupInput,
@@ -23,6 +24,7 @@ import { buildOccurrenceDates } from './match-occurrences'
 import { MatchSeries } from './match-series.entity'
 import { Match } from './match.entity'
 import { PlayerVoteService } from './player-vote.service'
+import { selectMatchesToRename } from './rename-matches'
 
 @Injectable()
 export class MatchService {
@@ -67,6 +69,7 @@ export class MatchService {
       this.em.persist(series)
     }
 
+    const pitchCostCents = data.pitchCostCents ?? organization.defaultPitchCostCents
     const matches: Match[] = []
     for (const startsAt of starts) {
       const match = new Match()
@@ -81,10 +84,10 @@ export class MatchService {
       match.createdBy = createdBy
       match.status = MatchStatus.Scheduled
       this.em.persist(match)
-      if (data.pitchCostCents != null && data.pitchCostCents > 0) {
+      if (pitchCostCents > 0) {
         const cost = new MatchCost()
         cost.match = match
-        cost.pitchCostCents = data.pitchCostCents
+        cost.pitchCostCents = pitchCostCents
         this.em.persist(cost)
       }
       matches.push(match)
@@ -226,6 +229,53 @@ export class MatchService {
 
     await this.playerVoteService.sync(match)
     return match
+  }
+
+  async rename(
+    organizationId: string,
+    userId: string,
+    matchId: string,
+    data: RenameMatchesInput,
+  ): Promise<{ updatedCount: number }> {
+    await this.organizationService.requireRole(organizationId, userId, ['owner', 'admin'])
+    const match = await this.get(organizationId, userId, matchId)
+    if (match.status === MatchStatus.Cancelled) {
+      throw new BadRequestException('Cannot rename a cancelled match')
+    }
+
+    const candidates =
+      data.scope === 'match'
+        ? [match]
+        : await this.em.find(Match, {
+            organization: { id: organizationId },
+            season: { id: match.season.id },
+          })
+
+    const targets = selectMatchesToRename({
+      scope: data.scope,
+      sourceId: match.id,
+      sourceOrganizationId: match.organization.id,
+      sourceSeasonId: match.season.id,
+      sourceStartsAt: match.startsAt,
+      candidates: candidates.map((candidate) => ({
+        id: candidate.id,
+        organizationId: candidate.organization.id,
+        seasonId: candidate.season.id,
+        startsAt: candidate.startsAt,
+        status: candidate.status,
+      })),
+    })
+    const targetIds = new Set(targets.map((target) => target.id))
+    if (targetIds.size === 0) {
+      throw new BadRequestException('Cannot rename a cancelled match')
+    }
+
+    for (const candidate of candidates) {
+      if (targetIds.has(candidate.id)) candidate.title = data.title
+    }
+    await this.em.flush()
+
+    return { updatedCount: targetIds.size }
   }
 
   async cancel(

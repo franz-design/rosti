@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 export const CLUB_SETTINGS_TABS = [
   'players',
   'invite',
-  'seasons',
+  'matches',
   'notifications',
   'payment',
 ] as const
@@ -22,8 +22,8 @@ export function ClubSettingsTabsList() {
       <TabsTrigger value="invite" className="flex-none px-3">
         {t('clubSettings.tabs.invite')}
       </TabsTrigger>
-      <TabsTrigger value="seasons" className="flex-none px-3">
-        {t('clubSettings.tabs.seasons')}
+      <TabsTrigger value="matches" className="flex-none px-3">
+        {t('clubSettings.tabs.matches')}
       </TabsTrigger>
       <TabsTrigger value="notifications" className="flex-none px-3">
         {t('clubSettings.tabs.notifications')}

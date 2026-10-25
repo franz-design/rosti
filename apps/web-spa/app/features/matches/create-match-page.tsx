@@ -13,7 +13,7 @@ import { fetchSeasonsQueryOptions } from '@/features/seasons/utils/seasons-queri
 import { rostiApi } from '@/lib/rosti-api'
 import { CreateMatchForm } from './components/create-match/create-match-form'
 import { CreateMatchHeader } from './components/create-match/create-match-header'
-import { eurosToCents } from './utils/euros'
+import { centsToEuroInput, eurosToCents } from './utils/euros'
 import {
   buildMatchRecurrencePayload,
   combineDateAndTime,
@@ -60,6 +60,9 @@ export default function CreateMatchPage() {
     setTitle(t('createMatch.defaultTitle', { club: activeClub.name }))
     setLocation(activeClub.venue ?? '')
     setMaxPlayers(activeClub.defaultMaxCapacity ?? 10)
+    if (activeClub.defaultPitchCostCents > 0) {
+      setPitchCost(centsToEuroInput(activeClub.defaultPitchCostCents))
+    }
     setDefaultsReady(true)
   }, [activeClub, defaultsReady, t])
 
@@ -104,7 +107,7 @@ export default function CreateMatchPage() {
         startsAt: startsAt.toISOString(),
         location: location.trim() || undefined,
         maxCapacity: maxPlayers,
-        ...(pitchCostCents > 0 ? { pitchCostCents } : {}),
+        pitchCostCents,
         recurrence: buildMatchRecurrencePayload({
           recurrence,
           endMode,

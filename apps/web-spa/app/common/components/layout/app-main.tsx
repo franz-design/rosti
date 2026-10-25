@@ -2,6 +2,7 @@ import { cn } from '@rosti/ui/lib/utils'
 import type { ReactNode } from 'react'
 import { useAppShell } from '../../hooks/app-shell-context'
 import { usePullToRefresh } from '../../hooks/use-pull-to-refresh'
+import { useScrollEdgeGuard } from '../../hooks/use-scroll-edge-guard'
 import { useScrollToTop } from '../../hooks/use-scroll-to-top'
 import { PULL_SETTLE_MS } from '../../utils/pull-to-refresh'
 import { PullToRefreshIndicator } from './pull-to-refresh-indicator'
@@ -16,6 +17,7 @@ export function AppMain({ children }: { children: ReactNode }) {
   const { isFullBleed } = useAppShell()
   const scrollRef = useScrollToTop<HTMLDivElement>()
   const { distance, isPulling, isRefreshing } = usePullToRefresh(scrollRef, !isFullBleed)
+  useScrollEdgeGuard(scrollRef, !isFullBleed)
 
   return (
     <div
@@ -27,7 +29,12 @@ export function AppMain({ children }: { children: ReactNode }) {
       )}
     >
       <div
-        className={cn('relative flex w-full min-w-0 flex-col', isFullBleed && 'min-h-0 flex-1')}
+        className={cn(
+          'relative flex w-full min-w-0 flex-col',
+          // One pixel taller than the scroller, so a short page can still move
+          // and iOS does not bounce the installed app.
+          isFullBleed ? 'min-h-0 flex-1' : 'min-h-[calc(100%+1px)]',
+        )}
         style={
           isFullBleed
             ? undefined

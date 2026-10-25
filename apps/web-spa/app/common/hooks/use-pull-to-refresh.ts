@@ -10,6 +10,7 @@ import {
   nextPullOnRelease,
   refreshMountedQueries,
 } from '../utils/pull-to-refresh'
+import { shouldBlockEdgeOverscroll } from '../utils/scroll-edge'
 
 interface PullToRefreshState {
   distance: number
@@ -126,12 +127,27 @@ export function usePullToRefresh(
       const touch = event.touches[0]
       if (!touch) return
 
+      const deltaX = touch.clientX - startX
+      const deltaY = touch.clientY - startY
       const decision = classifyPullMove({
-        deltaX: touch.clientX - startX,
-        deltaY: touch.clientY - startY,
+        deltaX,
+        deltaY,
         scrollTop: element.scrollTop,
         isPulling: tracking === 'pull',
       })
+
+      // Cancel the browser on the first pixels downward. The indicator still
+      // waits for a clearer drag. Waiting to cancel lets iOS rubber-band, and
+      // stopping that bounce halfway freezes scrolling and navigation.
+      const blockNative =
+        decision === 'pull' ||
+        shouldBlockEdgeOverscroll({
+          deltaX,
+          deltaY,
+          scrollTop: element.scrollTop,
+          maxScrollTop: element.scrollHeight - element.clientHeight,
+        })
+      if (blockNative && event.cancelable) event.preventDefault()
 
       if (decision === 'wait') return
       if (decision === 'ignore') {
@@ -142,8 +158,7 @@ export function usePullToRefresh(
       }
 
       tracking = 'pull'
-      if (event.cancelable) event.preventDefault()
-      distance = followFinger(touch.clientY - startY)
+      distance = followFinger(deltaY)
       publish({ distance, isPulling: true, isRefreshing: false })
     }
 

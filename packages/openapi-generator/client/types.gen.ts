@@ -76,6 +76,7 @@ export type UpdateClubSchema = {
     matchInviteLeadDays?: number;
     matchInviteReminderLeadDays?: number | null;
     feeReminderDelaysDays?: Array<number>;
+    defaultPitchCostCents?: number;
 };
 
 /**
@@ -305,6 +306,7 @@ export type ClubSchema = {
     matchInviteLeadDays: number;
     matchInviteReminderLeadDays?: number | null;
     feeReminderDelaysDays: Array<number>;
+    defaultPitchCostCents: number;
     createdAt: string;
 };
 
@@ -695,6 +697,7 @@ export type ClubControllerUpdateData = {
         matchInviteLeadDays?: number;
         matchInviteReminderLeadDays?: number | null;
         feeReminderDelaysDays?: Array<number>;
+        defaultPitchCostCents?: number;
     };
     path: {
         organizationId: string;

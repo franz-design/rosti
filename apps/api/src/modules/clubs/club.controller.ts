@@ -21,6 +21,7 @@ import { AvatarService } from '../avatars/avatar.service'
 import { AvatarDto, avatarSchema } from '../avatars/contracts/avatar.contract'
 import { readMatchDurationMinutes } from '../notifications/match-end'
 import { NotificationService } from '../notifications/notification.service'
+import { PaymentService } from '../payments/payment.service'
 import {
   ClubDto,
   clubMembersSchema,
@@ -46,6 +47,7 @@ function toClubDto(o: Organization): ClubDto {
     matchInviteLeadDays: o.matchInviteLeadDays,
     matchInviteReminderLeadDays: o.matchInviteReminderLeadDays,
     feeReminderDelaysDays: o.feeReminderDelaysDays,
+    defaultPitchCostCents: o.defaultPitchCostCents,
     createdAt: o.createdAt,
   }
 }
@@ -62,6 +64,7 @@ export class ClubController {
     private readonly organizationService: OrganizationService,
     private readonly notificationService: NotificationService,
     private readonly avatarService: AvatarService,
+    private readonly paymentService: PaymentService,
   ) {}
 
   @TypedRoute.Get('', clubsSchema)
@@ -97,6 +100,9 @@ export class ClubController {
     }
     if (body.matchDurationMinutes !== undefined) {
       await this.notificationService.rescheduleMatchEndNotifications(organizationId)
+    }
+    if (body.defaultPitchCostCents !== undefined) {
+      await this.paymentService.applyDefaultPitchCost(organizationId, body.defaultPitchCostCents)
     }
     return toClubDto(o)
   }

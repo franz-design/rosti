@@ -74,6 +74,13 @@ export class Organization {
   @Property({ type: 'json', defaultRaw: `'[3,7]'::jsonb` })
   feeReminderDelaysDays: number[] = [3, 7]
 
+  /**
+   * Default pitch cost in cents.
+   * Saving it replaces the pitch cost of every upcoming match.
+   */
+  @Property({ fieldName: 'defaultPitchCostCents', type: 'int', default: 0 })
+  defaultPitchCostCents: number = 0
+
   @Property({ fieldName: 'createdAt' })
   createdAt: Date = new Date()
 }

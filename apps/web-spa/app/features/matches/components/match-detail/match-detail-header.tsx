@@ -10,6 +10,7 @@ interface MatchDetailHeaderProps {
   match: Match
   canManage: boolean
   isStatusPending?: boolean
+  onRename: () => void
   onReopen: () => void
   onMarkPlayed: () => void
   onCancel: () => void
@@ -19,6 +20,7 @@ export function MatchDetailHeader({
   match,
   canManage,
   isStatusPending,
+  onRename,
   onReopen,
   onMarkPlayed,
   onCancel,
@@ -72,13 +74,20 @@ export function MatchDetailHeader({
           </p>
         </div>
         {canManage ? (
-          <MatchStatusMenu
-            status={match.status}
-            disabled={isStatusPending}
-            onReopen={onReopen}
-            onMarkPlayed={onMarkPlayed}
-            onCancel={onCancel}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            {match.status !== 'cancelled' ? (
+              <Button variant="outline" size="sm" onClick={onRename}>
+                {t('matches.rename')}
+              </Button>
+            ) : null}
+            <MatchStatusMenu
+              status={match.status}
+              disabled={isStatusPending}
+              onReopen={onReopen}
+              onMarkPlayed={onMarkPlayed}
+              onCancel={onCancel}
+            />
+          </div>
         ) : null}
       </div>
     </div>

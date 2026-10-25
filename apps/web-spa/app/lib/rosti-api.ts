@@ -54,6 +54,7 @@ export const rostiApi = {
       matchInviteLeadDays?: number
       matchInviteReminderLeadDays?: number | null
       feeReminderDelaysDays?: number[]
+      defaultPitchCostCents?: number
     },
   ) =>
     request<Club>(`/clubs/${orgId}`, {
@@ -107,6 +108,15 @@ export const rostiApi = {
   ) =>
     request<Match>(`/clubs/${orgId}/matches/${matchId}`, {
       method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+  renameMatches: (
+    orgId: string,
+    matchId: string,
+    body: { title: string; scope: 'match' | 'following' },
+  ) =>
+    request<{ updatedCount: number }>(`/clubs/${orgId}/matches/${matchId}/rename`, {
+      method: 'POST',
       body: JSON.stringify(body),
     }),
   cancelMatch: (orgId: string, matchId: string, reason?: string) =>
@@ -294,6 +304,7 @@ export interface Club {
   matchInviteLeadDays: number
   matchInviteReminderLeadDays?: number | null
   feeReminderDelaysDays: number[]
+  defaultPitchCostCents: number
   createdAt: string
 }
 

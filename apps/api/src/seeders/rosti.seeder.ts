@@ -44,6 +44,7 @@ const CLUB = {
   defaultMaxCapacity: 14,
   matchDurationMinutes: DEFAULT_MATCH_DURATION_MINUTES,
   matchInviteLeadDays: DEFAULT_MATCH_INVITE_LEAD_DAYS,
+  defaultPitchCostCents: 0,
 }
 
 const PLAYERS: Array<{ firstName: string; lastName: string }> = [
@@ -95,6 +96,7 @@ export class RostiSeeder extends Seeder {
       matchDurationMinutes: CLUB.matchDurationMinutes,
       matchInviteLeadDays: CLUB.matchInviteLeadDays,
       feeReminderDelaysDays: [3, 7],
+      defaultPitchCostCents: CLUB.defaultPitchCostCents,
       createdAt: new Date(),
     })
 

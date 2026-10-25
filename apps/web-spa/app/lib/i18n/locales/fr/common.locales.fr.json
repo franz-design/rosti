@@ -229,6 +229,18 @@
     "postponeConfirm": "Confirmer le report",
     "postponeCancel": "Annuler",
     "statusMenu": "Modifier le statut",
+    "rename": "Renommer",
+    "renameTitle": "Renommer le match",
+    "renameDescription": "Choisis le nouveau nom, pour ce match seulement ou pour tous les matchs suivants de la saison.",
+    "renameName": "Nom",
+    "renameNameRequired": "Indique un nom.",
+    "renameScope": "Appliquer à",
+    "renameScopeMatch": "Ce match seulement",
+    "renameScopeFollowing": "Ce match et les suivants",
+    "renameScopeFollowingHint": "Les matchs de cette saison qui commencent après celui-ci prennent le même nom. Les matchs annulés ne changent pas.",
+    "renameConfirm": "Enregistrer",
+    "renameSuccess": "Nom du match mis à jour",
+    "renameSuccessFollowing": "Nom appliqué à {{count}} matchs",
     "reopen": "Replanifier",
     "reopenTitle": "Replanifier le match",
     "reopenDescription": "La date actuelle est déjà remplie. Tu peux la garder ou en choisir une autre, y compris dans le passé.",
@@ -437,7 +449,7 @@
     "tabs": {
       "players": "Joueurs",
       "invite": "Invitations",
-      "seasons": "Saisons",
+      "matches": "Matchs",
       "notifications": "Notifications",
       "payment": "Paiement"
     },
@@ -494,10 +506,17 @@
       "save": "Enregistrer",
       "saved": "Relances enregistrées"
     },
-    "seasons": {
-      "title": "Saisons",
-      "hint": "Crée, renomme ou clôture les saisons du club. Une seule est en cours.",
-      "manage": "Gérer les saisons"
+    "matches": {
+      "title": "Matchs",
+      "hint": "Ce montant devient le coût du terrain de tous les matchs à venir. Les matchs déjà joués ne changent pas.",
+      "amount": "Montant par défaut (€)",
+      "placeholder": "Ex. 30",
+      "invalidAmount": "Indique un montant en euros, par exemple 30 ou 12,50.",
+      "save": "Enregistrer",
+      "saved": "Montant enregistré",
+      "seasonsTitle": "Saisons",
+      "seasonsHint": "Crée, renomme ou clôture les saisons du club. Une seule est en cours.",
+      "manageSeasons": "Gérer les saisons"
     },
     "matchDuration": {
       "title": "Durée des matchs",
@@ -521,6 +540,7 @@
     }
   },
   "seasons": {
+    "back": "Retour",
     "title": "Saisons",
     "description": "Une seule saison est en cours. Les stats de l'accueil et les nouveaux matchs suivent cette saison.",
     "noClub": "Aucun club sélectionné.",

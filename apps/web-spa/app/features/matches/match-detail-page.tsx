@@ -14,6 +14,7 @@ import { ChatTab } from './components/match-detail/chat/chat-tab'
 import { PaymentsTab } from './components/match-detail/payments/payments-tab'
 import { LineupDialog } from './components/match-detail/lineup/lineup-dialog'
 import { MatchDetailHeader } from './components/match-detail/match-detail-header'
+import { RenameMatchDialog } from './components/match-detail/rename-match-dialog'
 import {
   DEFAULT_MATCH_DETAIL_TAB,
   MATCH_DETAIL_TABS,
@@ -25,6 +26,7 @@ import { SummaryTab } from './components/match-detail/summary-tab'
 import { PostponeMatchDialog } from './components/postpone-match-dialog'
 import { extractMentionIds, toPlainMentionBody } from './utils/chat-mentions'
 import { shouldPromptEnterScore, shouldShowMatchResult } from './utils/match-filters'
+import type { RenameMatchFormValues } from './utils/rename-match-form'
 import {
   attendancesQueryKey,
   rollbackOptimisticAttendance,
@@ -59,6 +61,7 @@ export default function MatchDetailPage() {
   const pendingStatSave = useRef<Record<string, PlayerStatDraft> | null>(null)
   const [isLineupOpen, setIsLineupOpen] = useState(false)
   const [isReopenOpen, setIsReopenOpen] = useState(false)
+  const [isRenameOpen, setIsRenameOpen] = useState(false)
   const [unreadMessageCount, setUnreadMessageCount] = useState(0)
   const chatScrollRef = useRef<HTMLDivElement>(null)
   const knownMessageIds = useRef<Set<string> | null>(null)
@@ -252,6 +255,20 @@ export default function MatchDetailPage() {
     onError: (e: Error) => toast.error(e.message),
   })
 
+  const rename = useMutation({
+    mutationFn: (values: RenameMatchFormValues) => rostiApi.renameMatches(orgId!, matchId!, values),
+    onSuccess: (result) => {
+      toast.success(
+        result.updatedCount > 1
+          ? t('matches.renameSuccessFollowing', { count: result.updatedCount })
+          : t('matches.renameSuccess'),
+      )
+      setIsRenameOpen(false)
+      invalidate()
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
+
   const setStatus = useMutation({
     mutationFn: (body: { status: 'scheduled' | 'played'; startsAt?: string }) =>
       rostiApi.setMatchStatus(orgId!, matchId!, body),
@@ -364,6 +381,7 @@ export default function MatchDetailPage() {
             match={match}
             canManage={isClubAdmin}
             isStatusPending={cancel.isPending || setStatus.isPending}
+            onRename={() => setIsRenameOpen(true)}
             onReopen={() => setIsReopenOpen(true)}
             onMarkPlayed={() => setStatus.mutate({ status: 'played' })}
             onCancel={() => cancel.mutate()}
@@ -467,6 +485,13 @@ export default function MatchDetailPage() {
           />
         </TabsContent>
       </Tabs>
+      <RenameMatchDialog
+        open={isRenameOpen}
+        onOpenChange={setIsRenameOpen}
+        currentTitle={match.title}
+        isPending={rename.isPending}
+        onSubmit={(values) => rename.mutate(values)}
+      />
       <PostponeMatchDialog
         open={isReopenOpen}
         onOpenChange={setIsReopenOpen}

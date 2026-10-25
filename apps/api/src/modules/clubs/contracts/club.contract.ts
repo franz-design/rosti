@@ -56,6 +56,7 @@ export const clubSchema = z
     matchInviteLeadDays: z.number().int().min(1).max(30),
     matchInviteReminderLeadDays: z.number().int().min(1).max(29).nullish(),
     feeReminderDelaysDays: z.array(z.number().int().min(1).max(60)).max(4),
+    defaultPitchCostCents: z.number().int().nonnegative(),
     createdAt: z.coerce.date(),
   })
   .meta({ title: 'ClubSchema' })
@@ -73,6 +74,7 @@ export const updateClubSchema = z
     matchInviteLeadDays: z.number().int().min(1).max(30).optional(),
     matchInviteReminderLeadDays: z.number().int().min(1).max(29).nullish(),
     feeReminderDelaysDays: z.array(z.number().int().min(1).max(60)).max(4).optional(),
+    defaultPitchCostCents: z.number().int().nonnegative().optional(),
   })
   .meta({ title: 'UpdateClubSchema' })
 

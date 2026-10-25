@@ -14,6 +14,9 @@ import {
   MatchDto,
   matchSchema,
   matchesSchema,
+  RenameMatchesInput,
+  renameMatchesResultSchema,
+  renameMatchesSchema,
   RespondAttendanceInput,
   respondAttendanceSchema,
   SetAttendanceInput,
@@ -86,6 +89,16 @@ export class MatchController {
   ): Promise<MatchDto> {
     const match = await this.matchService.update(organizationId, session.user.id, matchId, body)
     return this.mapMatch(match, session.user.id)
+  }
+
+  @TypedRoute.Post(':matchId/rename', renameMatchesResultSchema)
+  async rename(
+    @Session() session: LoggedInBetterAuthSession,
+    @TypedParam('organizationId', z.string().uuid()) organizationId: string,
+    @TypedParam('matchId', z.string().uuid()) matchId: string,
+    @TypedBody(renameMatchesSchema) body: RenameMatchesInput,
+  ) {
+    return this.matchService.rename(organizationId, session.user.id, matchId, body)
   }
 
   @TypedRoute.Post(':matchId/cancel', matchSchema)

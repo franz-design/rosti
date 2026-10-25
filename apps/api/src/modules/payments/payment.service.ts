@@ -1,10 +1,11 @@
 import { EntityManager } from '@mikro-orm/core'
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { OrganizationService } from '../auth/organization.service'
-import { AttendanceStatus } from '../matches/contracts/match.contract'
+import { AttendanceStatus, MatchStatus } from '../matches/contracts/match.contract'
 import { MatchAttendance } from '../matches/match-attendance.entity'
 import { Match } from '../matches/match.entity'
 import { FeeStatus, UpdateFeeStatusInput, UpsertMatchCostInput } from './contracts/payment.contract'
+import { shouldApplyDefaultPitchCost } from './default-pitch-cost'
 import { planFeeUpdates } from './fee-split'
 import { MatchCost } from './match-cost.entity'
 import { SessionFee } from './session-fee.entity'
@@ -191,5 +192,59 @@ export class PaymentService {
     fee.shares = shares
     const { fees } = await this.recomputeFees(fee.match.id)
     return fees.find((item) => item.id === fee.id) ?? fee
+  }
+
+  /**
+   * Replaces the pitch cost of every upcoming match with the club default.
+   * Equipment costs stay as they are. Shares are recalculated when they exist.
+   */
+  async applyDefaultPitchCost(organizationId: string, pitchCostCents: number): Promise<void> {
+    const now = new Date()
+    const matches = await this.em.find(Match, {
+      organization: { id: organizationId },
+      status: MatchStatus.Scheduled,
+      startsAt: { $gt: now },
+    })
+    if (matches.length === 0) return
+
+    const costs = await this.em.find(
+      MatchCost,
+      { match: { id: { $in: matches.map((match) => match.id) } } },
+      { populate: ['match'] },
+    )
+    const costByMatchId = new Map(costs.map((cost) => [cost.match.id, cost]))
+    const touchedMatchIds: string[] = []
+
+    for (const match of matches) {
+      const cost = costByMatchId.get(match.id)
+      if (
+        !shouldApplyDefaultPitchCost(
+          {
+            status: match.status,
+            startsAt: match.startsAt,
+            feesNotifiedAt: cost?.feesNotifiedAt,
+          },
+          now,
+        )
+      ) {
+        continue
+      }
+
+      if (!cost) {
+        if (pitchCostCents === 0) continue
+        const created = new MatchCost()
+        created.match = match
+        created.pitchCostCents = pitchCostCents
+        this.em.persist(created)
+      } else {
+        cost.pitchCostCents = pitchCostCents
+      }
+      touchedMatchIds.push(match.id)
+    }
+
+    await this.em.flush()
+    for (const matchId of touchedMatchIds) {
+      await this.recomputeFees(matchId)
+    }
   }
 }

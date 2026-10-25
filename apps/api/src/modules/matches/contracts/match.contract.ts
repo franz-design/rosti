@@ -84,6 +84,26 @@ export const updateMatchSchema = z
 
 export type UpdateMatchInput = z.infer<typeof updateMatchSchema>
 
+export const renameMatchScopeSchema = z.enum(['match', 'following'])
+export type RenameMatchScope = z.infer<typeof renameMatchScopeSchema>
+
+export const renameMatchesSchema = z
+  .object({
+    title: z.string().trim().min(1),
+    scope: renameMatchScopeSchema,
+  })
+  .meta({ title: 'RenameMatchesSchema' })
+
+export type RenameMatchesInput = z.infer<typeof renameMatchesSchema>
+
+export const renameMatchesResultSchema = z
+  .object({
+    updatedCount: z.number().int().positive(),
+  })
+  .meta({ title: 'RenameMatchesResultSchema' })
+
+export type RenameMatchesResult = z.infer<typeof renameMatchesResultSchema>
+
 export const cancelMatchSchema = z
   .object({
     reason: z.string().optional(),

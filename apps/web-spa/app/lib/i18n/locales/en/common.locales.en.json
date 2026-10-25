@@ -229,6 +229,18 @@
     "postponeConfirm": "Confirm postpone",
     "postponeCancel": "Cancel",
     "statusMenu": "Change status",
+    "rename": "Rename",
+    "renameTitle": "Rename match",
+    "renameDescription": "Choose the new name, for this match only or for every later match in the season.",
+    "renameName": "Name",
+    "renameNameRequired": "Enter a name.",
+    "renameScope": "Apply to",
+    "renameScopeMatch": "This match only",
+    "renameScopeFollowing": "This match and the following ones",
+    "renameScopeFollowingHint": "Matches in this season that start after this one get the same name. Cancelled matches stay as they are.",
+    "renameConfirm": "Save",
+    "renameSuccess": "Match name updated",
+    "renameSuccessFollowing": "Name applied to {{count}} matches",
     "reopen": "Reschedule",
     "reopenTitle": "Reschedule match",
     "reopenDescription": "The current date is already filled in. Keep it, or pick another one, including a past date.",
@@ -437,7 +449,7 @@
     "tabs": {
       "players": "Players",
       "invite": "Invitations",
-      "seasons": "Seasons",
+      "matches": "Matches",
       "notifications": "Notifications",
       "payment": "Payment"
     },
@@ -494,10 +506,17 @@
       "save": "Save",
       "saved": "Reminders saved"
     },
-    "seasons": {
-      "title": "Seasons",
-      "hint": "Create, rename, or close the club seasons. Only one stays active.",
-      "manage": "Manage seasons"
+    "matches": {
+      "title": "Matches",
+      "hint": "This amount becomes the pitch cost of every upcoming match. Matches already played stay as they are.",
+      "amount": "Default amount (€)",
+      "placeholder": "e.g. 30",
+      "invalidAmount": "Enter an amount in euros, for example 30 or 12.50.",
+      "save": "Save",
+      "saved": "Amount saved",
+      "seasonsTitle": "Seasons",
+      "seasonsHint": "Create, rename, or close the club seasons. Only one stays active.",
+      "manageSeasons": "Manage seasons"
     },
     "matchDuration": {
       "title": "Match length",
@@ -521,6 +540,7 @@
     }
   },
   "seasons": {
+    "back": "Back",
     "title": "Seasons",
     "description": "Only one season is active. Home stats and new matches follow that season.",
     "noClub": "No club selected.",

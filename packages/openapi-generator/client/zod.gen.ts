@@ -112,7 +112,8 @@ export const zUpdateClubSchema = z.object({
         z.int().gte(1).lte(29),
         z.null()
     ])),
-    feeReminderDelaysDays: z.optional(z.array(z.int().gte(1).lte(60)).max(4))
+    feeReminderDelaysDays: z.optional(z.array(z.int().gte(1).lte(60)).max(4)),
+    defaultPitchCostCents: z.optional(z.int().gte(0).lte(9007199254740991))
 });
 
 /**
@@ -452,6 +453,7 @@ export const zClubSchema = z.object({
         z.null()
     ])),
     feeReminderDelaysDays: z.array(z.int().gte(1).lte(60)).max(4),
+    defaultPitchCostCents: z.int().gte(0).lte(9007199254740991),
     createdAt: z.string()
 });
 
@@ -1045,7 +1047,8 @@ export const zClubControllerUpdateData = z.object({
             z.int().gte(1).lte(29),
             z.null()
         ])),
-        feeReminderDelaysDays: z.optional(z.array(z.int().gte(1).lte(60)).max(4))
+        feeReminderDelaysDays: z.optional(z.array(z.int().gte(1).lte(60)).max(4)),
+        defaultPitchCostCents: z.optional(z.int().gte(0).lte(9007199254740991))
     }),
     path: z.object({
         organizationId: z.uuid().regex(/^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/)
