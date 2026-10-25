@@ -13,9 +13,10 @@ interface MatchCardActionsProps {
   match: Match
   onPostpone: (match: Match) => void
   onCancel: (matchId: string) => void
+  onDelete?: (match: Match) => void
 }
 
-export function MatchCardActions({ match, onPostpone, onCancel }: MatchCardActionsProps) {
+export function MatchCardActions({ match, onPostpone, onCancel, onDelete }: MatchCardActionsProps) {
   const { t } = useTranslation()
 
   return (
@@ -43,6 +44,17 @@ export function MatchCardActions({ match, onPostpone, onCancel }: MatchCardActio
         >
           {t('matches.cancel')}
         </DropdownMenuItem>
+        {onDelete ? (
+          <DropdownMenuItem
+            variant="destructive"
+            onClick={(e) => {
+              e.preventDefault()
+              onDelete(match)
+            }}
+          >
+            {t('matches.delete')}
+          </DropdownMenuItem>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   )

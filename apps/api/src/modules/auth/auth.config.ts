@@ -1,9 +1,11 @@
 import type { MikroORM } from '@mikro-orm/core'
 import type { BetterAuthOptions, User } from 'better-auth'
 import type { BetterAuthType } from './auth.client-types'
+import { Logger } from '@nestjs/common'
 import { betterAuth } from 'better-auth'
 import { createAuthMiddleware } from 'better-auth/api'
 import { openAPI, organization } from 'better-auth/plugins'
+import { addMemberToUpcomingMatches } from '../matches/add-member-to-upcoming-matches'
 import { legacyAuthCookieClears } from './auth-cookie-domain'
 import { mikroOrmAdapter } from './auth-db.adapter'
 
@@ -44,6 +46,18 @@ export type { BetterAuthType }
 export type BetterAuthContext = ReturnType<typeof createBetterAuth>['$context']
 
 export function createBetterAuth(options: BetterAuthOptionsDynamic): BetterAuthType {
+  const logger = new Logger('OrganizationHooks')
+  const enrollMember = async (organizationId: string, userId: string): Promise<void> => {
+    try {
+      await addMemberToUpcomingMatches(options.orm.em.fork(), { organizationId, userId })
+    } catch (error) {
+      logger.error(
+        `Failed to add member ${userId} to upcoming matches of club ${organizationId}`,
+        error instanceof Error ? error.stack : undefined,
+      )
+    }
+  }
+
   const authOptions = {
     baseURL: options.baseUrl,
     secret: options.secret,
@@ -131,6 +145,14 @@ export function createBetterAuth(options: BetterAuthOptionsDynamic): BetterAuthT
         membershipLimit: 500,
         invitationExpiresIn: 60 * 60 * 24 * 7,
         requireEmailVerificationOnInvitation: true,
+        organizationHooks: {
+          afterAddMember: async ({ user, organization: club }) => {
+            await enrollMember(club.id, user.id)
+          },
+          afterAcceptInvitation: async ({ user, organization: club }) => {
+            await enrollMember(club.id, user.id)
+          },
+        },
         async sendInvitationEmail(data) {
           if (options.sendInvitationEmail) {
             await options.sendInvitationEmail(data)

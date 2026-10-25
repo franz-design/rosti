@@ -124,6 +124,14 @@ export const rostiApi = {
       method: 'POST',
       body: JSON.stringify({ reason }),
     }),
+  deleteMatch: (orgId: string, matchId: string) =>
+    request<{ deletedCount: number }>(`/clubs/${orgId}/matches/${matchId}`, {
+      method: 'DELETE',
+    }),
+  deleteUpcomingMatches: (orgId: string) =>
+    request<{ deletedCount: number }>(`/clubs/${orgId}/matches/upcoming`, {
+      method: 'DELETE',
+    }),
   setMatchStatus: (
     orgId: string,
     matchId: string,

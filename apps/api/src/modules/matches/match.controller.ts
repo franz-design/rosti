@@ -10,6 +10,8 @@ import {
   cancelMatchSchema,
   CreateMatchInput,
   createMatchSchema,
+  DeleteMatchesResult,
+  deleteMatchesResultSchema,
   lineupsSchema,
   MatchDto,
   matchSchema,
@@ -99,6 +101,23 @@ export class MatchController {
     @TypedBody(renameMatchesSchema) body: RenameMatchesInput,
   ) {
     return this.matchService.rename(organizationId, session.user.id, matchId, body)
+  }
+
+  @TypedRoute.Delete('upcoming', deleteMatchesResultSchema)
+  async deleteUpcoming(
+    @Session() session: LoggedInBetterAuthSession,
+    @TypedParam('organizationId', z.string().uuid()) organizationId: string,
+  ): Promise<DeleteMatchesResult> {
+    return this.matchService.deleteUpcoming(organizationId, session.user.id)
+  }
+
+  @TypedRoute.Delete(':matchId', deleteMatchesResultSchema)
+  async deleteOne(
+    @Session() session: LoggedInBetterAuthSession,
+    @TypedParam('organizationId', z.string().uuid()) organizationId: string,
+    @TypedParam('matchId', z.string().uuid()) matchId: string,
+  ): Promise<DeleteMatchesResult> {
+    return this.matchService.deleteUpcoming(organizationId, session.user.id, matchId)
   }
 
   @TypedRoute.Post(':matchId/cancel', matchSchema)

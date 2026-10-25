@@ -14,6 +14,7 @@ interface MatchDetailHeaderProps {
   onReopen: () => void
   onMarkPlayed: () => void
   onCancel: () => void
+  onDelete?: () => void
 }
 
 export function MatchDetailHeader({
@@ -24,6 +25,7 @@ export function MatchDetailHeader({
   onReopen,
   onMarkPlayed,
   onCancel,
+  onDelete,
 }: MatchDetailHeaderProps) {
   const { t, i18n } = useTranslation()
   const dateLocale = i18n.language?.startsWith('en') ? 'en-GB' : 'fr-FR'
@@ -78,6 +80,11 @@ export function MatchDetailHeader({
             {match.status !== 'cancelled' ? (
               <Button variant="outline" size="sm" onClick={onRename}>
                 {t('matches.rename')}
+              </Button>
+            ) : null}
+            {onDelete ? (
+              <Button variant="destructive" size="sm" disabled={isStatusPending} onClick={onDelete}>
+                {t('matches.delete')}
               </Button>
             ) : null}
             <MatchStatusMenu

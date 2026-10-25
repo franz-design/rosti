@@ -18,6 +18,7 @@ import {
   UpdateMatchInput,
 } from './contracts/match.contract'
 import { AttendanceStatus, MatchStatus, TeamSide } from './contracts/match.contract'
+import { selectUpcomingMatchesToDelete } from './delete-upcoming-matches'
 import { MatchAttendance } from './match-attendance.entity'
 import { MatchLineup } from './match-lineup.entity'
 import { buildOccurrenceDates } from './match-occurrences'
@@ -294,6 +295,52 @@ export class MatchService {
     await this.notificationService.syncUpcomingMatchInvites(match.organization.id)
     await this.playerVoteService.sync(match)
     return match
+  }
+
+  /**
+   * Deletes one upcoming match, or every upcoming match of the club.
+   * An upcoming match is scheduled and has not started. Played and cancelled matches stay.
+   * Related attendances, chat, fees, and reminders are removed with the match.
+   */
+  async deleteUpcoming(
+    organizationId: string,
+    userId: string,
+    matchId?: string,
+  ): Promise<{ deletedCount: number }> {
+    await this.organizationService.requireRole(organizationId, userId, ['owner', 'admin'])
+    const now = new Date()
+
+    if (matchId) {
+      const match = await this.em.findOne(Match, {
+        id: matchId,
+        organization: { id: organizationId },
+      })
+      if (!match) throw new NotFoundException('Match not found')
+      const targets = selectUpcomingMatchesToDelete({ matches: [match], now, matchId })
+      if (targets.length === 0) {
+        throw new BadRequestException('Only an upcoming match can be deleted')
+      }
+      await this.removeMatches([match])
+      await this.notificationService.syncUpcomingMatchInvites(organizationId)
+      return { deletedCount: 1 }
+    }
+
+    const matches = await this.em.find(Match, {
+      organization: { id: organizationId },
+      status: MatchStatus.Scheduled,
+      startsAt: { $gte: now },
+    })
+    const targets = selectUpcomingMatchesToDelete({ matches, now })
+    if (targets.length === 0) return { deletedCount: 0 }
+
+    await this.removeMatches(targets)
+    await this.notificationService.syncUpcomingMatchInvites(organizationId)
+    return { deletedCount: targets.length }
+  }
+
+  private async removeMatches(matches: Match[]): Promise<void> {
+    this.em.remove(matches)
+    await this.em.flush()
   }
 
   async respondAttendance(

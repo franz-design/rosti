@@ -112,6 +112,14 @@ export const cancelMatchSchema = z
 
 export type CancelMatchInput = z.infer<typeof cancelMatchSchema>
 
+export const deleteMatchesResultSchema = z
+  .object({
+    deletedCount: z.number().int().nonnegative(),
+  })
+  .meta({ title: 'DeleteMatchesResultSchema' })
+
+export type DeleteMatchesResult = z.infer<typeof deleteMatchesResultSchema>
+
 export const setMatchStatusSchema = z
   .object({
     status: z.enum([MatchStatus.Scheduled, MatchStatus.Played]),

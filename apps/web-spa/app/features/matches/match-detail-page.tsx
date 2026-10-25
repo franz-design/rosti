@@ -4,12 +4,13 @@ import { cn } from '@rosti/ui/lib/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { useTabSearchParam } from '@/common/hooks/use-tab-search-param'
 import { useClub } from '@/features/clubs/hooks/club-context'
 import { useFullBleedShell } from '@/common/hooks/app-shell-context'
 import { authClient } from '@/lib/auth-client'
 import { rostiApi } from '@/lib/rosti-api'
+import { DeleteMatchesDialog } from './components/delete-matches-dialog'
 import { ChatTab } from './components/match-detail/chat/chat-tab'
 import { PaymentsTab } from './components/match-detail/payments/payments-tab'
 import { LineupDialog } from './components/match-detail/lineup/lineup-dialog'
@@ -25,7 +26,11 @@ import { StatsTab } from './components/match-detail/stats/stats-tab'
 import { SummaryTab } from './components/match-detail/summary-tab'
 import { PostponeMatchDialog } from './components/postpone-match-dialog'
 import { extractMentionIds, toPlainMentionBody } from './utils/chat-mentions'
-import { shouldPromptEnterScore, shouldShowMatchResult } from './utils/match-filters'
+import {
+  isUpcomingMatch,
+  shouldPromptEnterScore,
+  shouldShowMatchResult,
+} from './utils/match-filters'
 import type { RenameMatchFormValues } from './utils/rename-match-form'
 import {
   attendancesQueryKey,
@@ -47,6 +52,7 @@ function playerStatsMatch(
 
 export default function MatchDetailPage() {
   const { matchId } = useParams()
+  const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const { activeClub, isClubAdmin } = useClub()
   const orgId = activeClub?.id
@@ -62,6 +68,7 @@ export default function MatchDetailPage() {
   const [isLineupOpen, setIsLineupOpen] = useState(false)
   const [isReopenOpen, setIsReopenOpen] = useState(false)
   const [isRenameOpen, setIsRenameOpen] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [unreadMessageCount, setUnreadMessageCount] = useState(0)
   const chatScrollRef = useRef<HTMLDivElement>(null)
   const knownMessageIds = useRef<Set<string> | null>(null)
@@ -255,6 +262,18 @@ export default function MatchDetailPage() {
     onError: (e: Error) => toast.error(e.message),
   })
 
+  const removeMatch = useMutation({
+    mutationFn: () => rostiApi.deleteMatch(orgId!, matchId!),
+    onSuccess: () => {
+      toast.success(t('matches.deleteSuccess'))
+      setIsDeleteOpen(false)
+      void queryClient.invalidateQueries({ queryKey: ['matches', orgId] })
+      void queryClient.removeQueries({ queryKey: ['match', orgId, matchId] })
+      navigate('/matches?tab=upcoming')
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
+
   const rename = useMutation({
     mutationFn: (values: RenameMatchFormValues) => rostiApi.renameMatches(orgId!, matchId!, values),
     onSuccess: (result) => {
@@ -380,11 +399,14 @@ export default function MatchDetailPage() {
           <MatchDetailHeader
             match={match}
             canManage={isClubAdmin}
-            isStatusPending={cancel.isPending || setStatus.isPending}
+            isStatusPending={cancel.isPending || setStatus.isPending || removeMatch.isPending}
             onRename={() => setIsRenameOpen(true)}
             onReopen={() => setIsReopenOpen(true)}
             onMarkPlayed={() => setStatus.mutate({ status: 'played' })}
             onCancel={() => cancel.mutate()}
+            onDelete={
+              isClubAdmin && isUpcomingMatch(match) ? () => setIsDeleteOpen(true) : undefined
+            }
           />
           <MatchDetailTabsList unreadMessageCount={unreadMessageCount} />
         </div>
@@ -485,6 +507,15 @@ export default function MatchDetailPage() {
           />
         </TabsContent>
       </Tabs>
+      <DeleteMatchesDialog
+        open={isDeleteOpen}
+        scope="match"
+        matchTitle={match.title}
+        count={1}
+        isPending={removeMatch.isPending}
+        onOpenChange={setIsDeleteOpen}
+        onConfirm={() => removeMatch.mutate()}
+      />
       <RenameMatchDialog
         open={isRenameOpen}
         onOpenChange={setIsRenameOpen}

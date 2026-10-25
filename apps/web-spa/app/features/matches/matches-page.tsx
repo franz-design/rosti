@@ -1,3 +1,4 @@
+import { Button } from '@rosti/ui/components/primitives/button'
 import { Tabs, TabsContent } from '@rosti/ui/components/primitives/tabs'
 import { toast } from '@rosti/ui/components/primitives/sonner'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -7,6 +8,7 @@ import { useNavigate } from 'react-router'
 import { useTabSearchParam } from '@/common/hooks/use-tab-search-param'
 import { useClub } from '@/features/clubs/hooks/club-context'
 import { rostiApi, type Match } from '@/lib/rosti-api'
+import { DeleteMatchesDialog } from './components/delete-matches-dialog'
 import { MatchCardActions } from './components/match-card-actions'
 import { MatchesHeader } from './components/matches-header'
 import { MatchesList } from './components/matches-list'
@@ -17,10 +19,12 @@ import { listPastMatches, listUpcomingMatches } from './utils/match-filters'
 export default function MatchesPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
-  const { activeClub } = useClub()
+  const { activeClub, isClubAdmin } = useClub()
   const queryClient = useQueryClient()
   const orgId = activeClub?.id
   const [postponeMatch, setPostponeMatch] = useState<Match | null>(null)
+  const [matchToDelete, setMatchToDelete] = useState<Match | null>(null)
+  const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false)
   const [listTab, setListTab] = useTabSearchParam(MATCHES_TABS, DEFAULT_MATCHES_TAB)
 
   const { data: matches = [], isLoading } = useQuery({
@@ -58,6 +62,30 @@ export default function MatchesPage() {
     onError: (e: Error) => toast.error(e.message),
   })
 
+  const removeOne = useMutation({
+    mutationFn: (matchId: string) => rostiApi.deleteMatch(orgId!, matchId),
+    onSuccess: () => {
+      toast.success(t('matches.deleteSuccess'))
+      setMatchToDelete(null)
+      invalidate()
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
+
+  const removeAll = useMutation({
+    mutationFn: () => rostiApi.deleteUpcomingMatches(orgId!),
+    onSuccess: (result) => {
+      toast.success(
+        result.deletedCount === 1
+          ? t('matches.deleteSuccess')
+          : t('matches.deleteAllSuccess', { count: result.deletedCount }),
+      )
+      setIsDeleteAllOpen(false)
+      invalidate()
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
+
   const dateLocale = i18n.language?.startsWith('en') ? 'en-GB' : 'fr-FR'
 
   if (!activeClub) {
@@ -69,7 +97,14 @@ export default function MatchesPage() {
       <MatchesHeader clubName={activeClub.name} />
 
       <Tabs value={listTab} onValueChange={setListTab} className="gap-4">
-        <MatchesTabsList />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <MatchesTabsList />
+          {listTab === 'upcoming' && isClubAdmin && upcoming.length > 0 ? (
+            <Button variant="destructive" onClick={() => setIsDeleteAllOpen(true)}>
+              {t('matches.deleteAll')}
+            </Button>
+          ) : null}
+        </div>
 
         <TabsContent value="upcoming" className="outline-none">
           <MatchesList
@@ -87,6 +122,7 @@ export default function MatchesPage() {
                 match={match}
                 onPostpone={setPostponeMatch}
                 onCancel={(matchId) => cancel.mutate(matchId)}
+                onDelete={isClubAdmin ? setMatchToDelete : undefined}
               />
             )}
           />
@@ -113,6 +149,28 @@ export default function MatchesPage() {
           onConfirm={(startsAt) => postpone.mutate({ matchId: postponeMatch.id, startsAt })}
         />
       ) : null}
+
+      <DeleteMatchesDialog
+        open={!!matchToDelete}
+        scope="match"
+        matchTitle={matchToDelete?.title}
+        count={1}
+        isPending={removeOne.isPending}
+        onOpenChange={(open) => {
+          if (!open) setMatchToDelete(null)
+        }}
+        onConfirm={() => {
+          if (matchToDelete) removeOne.mutate(matchToDelete.id)
+        }}
+      />
+      <DeleteMatchesDialog
+        open={isDeleteAllOpen}
+        scope="all"
+        count={upcoming.length}
+        isPending={removeAll.isPending}
+        onOpenChange={setIsDeleteAllOpen}
+        onConfirm={() => removeAll.mutate()}
+      />
     </div>
   )
 }

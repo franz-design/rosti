@@ -15,8 +15,8 @@ export function MatchDetailTabsList({ unreadMessageCount }: MatchDetailTabsListP
   const { t } = useTranslation()
 
   return (
-    <HorizontalPan className="h-9 rounded-lg border border-border bg-muted p-1">
-      <TabsList className="h-full w-full justify-start gap-1 bg-transparent p-0">
+    <HorizontalPan className="rounded-lg border border-border bg-muted p-1">
+      <TabsList className="h-auto w-full justify-start gap-1 bg-transparent p-0">
         <TabsTrigger value="summary" className="px-3">
           {t('matches.detail.tabs.summary')}
         </TabsTrigger>
