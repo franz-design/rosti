@@ -15,7 +15,7 @@ export function ClubSettingsTabsList() {
   const { t } = useTranslation()
 
   return (
-    <TabsList className="no-scrollbar h-auto min-w-0 max-w-full justify-start gap-1 overflow-x-auto rounded-lg border border-border bg-muted p-1">
+    <TabsList className="no-scrollbar h-auto min-w-0 max-w-full justify-start gap-1 overflow-x-auto overflow-y-hidden rounded-lg border border-border bg-muted p-1">
       <TabsTrigger value="players" className="flex-none px-3">
         {t('clubSettings.tabs.players')}
       </TabsTrigger>

@@ -29,12 +29,7 @@ export function AppMain({ children }: { children: ReactNode }) {
       )}
     >
       <div
-        className={cn(
-          'relative flex w-full min-w-0 flex-col',
-          // One pixel taller than the scroller, so a short page can still move
-          // and iOS does not bounce the installed app.
-          isFullBleed ? 'min-h-0 flex-1' : 'min-h-[calc(100%+1px)]',
-        )}
+        className={cn('relative flex w-full min-w-0 flex-col', isFullBleed && 'min-h-0 flex-1')}
         style={
           isFullBleed
             ? undefined

@@ -20,19 +20,34 @@ interface EdgeOverscrollInput {
   deltaY: number
   scrollTop: number
   maxScrollTop: number
+  /** True when this touch began at the top. A scroll that only arrives there keeps going. */
+  startedAtTop: boolean
+  /** True when this touch began at the bottom. */
+  startedAtBottom: boolean
+}
+
+/** True when the scroller is sitting on its top edge. */
+export function isScrollAtTop(scrollTop: number): boolean {
+  return scrollTop <= SCROLL_EDGE_SLOP_PX
+}
+
+/** True when the scroller is sitting on its bottom edge. */
+export function isScrollAtBottom(scrollTop: number, maxScrollTop: number): boolean {
+  const max = Math.max(0, maxScrollTop)
+  if (max <= SCROLL_EDGE_SLOP_PX) return scrollTop >= max
+  return scrollTop >= max - SCROLL_EDGE_SLOP_PX
 }
 
 /**
  * True when this drag would leave the scroller and bounce the web view.
+ * Only a drag that started on that edge is blocked. A drag that started in the
+ * middle must be allowed to reach the top, or the page stops short of it.
  * A sideways drag is left alone so a horizontal strip can still move.
  */
 export function shouldBlockEdgeOverscroll(input: EdgeOverscrollInput): boolean {
   if (input.deltaY === 0) return false
   if (Math.abs(input.deltaX) > Math.abs(input.deltaY)) return false
 
-  if (input.deltaY > 0) return input.scrollTop <= SCROLL_EDGE_SLOP_PX
-
-  const maxScrollTop = Math.max(0, input.maxScrollTop)
-  if (maxScrollTop <= SCROLL_EDGE_SLOP_PX) return input.scrollTop >= maxScrollTop
-  return input.scrollTop >= maxScrollTop - SCROLL_EDGE_SLOP_PX
+  if (input.deltaY > 0) return input.startedAtTop && isScrollAtTop(input.scrollTop)
+  return input.startedAtBottom && isScrollAtBottom(input.scrollTop, input.maxScrollTop)
 }

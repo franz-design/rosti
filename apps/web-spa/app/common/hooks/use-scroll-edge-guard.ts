@@ -1,6 +1,11 @@
 import { useEffect, type RefObject } from 'react'
 import { hasNestedScroller, isEditableTarget } from '../utils/pull-to-refresh'
-import { scrollTopOffEdge, shouldBlockEdgeOverscroll } from '../utils/scroll-edge'
+import {
+  isScrollAtBottom,
+  isScrollAtTop,
+  scrollTopOffEdge,
+  shouldBlockEdgeOverscroll,
+} from '../utils/scroll-edge'
 
 /**
  * Keeps an iOS drag inside this scroller.
@@ -15,6 +20,8 @@ export function useScrollEdgeGuard(scrollRef: RefObject<HTMLElement | null>, ena
     let startX = 0
     let startY = 0
     let tracking = false
+    let startedAtTop = false
+    let startedAtBottom = false
 
     const onStart = (event: TouchEvent): void => {
       if (event.touches.length !== 1) {
@@ -29,6 +36,8 @@ export function useScrollEdgeGuard(scrollRef: RefObject<HTMLElement | null>, ena
       }
 
       const maxScrollTop = element.scrollHeight - element.clientHeight
+      startedAtTop = isScrollAtTop(element.scrollTop)
+      startedAtBottom = isScrollAtBottom(element.scrollTop, maxScrollTop)
       const nextTop = scrollTopOffEdge(element.scrollTop, maxScrollTop)
       if (nextTop !== element.scrollTop) element.scrollTop = nextTop
 
@@ -48,6 +57,8 @@ export function useScrollEdgeGuard(scrollRef: RefObject<HTMLElement | null>, ena
         deltaY: touch.clientY - startY,
         scrollTop: element.scrollTop,
         maxScrollTop: element.scrollHeight - element.clientHeight,
+        startedAtTop,
+        startedAtBottom,
       })
       if (block && event.cancelable) event.preventDefault()
     }

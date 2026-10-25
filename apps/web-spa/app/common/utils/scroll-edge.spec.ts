@@ -26,7 +26,14 @@ describe('scrollTopOffEdge', () => {
 
 describe('shouldBlockEdgeOverscroll', () => {
   it('blocks a downward drag at the top before a pull indicator would show', () => {
-    const input = { deltaX: 1, deltaY: 4, scrollTop: 0, maxScrollTop: 800 }
+    const input = {
+      deltaX: 1,
+      deltaY: 4,
+      scrollTop: 0,
+      maxScrollTop: 800,
+      startedAtTop: true,
+      startedAtBottom: false,
+    }
 
     expect(classifyPullMove({ ...input, isPulling: false })).toBe('wait')
     expect(shouldBlockEdgeOverscroll(input)).toBe(true)
@@ -34,40 +41,99 @@ describe('shouldBlockEdgeOverscroll', () => {
 
   it('blocks the same drag when the list sits one pixel in from the top', () => {
     expect(
-      shouldBlockEdgeOverscroll({ deltaX: 0, deltaY: 4, scrollTop: 1, maxScrollTop: 400 }),
+      shouldBlockEdgeOverscroll({
+        deltaX: 0,
+        deltaY: 4,
+        scrollTop: 1,
+        maxScrollTop: 400,
+        startedAtTop: true,
+        startedAtBottom: false,
+      }),
     ).toBe(true)
+  })
+
+  it('lets a scroll that started in the middle reach the top', () => {
+    expect(
+      shouldBlockEdgeOverscroll({
+        deltaX: 0,
+        deltaY: 40,
+        scrollTop: 0,
+        maxScrollTop: 800,
+        startedAtTop: false,
+        startedAtBottom: false,
+      }),
+    ).toBe(false)
   })
 
   it('lets the page scroll up from the top', () => {
     expect(
-      shouldBlockEdgeOverscroll({ deltaX: 0, deltaY: -20, scrollTop: 1, maxScrollTop: 400 }),
+      shouldBlockEdgeOverscroll({
+        deltaX: 0,
+        deltaY: -20,
+        scrollTop: 1,
+        maxScrollTop: 400,
+        startedAtTop: true,
+        startedAtBottom: false,
+      }),
     ).toBe(false)
   })
 
   it('lets a sideways drag through', () => {
     expect(
-      shouldBlockEdgeOverscroll({ deltaX: 12, deltaY: 4, scrollTop: 0, maxScrollTop: 400 }),
+      shouldBlockEdgeOverscroll({
+        deltaX: 12,
+        deltaY: 4,
+        scrollTop: 0,
+        maxScrollTop: 400,
+        startedAtTop: true,
+        startedAtBottom: false,
+      }),
     ).toBe(false)
   })
 
   it('lets a downward drag leave the bottom', () => {
     expect(
-      shouldBlockEdgeOverscroll({ deltaX: 0, deltaY: 10, scrollTop: 399, maxScrollTop: 400 }),
+      shouldBlockEdgeOverscroll({
+        deltaX: 0,
+        deltaY: 10,
+        scrollTop: 399,
+        maxScrollTop: 400,
+        startedAtTop: false,
+        startedAtBottom: true,
+      }),
     ).toBe(false)
   })
 
   it('blocks an upward drag at the bottom', () => {
     expect(
-      shouldBlockEdgeOverscroll({ deltaX: 0, deltaY: -6, scrollTop: 400, maxScrollTop: 400 }),
+      shouldBlockEdgeOverscroll({
+        deltaX: 0,
+        deltaY: -6,
+        scrollTop: 400,
+        maxScrollTop: 400,
+        startedAtTop: false,
+        startedAtBottom: true,
+      }),
     ).toBe(true)
   })
 
-  it('blocks every vertical drag on a page that does not scroll', () => {
-    expect(shouldBlockEdgeOverscroll({ deltaX: 0, deltaY: 8, scrollTop: 0, maxScrollTop: 0 })).toBe(
-      true,
-    )
+  it('lets a scroll that started in the middle reach the bottom', () => {
     expect(
-      shouldBlockEdgeOverscroll({ deltaX: 0, deltaY: -8, scrollTop: 0, maxScrollTop: 0 }),
-    ).toBe(true)
+      shouldBlockEdgeOverscroll({
+        deltaX: 0,
+        deltaY: -40,
+        scrollTop: 400,
+        maxScrollTop: 400,
+        startedAtTop: false,
+        startedAtBottom: false,
+      }),
+    ).toBe(false)
+  })
+
+  it('blocks every vertical drag on a page that does not scroll', () => {
+    const edges = { startedAtTop: true, startedAtBottom: true, scrollTop: 0, maxScrollTop: 0 }
+
+    expect(shouldBlockEdgeOverscroll({ deltaX: 0, deltaY: 8, ...edges })).toBe(true)
+    expect(shouldBlockEdgeOverscroll({ deltaX: 0, deltaY: -8, ...edges })).toBe(true)
   })
 })

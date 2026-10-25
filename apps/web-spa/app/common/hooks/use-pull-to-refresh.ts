@@ -146,6 +146,9 @@ export function usePullToRefresh(
           deltaY,
           scrollTop: element.scrollTop,
           maxScrollTop: element.scrollHeight - element.clientHeight,
+          // This listener only follows a touch that began at the top.
+          startedAtTop: true,
+          startedAtBottom: false,
         })
       if (blockNative && event.cancelable) event.preventDefault()
 

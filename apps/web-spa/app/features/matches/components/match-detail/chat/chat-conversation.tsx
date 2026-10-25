@@ -27,8 +27,8 @@ export function ChatConversation({
     <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-y-none px-6 py-4">
       <div
         className={cn(
-          'flex min-h-[calc(100%+1px)] flex-col',
-          isEmpty ? 'items-center justify-center text-center' : 'space-y-3',
+          'flex flex-col',
+          isEmpty ? 'min-h-full items-center justify-center text-center' : 'space-y-3',
         )}
       >
         {isEmpty ? (
