@@ -18,7 +18,7 @@ export function HorizontalPan({
   useHorizontalPan(frameRef)
 
   return (
-    <div ref={frameRef} className={cn('w-full min-w-0 overflow-clip', className)}>
+    <div ref={frameRef} className={cn('w-fit max-w-full min-w-0 overflow-clip', className)}>
       {children}
     </div>
   )

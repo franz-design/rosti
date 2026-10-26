@@ -83,7 +83,7 @@ export default function MatchCard({
 
   const body = (
     <div className="flex h-full items-center justify-between gap-2">
-      <div className="space-y-2 min-w-0 p-3">
+      <div className="space-y-2 min-w-0 p-3 pr-0 sm:pr-3">
         <div
           className={cn(
             'flex min-w-0 items-center gap-1.5',

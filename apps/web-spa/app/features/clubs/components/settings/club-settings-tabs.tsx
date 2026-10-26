@@ -16,8 +16,8 @@ export function ClubSettingsTabsList() {
   const { t } = useTranslation()
 
   return (
-    <HorizontalPan className="rounded-lg border border-border bg-muted p-1">
-      <TabsList className="h-auto w-max min-w-full justify-start gap-1 bg-transparent p-0">
+    <HorizontalPan className="rounded-lg border border-border bg-muted">
+      <TabsList className="h-auto w-max justify-start gap-1 bg-transparent p-1">
         <TabsTrigger value="players" className="flex-none px-3">
           {t('clubSettings.tabs.players')}
         </TabsTrigger>

@@ -15,21 +15,21 @@ export function MatchDetailTabsList({ unreadMessageCount }: MatchDetailTabsListP
   const { t } = useTranslation()
 
   return (
-    <HorizontalPan className="rounded-lg border border-border bg-muted p-1">
-      <TabsList className="h-auto w-full justify-start gap-1 bg-transparent p-0">
-        <TabsTrigger value="summary" className="px-3">
+    <HorizontalPan className="rounded-lg border border-border bg-muted">
+      <TabsList className="h-auto w-max justify-start gap-1 bg-transparent p-1">
+        <TabsTrigger value="summary" className="flex-none px-3">
           {t('matches.detail.tabs.summary')}
         </TabsTrigger>
-        <TabsTrigger value="chat" className="gap-1.5 px-3">
+        <TabsTrigger value="chat" className="flex-none gap-1.5 px-3">
           {t('matches.detail.tabs.chat')}
           {unreadMessageCount > 0 && (
             <Badge className="h-5 min-w-5 px-1.5">{Math.min(unreadMessageCount, 99)}</Badge>
           )}
         </TabsTrigger>
-        <TabsTrigger value="stats" className="px-3">
+        <TabsTrigger value="stats" className="flex-none px-3">
           {t('matches.detail.tabs.stats')}
         </TabsTrigger>
-        <TabsTrigger value="payments" className="px-3">
+        <TabsTrigger value="payments" className="flex-none px-3">
           {t('matches.detail.tabs.payments')}
         </TabsTrigger>
       </TabsList>

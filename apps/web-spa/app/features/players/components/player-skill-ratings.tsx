@@ -1,8 +1,11 @@
+import { Button } from '@rosti/ui/components/primitives/button'
 import { Slider } from '@rosti/ui/components/primitives/slider'
 import { toast } from '@rosti/ui/components/primitives/sonner'
+import { useIsMobile } from '@rosti/ui/hooks/use-mobile'
+import { cn } from '@rosti/ui/lib/utils'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { TFunction } from 'i18next'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useClub } from '@/features/clubs/hooks/club-context'
 import { authClient } from '@/lib/auth-client'
@@ -108,42 +111,90 @@ export function PlayerSkillRatingsSection({
   const { isClubAdmin, isMembershipLoading } = useClub()
   const { data: session } = authClient.useSession()
   const queryClient = useQueryClient()
+  const isMobile = useIsMobile()
+  const [isEditing, setIsEditing] = useState(false)
   const [resetNonce, setResetNonce] = useState(0)
+  const drafts = useRef(new Map<PlayerSkillKey, number>())
+  const isEditingRef = useRef(isEditing)
   const isSelf = session?.user?.id === playerUserId
   const canEdit = isSelf || (isClubAdmin && !isMembershipLoading)
+  const isMobileLocked = isMobile && !isEditing
+  isEditingRef.current = isEditing
+
+  useEffect(() => {
+    if (isMobile || !isEditing) return
+    setIsEditing(false)
+    setResetNonce((nonce) => nonce + 1)
+    drafts.current.clear()
+  }, [isMobile, isEditing])
 
   const save = useMutation({
-    mutationFn: (input: { key: PlayerSkillKey; value: number }) =>
-      rostiApi.updatePlayerSkills(organizationId, playerUserId, [input]),
-    onSuccess: (_ratings, input) => {
+    mutationFn: (skills: Array<{ key: PlayerSkillKey; value: number }>) =>
+      rostiApi.updatePlayerSkills(organizationId, playerUserId, skills),
+    onSuccess: (nextRatings) => {
       queryClient.setQueryData<PlayerDetail>(
         fetchPlayerDetailQueryOptions(organizationId, playerUserId).queryKey,
         (current) => {
-          if (!current?.skillRatings) return current
-          return {
-            ...current,
-            skillRatings: {
-              ...current.skillRatings,
-              skills: current.skillRatings.skills.map((skill) =>
-                skill.key === input.key ? { key: input.key, value: input.value } : skill,
-              ),
-            },
-          }
+          if (!current) return current
+          return { ...current, skillRatings: nextRatings }
         },
       )
+      setIsEditing(false)
+      drafts.current.clear()
     },
     onError: () => {
       toast.error(t('playerSkills.saveError'))
-      setResetNonce((nonce) => nonce + 1)
+      if (!isEditingRef.current) setResetNonce((nonce) => nonce + 1)
     },
   })
 
+  function handleStartEditing() {
+    drafts.current.clear()
+    setIsEditing(true)
+  }
+
+  function handleDraftChange(key: PlayerSkillKey, value: number) {
+    drafts.current.set(key, value)
+  }
+
+  function handleSave() {
+    if (save.isPending) return
+    const changed = ratings.skills.flatMap((skill) => {
+      const value = drafts.current.get(skill.key)
+      if (value === undefined || value === skill.value) return []
+      return [{ key: skill.key, value }]
+    })
+    if (changed.length === 0) {
+      setIsEditing(false)
+      drafts.current.clear()
+      return
+    }
+    save.mutate(changed)
+  }
+
+  function renderSaveButton() {
+    return (
+      <Button type="button" className="w-full" loading={save.isPending} onClick={handleSave}>
+        {t('playerSkills.save')}
+      </Button>
+    )
+  }
+
   return (
-    <section className="w-full lg:w-1/2">
-      <div>
-        <h2 className="text-lg font-medium">{t('playerSkills.title')}</h2>
-      </div>
-      <div className="mt-6 flex flex-col gap-6">
+    <section className="w-full px-4 sm:px-0 lg:w-1/2">
+      <h2 className="text-lg font-medium">{t('playerSkills.title')}</h2>
+      {canEdit ? (
+        <div className="mt-4 md:hidden">
+          {isEditing ? (
+            renderSaveButton()
+          ) : (
+            <Button type="button" variant="outline" className="w-full" onClick={handleStartEditing}>
+              {t('playerSkills.edit')}
+            </Button>
+          )}
+        </div>
+      ) : null}
+      <div className="mt-6 flex flex-col gap-10">
         {ratings.skills.map((skill) => (
           <SkillSlider
             key={skill.key}
@@ -151,11 +202,16 @@ export function PlayerSkillRatingsSection({
             skillKey={skill.key}
             savedValue={skill.value}
             resetNonce={resetNonce}
-            disabled={!canEdit}
-            onCommit={(key, value) => save.mutate({ key, value })}
+            disabled={!canEdit || isMobileLocked || (isEditing && save.isPending)}
+            locked={!isEditing}
+            preserveOpacity={canEdit && isMobileLocked}
+            deferCommit={isEditing}
+            onDraftChange={handleDraftChange}
+            onCommit={(key, value) => save.mutate([{ key, value }])}
           />
         ))}
       </div>
+      {canEdit && isEditing ? <div className="mt-8 md:hidden">{renderSaveButton()}</div> : null}
     </section>
   )
 }
@@ -166,6 +222,10 @@ interface SkillSliderProps {
   savedValue: number
   resetNonce: number
   disabled: boolean
+  locked: boolean
+  preserveOpacity: boolean
+  deferCommit: boolean
+  onDraftChange: (key: PlayerSkillKey, value: number) => void
   onCommit: (key: PlayerSkillKey, value: number) => void
 }
 
@@ -175,6 +235,10 @@ function SkillSlider({
   savedValue,
   resetNonce,
   disabled,
+  locked,
+  preserveOpacity,
+  deferCommit,
+  onDraftChange,
   onCommit,
 }: SkillSliderProps) {
   const [value, setValue] = useState(savedValue)
@@ -194,9 +258,20 @@ function SkillSlider({
         largeStep={1}
         disabled={disabled}
         aria-label={label}
-        onValueChange={setValue}
+        className={cn(
+          locked && 'max-md:pointer-events-none',
+          preserveOpacity && 'aria-disabled:opacity-100',
+        )}
+        onValueChange={(next) => {
+          setValue(next)
+          if (deferCommit) onDraftChange(skillKey, next)
+        }}
         onValueCommitted={(next) => {
-          if (next === savedValue) return
+          if (deferCommit) {
+            onDraftChange(skillKey, next)
+            return
+          }
+          if (disabled || next === savedValue) return
           onCommit(skillKey, next)
         }}
       />
