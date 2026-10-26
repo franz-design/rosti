@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { getMatchesListHref } from '@/features/matches/utils/match-filters'
 import type { Match } from '@/lib/rosti-api'
-import { MatchStatusMenu } from './match-status-menu'
+import { MatchDetailActions } from './match-detail-actions'
 
 interface MatchDetailHeaderProps {
   match: Match
@@ -76,25 +76,15 @@ export function MatchDetailHeader({
           </p>
         </div>
         {canManage ? (
-          <div className="flex flex-wrap items-center gap-2">
-            {match.status !== 'cancelled' ? (
-              <Button variant="outline" size="sm" onClick={onRename}>
-                {t('matches.rename')}
-              </Button>
-            ) : null}
-            {onDelete ? (
-              <Button variant="destructive" size="sm" disabled={isStatusPending} onClick={onDelete}>
-                {t('matches.delete')}
-              </Button>
-            ) : null}
-            <MatchStatusMenu
-              status={match.status}
-              disabled={isStatusPending}
-              onReopen={onReopen}
-              onMarkPlayed={onMarkPlayed}
-              onCancel={onCancel}
-            />
-          </div>
+          <MatchDetailActions
+            status={match.status}
+            disabled={isStatusPending}
+            onRename={onRename}
+            onReopen={onReopen}
+            onMarkPlayed={onMarkPlayed}
+            onCancel={onCancel}
+            onDelete={onDelete}
+          />
         ) : null}
       </div>
     </div>

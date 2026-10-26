@@ -22,6 +22,26 @@ export function readMatchDurationMinutes(value: number | null | undefined): Matc
 }
 
 /**
+ * Kickoff plus the club's match length, plus the 15-minute margin.
+ */
+export function computeMatchEndAt(startsAt: Date, durationMinutes: number): Date {
+  const duration = readMatchDurationMinutes(durationMinutes)
+  return new Date(startsAt.getTime() + (duration + MATCH_END_MARGIN_MINUTES) * MINUTE_MS)
+}
+
+/**
+ * True once kickoff + duration + 15 minutes is reached.
+ * The exact end instant counts as finished.
+ */
+export function hasMatchEnded(
+  startsAt: Date,
+  durationMinutes: number,
+  now: Date = new Date(),
+): boolean {
+  return computeMatchEndAt(startsAt, durationMinutes).getTime() <= now.getTime()
+}
+
+/**
  * Score reminders and payment requests go out at kickoff + duration + 15 minutes.
  * A match that already ended is due immediately.
  */
@@ -30,9 +50,26 @@ export function computeMatchEndNotificationRunAt(
   durationMinutes: number,
   now: Date = new Date(),
 ): Date {
-  const duration = readMatchDurationMinutes(durationMinutes)
-  const dueAt = new Date(startsAt.getTime() + (duration + MATCH_END_MARGIN_MINUTES) * MINUTE_MS)
+  const dueAt = computeMatchEndAt(startsAt, durationMinutes)
   return dueAt > now ? dueAt : new Date(now.getTime())
+}
+
+/**
+ * Latest kickoff that can already be finished, using the shortest allowed match.
+ * A longer match that started at this time is not finished yet.
+ */
+export function latestKickoffThatMayHaveEnded(now: Date): Date {
+  const shortestMinutes = Math.min(...MATCH_DURATION_MINUTE_OPTIONS)
+  return new Date(now.getTime() - (shortestMinutes + MATCH_END_MARGIN_MINUTES) * MINUTE_MS)
+}
+
+/**
+ * Latest kickoff that is finished for every allowed match length.
+ * Anything that started at this time or earlier is played, whatever the club chose.
+ */
+export function latestKickoffThatHasEnded(now: Date): Date {
+  const longestMinutes = Math.max(...MATCH_DURATION_MINUTE_OPTIONS)
+  return new Date(now.getTime() - (longestMinutes + MATCH_END_MARGIN_MINUTES) * MINUTE_MS)
 }
 
 /**

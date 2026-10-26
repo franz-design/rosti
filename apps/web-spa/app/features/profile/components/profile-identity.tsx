@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@rosti/ui/components/primit
 import { Button } from '@rosti/ui/components/primitives/button'
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { AVATAR_FILE_ACCEPT } from '@/common/utils/avatar-file'
 
 interface ProfileIdentityProps {
   displayName: string
@@ -40,7 +41,7 @@ export function ProfileIdentity({
           <input
             ref={inputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept={AVATAR_FILE_ACCEPT}
             className="sr-only"
             onChange={(event) => {
               const file = event.target.files?.[0]

@@ -1,8 +1,14 @@
 import { EntityManager } from '@mikro-orm/core'
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { CreateRequestContext } from '@mikro-orm/decorators/legacy'
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { Organization, User } from '../auth/auth.entity'
 import { OrganizationService } from '../auth/organization.service'
 import { ScheduledJobType } from '../notifications/contracts/notification.contract'
+import {
+  hasMatchEnded,
+  latestKickoffThatHasEnded,
+  latestKickoffThatMayHaveEnded,
+} from '../notifications/match-end'
 import { NotificationService } from '../notifications/notification.service'
 import { MatchCost } from '../payments/match-cost.entity'
 import { PaymentService } from '../payments/payment.service'
@@ -27,8 +33,13 @@ import { Match } from './match.entity'
 import { PlayerVoteService } from './player-vote.service'
 import { selectMatchesToRename } from './rename-matches'
 
+/** How many overdue matches one scheduler pass closes, so a backlog stays bounded. */
+const FINISHED_MATCH_BATCH_SIZE = 50
+
 @Injectable()
 export class MatchService {
+  private readonly logger = new Logger(MatchService.name)
+
   constructor(
     private readonly em: EntityManager,
     private readonly organizationService: OrganizationService,
@@ -558,6 +569,60 @@ export class MatchService {
 
   async markPlayed(organizationId: string, userId: string, matchId: string): Promise<Match> {
     return this.setStatus(organizationId, userId, matchId, { status: MatchStatus.Played })
+  }
+
+  /**
+   * Marks scheduled matches as played once kickoff + the club duration + 15 minutes has passed.
+   * A cancelled match stays cancelled. An admin can still mark a match played earlier.
+   */
+  @CreateRequestContext()
+  async closeFinishedMatches(now: Date = new Date()): Promise<number> {
+    const definite = await this.em.find(
+      Match,
+      {
+        status: MatchStatus.Scheduled,
+        startsAt: { $lte: latestKickoffThatHasEnded(now) },
+      },
+      {
+        populate: ['organization'],
+        orderBy: { startsAt: 'ASC' },
+        limit: FINISHED_MATCH_BATCH_SIZE,
+      },
+    )
+    const recent =
+      definite.length < FINISHED_MATCH_BATCH_SIZE
+        ? await this.em.find(
+            Match,
+            {
+              status: MatchStatus.Scheduled,
+              startsAt: {
+                $gt: latestKickoffThatHasEnded(now),
+                $lte: latestKickoffThatMayHaveEnded(now),
+              },
+            },
+            { populate: ['organization'], orderBy: { startsAt: 'ASC' } },
+          )
+        : []
+    const finished = [...definite, ...recent]
+      .filter((match) =>
+        hasMatchEnded(match.startsAt, match.organization.matchDurationMinutes, now),
+      )
+      .slice(0, FINISHED_MATCH_BATCH_SIZE)
+
+    let closed = 0
+    for (const match of finished) {
+      try {
+        const previousStatus = match.status
+        match.status = MatchStatus.Played
+        match.cancellationReason = null
+        await this.em.flush()
+        await this.applyStatusChangeEffects(match, previousStatus)
+        closed += 1
+      } catch (error) {
+        this.logger.error(`Automatic match close failed for match ${match.id}`, error)
+      }
+    }
+    return closed
   }
 
   /**

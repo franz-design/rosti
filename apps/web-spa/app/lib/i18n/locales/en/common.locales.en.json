@@ -220,6 +220,7 @@
     "selectClub": "Select or create a club first.",
     "capacity": "{{present}} / {{max}} players",
     "menuOpen": "Match actions",
+    "actions": "Actions",
     "cancel": "Cancel match",
     "postpone": "Postpone match",
     "cancelSuccess": "Match cancelled",

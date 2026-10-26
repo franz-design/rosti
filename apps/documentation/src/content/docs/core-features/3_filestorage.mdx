@@ -3,11 +3,11 @@ title: File Storage
 description: How Rösti stores avatar images on the server disk
 ---
 
-Avatars are the only files Rösti stores. Each one is a square WebP, written on the disk of the machine that runs the API. There is no object-storage service.
+Avatars are the only files Rösti stores. Each one is a WebP at most 512 pixels wide, written on the disk of the machine that runs the API. There is no object-storage service.
 
 ## What gets stored
 
-A player uploads a JPEG, PNG, or WebP of at most 2 MB. The API crops it to a 256 pixel square, encodes it as WebP, and writes one file:
+A player uploads a JPEG, PNG, WebP, or HEIC of at most 6 MB. The API keeps the original proportions and shrinks the photo so it is at most 512 pixels wide. A smaller photo stays at its original size. The result is encoded as WebP and written as one file:
 
 `{AVATAR_STORAGE_DIR}/{userId}.webp`
 

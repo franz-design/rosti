@@ -2,6 +2,7 @@ import { Camera, Loader2, XIcon } from '@rosti/ui/icons'
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PlayerAvatar } from '@/common/components/player-avatar'
+import { AVATAR_FILE_ACCEPT } from '@/common/utils/avatar-file'
 
 interface MemberAvatarControlProps {
   name: string
@@ -48,7 +49,7 @@ export function MemberAvatarControl({
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept={AVATAR_FILE_ACCEPT}
         className="sr-only"
         disabled={isBusy}
         onChange={(event) => {

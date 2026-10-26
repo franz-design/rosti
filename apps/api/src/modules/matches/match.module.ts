@@ -6,6 +6,7 @@ import { MatchAttendance } from './match-attendance.entity'
 import { MatchLineup } from './match-lineup.entity'
 import { MatchPlayerVote } from './match-player-vote.entity'
 import { MatchSeries } from './match-series.entity'
+import { MatchStatusScheduler } from './match-status.scheduler'
 import { MatchController } from './match.controller'
 import { Match } from './match.entity'
 import { MatchMapper } from './match.mapper'
@@ -20,7 +21,13 @@ import { PlayerVoteService } from './player-vote.service'
     PaymentModule,
   ],
   controllers: [MatchController],
-  providers: [MatchService, MatchMapper, PlayerVoteService, PlayerVoteScheduler],
+  providers: [
+    MatchService,
+    MatchMapper,
+    PlayerVoteService,
+    PlayerVoteScheduler,
+    MatchStatusScheduler,
+  ],
   exports: [MatchService, PlayerVoteService],
 })
 export class MatchModule {}

@@ -10,13 +10,22 @@ import {
   NotFoundException,
   OnModuleInit,
 } from '@nestjs/common'
-import sharp from 'sharp'
+import decodeHeic from 'heic-decode'
+import sharp, { type Sharp } from 'sharp'
 import { z } from 'zod'
 import { config } from '../../config/env.config'
 import { User } from '../auth/auth.entity'
-import { AVATAR_MAX_BYTES, AVATAR_SIZE_PX, AVATAR_URL_MAX_LENGTH } from './avatar.constants'
+import {
+  AVATAR_INVALID_TYPE_MESSAGE,
+  AVATAR_MAX_BYTES,
+  AVATAR_MAX_INPUT_PIXELS,
+  AVATAR_MAX_WIDTH_PX,
+  AVATAR_TOO_LARGE_MESSAGE,
+  AVATAR_URL_MAX_LENGTH,
+} from './avatar.constants'
 
-const ALLOWED_FORMATS = new Set(['jpeg', 'png', 'webp'])
+const SHARP_FORMATS = new Set(['jpeg', 'png', 'webp'])
+const HEIC_BRANDS = new Set(['mif1', 'msf1', 'heic', 'heix', 'hevc', 'hevx'])
 
 @Injectable()
 export class AvatarService implements OnModuleInit {
@@ -34,7 +43,7 @@ export class AvatarService implements OnModuleInit {
       throw new BadRequestException('Choose an image file')
     }
     if (buffer.length > AVATAR_MAX_BYTES) {
-      throw new BadRequestException('Avatar must be 2 MB or smaller')
+      throw new BadRequestException(AVATAR_TOO_LARGE_MESSAGE)
     }
 
     const webp = await this.toWebp(buffer)
@@ -79,24 +88,70 @@ export class AvatarService implements OnModuleInit {
 
   private async toWebp(buffer: Buffer): Promise<Buffer> {
     try {
-      const image = sharp(buffer, {
-        limitInputPixels: 16_777_216,
-        animated: false,
-        failOn: 'error',
-      })
-      const metadata = await image.metadata()
-      if (!metadata.format || !ALLOWED_FORMATS.has(metadata.format)) {
-        throw new BadRequestException('Avatar must be a JPEG, PNG, or WebP image')
-      }
+      const image = await this.openImage(buffer)
       return await image
         .rotate()
-        .resize(AVATAR_SIZE_PX, AVATAR_SIZE_PX, { fit: 'cover', position: 'centre' })
+        .resize({ width: AVATAR_MAX_WIDTH_PX, withoutEnlargement: true })
         .webp({ quality: 80 })
         .toBuffer()
     } catch (error) {
       if (error instanceof BadRequestException) throw error
-      throw new BadRequestException('Avatar must be a JPEG, PNG, or WebP image')
+      throw new BadRequestException(AVATAR_INVALID_TYPE_MESSAGE)
     }
+  }
+
+  private async openImage(buffer: Buffer): Promise<Sharp> {
+    if (this.isHeic(buffer)) return this.openHeic(buffer)
+
+    const image = sharp(buffer, {
+      limitInputPixels: AVATAR_MAX_INPUT_PIXELS,
+      animated: false,
+      failOn: 'error',
+    })
+    const metadata = await image.metadata()
+    if (!metadata.format || !SHARP_FORMATS.has(metadata.format)) {
+      throw new BadRequestException(AVATAR_INVALID_TYPE_MESSAGE)
+    }
+    return image
+  }
+
+  // Sharp's bundled libvips cannot decode HEVC, which is what HEIC photos use.
+  private async openHeic(buffer: Buffer): Promise<Sharp> {
+    let images: Awaited<ReturnType<typeof decodeHeic.all>>
+    try {
+      images = await decodeHeic.all({ buffer })
+    } catch {
+      throw new BadRequestException(AVATAR_INVALID_TYPE_MESSAGE)
+    }
+
+    try {
+      const primary = images[0]
+      if (!primary || primary.width < 1 || primary.height < 1) {
+        throw new BadRequestException(AVATAR_INVALID_TYPE_MESSAGE)
+      }
+      if (primary.width * primary.height > AVATAR_MAX_INPUT_PIXELS) {
+        throw new BadRequestException(AVATAR_INVALID_TYPE_MESSAGE)
+      }
+      const decoded = await primary.decode()
+      return sharp(decoded.data, {
+        raw: {
+          width: decoded.width,
+          height: decoded.height,
+          channels: 4,
+        },
+        limitInputPixels: AVATAR_MAX_INPUT_PIXELS,
+      })
+    } finally {
+      images.dispose()
+    }
+  }
+
+  private isHeic(buffer: Buffer): boolean {
+    if (buffer.length < 12) return false
+    const brand = String.fromCharCode(buffer[8], buffer[9], buffer[10], buffer[11])
+      .replace('\0', ' ')
+      .trim()
+    return HEIC_BRANDS.has(brand)
   }
 
   private buildUrl(userId: string, version: number): string {
