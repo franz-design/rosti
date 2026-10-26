@@ -395,7 +395,9 @@ export default function MatchDetailPage() {
         onValueChange={setTab}
         className={cn('w-full min-h-0 flex-col gap-0', isChat && 'flex-1')}
       >
-        <div className={cn('shrink-0 space-y-4', isChat && 'border-b px-6 pt-6 pb-3')}>
+        <div
+          className={cn('shrink-0 space-y-4', isChat && 'border-b px-3 sm:px-6 pt-3 sm:pt-6 pb-3')}
+        >
           <MatchDetailHeader
             match={match}
             canManage={isClubAdmin}
