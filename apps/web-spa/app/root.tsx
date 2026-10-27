@@ -23,6 +23,12 @@ client.setConfig({
   credentials: 'include',
 })
 
+const SHARE_TITLE = 'Rösti'
+const SHARE_DESCRIPTION =
+  'Rösti aide les clubs à planifier les matchs, collecter les RSVP et suivre la saison.'
+// Slack and other link previews ignore a relative image URL. This is the public site.
+const SHARE_IMAGE_URL = 'https://rosti.lesk.fr/og.png'
+
 export const links: Route.LinksFunction = () => [
   { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
   { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon-v3.png' },
@@ -58,21 +64,31 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <html lang={htmlLang} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-        <title>Rösti</title>
+        <title>{SHARE_TITLE}</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <script dangerouslySetInnerHTML={{ __html: iosViewportResetScript }} />
         <meta name="theme-color" content="#c74209" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="Rösti" />
-        <meta name="author" content="Rösti" />
+        <meta name="apple-mobile-web-app-title" content={SHARE_TITLE} />
+        <meta name="author" content={SHARE_TITLE} />
         <meta name="keywords" content="Rösti, club, match, RSVP, sport" />
-
-        <meta
-          name="description"
-          content="Rösti aide les clubs à planifier les matchs, collecter les RSVP et suivre la saison."
-        />
+        <meta name="description" content={SHARE_DESCRIPTION} />
+        <meta property="og:title" content={SHARE_TITLE} />
+        <meta property="og:description" content={SHARE_DESCRIPTION} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://rosti.lesk.fr" />
+        <meta property="og:image" content={SHARE_IMAGE_URL} />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={SHARE_TITLE} />
+        <meta property="og:locale" content="fr_FR" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={SHARE_TITLE} />
+        <meta name="twitter:description" content={SHARE_DESCRIPTION} />
+        <meta name="twitter:image" content={SHARE_IMAGE_URL} />
         <Meta />
         <Links />
       </head>
