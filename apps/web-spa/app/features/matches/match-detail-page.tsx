@@ -9,7 +9,7 @@ import { useTabSearchParam } from '@/common/hooks/use-tab-search-param'
 import { useClub } from '@/features/clubs/hooks/club-context'
 import { useFullBleedShell } from '@/common/hooks/app-shell-context'
 import { authClient } from '@/lib/auth-client'
-import { rostiApi } from '@/lib/rosti-api'
+import { rostiApi, type MatchMessage } from '@/lib/rosti-api'
 import { DeleteMatchesDialog } from './components/delete-matches-dialog'
 import { ChatTab } from './components/match-detail/chat/chat-tab'
 import { PaymentsTab } from './components/match-detail/payments/payments-tab'
@@ -31,6 +31,16 @@ import {
   shouldPromptEnterScore,
   shouldShowMatchResult,
 } from './utils/match-filters'
+import {
+  appendMessageIfMissing,
+  buildOptimisticMessage,
+  confirmOutgoingMessage,
+  mergeOutgoingMessages,
+  messagesQueryKey,
+  pruneOutgoingMessages,
+  restoreDraftOnSendFailure,
+  type OutgoingChatMessage,
+} from './utils/optimistic-chat'
 import type { RenameMatchFormValues } from './utils/rename-match-form'
 import {
   attendancesQueryKey,
@@ -60,6 +70,8 @@ export default function MatchDetailPage() {
   const { data: session } = authClient.useSession()
   const [tab, setTab] = useTabSearchParam(MATCH_DETAIL_TABS, DEFAULT_MATCH_DETAIL_TAB)
   const [message, setMessage] = useState('')
+  const [outgoingMessages, setOutgoingMessages] = useState<OutgoingChatMessage[]>([])
+  const messageRef = useRef(message)
   const [statDrafts, setStatDrafts] = useState<Record<string, PlayerStatDraft>>({})
   const [scoreDraft, setScoreDraft] = useState({ blue: 0, red: 0 })
   const savingScore = useRef<{ blue: number; red: number } | null>(null)
@@ -99,13 +111,17 @@ export default function MatchDetailPage() {
   })
 
   const { data: messagesData } = useQuery({
-    queryKey: ['messages', orgId, matchId],
+    queryKey: messagesQueryKey(orgId, matchId),
     queryFn: () => rostiApi.listMessages(orgId!, matchId!),
     enabled,
     refetchInterval: 2000,
     refetchIntervalInBackground: false,
   })
   const messages = messagesData ?? []
+  const visibleMessages = useMemo(
+    () => mergeOutgoingMessages(messages, outgoingMessages, matchId),
+    [messages, outgoingMessages, matchId],
+  )
 
   const { data: stats = [] } = useQuery({
     queryKey: ['match-stats', orgId, matchId],
@@ -197,7 +213,14 @@ export default function MatchDetailPage() {
     const conversation = chatScrollRef.current
     if (!conversation) return
     conversation.scrollTop = conversation.scrollHeight
-  }, [messages, isChat])
+  }, [visibleMessages, isChat])
+
+  useEffect(() => {
+    setOutgoingMessages((current) => {
+      const next = pruneOutgoingMessages(current, messages, matchId)
+      return next.length === current.length ? current : next
+    })
+  }, [matchId, messages])
 
   useEffect(() => {
     if (!messagesData) return
@@ -233,7 +256,7 @@ export default function MatchDetailPage() {
     void queryClient.invalidateQueries({ queryKey: ['match', orgId, matchId] })
     void queryClient.invalidateQueries({ queryKey: ['matches', orgId] })
     void queryClient.invalidateQueries({ queryKey: ['lineups', orgId, matchId] })
-    void queryClient.invalidateQueries({ queryKey: ['messages', orgId, matchId] })
+    void queryClient.invalidateQueries({ queryKey: messagesQueryKey(orgId, matchId) })
     void queryClient.invalidateQueries({ queryKey: ['match-stats', orgId, matchId] })
     void queryClient.invalidateQueries({ queryKey: ['player-vote', orgId, matchId] })
   }
@@ -340,21 +363,57 @@ export default function MatchDetailPage() {
   )
 
   const postMsg = useMutation({
-    mutationFn: () => {
-      const markup = message.trim()
-      return rostiApi.postMessage(
-        orgId!,
-        matchId!,
-        toPlainMentionBody(markup),
-        extractMentionIds(markup),
+    mutationFn: ({ markup }: { clientId: string; markup: string }) =>
+      rostiApi.postMessage(orgId!, matchId!, toPlainMentionBody(markup), extractMentionIds(markup)),
+    onSuccess: async (saved, { clientId }) => {
+      setOutgoingMessages((current) => confirmOutgoingMessage(current, clientId, saved.id))
+      await queryClient.cancelQueries({ queryKey: messagesQueryKey(orgId, matchId) })
+      queryClient.setQueryData<MatchMessage[]>(messagesQueryKey(orgId, matchId), (current) =>
+        appendMessageIfMissing(current, saved),
       )
-    },
-    onSuccess: () => {
-      setMessage('')
       invalidate()
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (error: Error, { clientId, markup }) => {
+      setOutgoingMessages((current) => current.filter((item) => item.clientId !== clientId))
+      const restored = restoreDraftOnSendFailure(messageRef.current, markup)
+      messageRef.current = restored
+      setMessage(restored)
+      toast.error(error.message)
+    },
   })
+
+  const handleSendMessage = () => {
+    const markup = messageRef.current.trim()
+    const author = session?.user
+    if (!markup || !orgId || !matchId || !author) return
+
+    const clientId = `pending-${crypto.randomUUID()}`
+    messageRef.current = ''
+    setMessage('')
+    setOutgoingMessages((current) => [
+      ...current,
+      {
+        clientId,
+        matchId,
+        markup,
+        message: buildOptimisticMessage({
+          clientId,
+          matchId,
+          authorId: author.id,
+          authorName: author.name || author.email,
+          authorImage: author.image,
+          markup,
+          createdAt: new Date().toISOString(),
+        }),
+      },
+    ])
+    postMsg.mutate({ clientId, markup })
+  }
+
+  const handleDraftChange = (value: string) => {
+    messageRef.current = value
+    setMessage(value)
+  }
 
   const saveStats = useMutation({
     mutationFn: (entries: Array<{ userId: string; goals: number; assists: number }>) =>
@@ -447,13 +506,12 @@ export default function MatchDetailPage() {
 
         <TabsContent value="chat" className="flex min-h-0 flex-1 flex-col outline-none">
           <ChatTab
-            messages={messages}
+            messages={visibleMessages}
             currentUserId={session?.user?.id}
             scrollRef={chatScrollRef}
             draft={message}
-            onDraftChange={setMessage}
-            onSubmit={() => postMsg.mutate()}
-            isPending={postMsg.isPending}
+            onDraftChange={handleDraftChange}
+            onSubmit={handleSendMessage}
           />
         </TabsContent>
 

@@ -8,6 +8,7 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration }
 import { captureBrowserInstallPrompt } from '@/lib/browser-install-prompt'
 import { useI18nStore } from '@/lib/i18n/i18n-client'
 import { iosViewportResetScript } from '@/lib/ios-viewport-reset'
+import { PushOpenListener } from '@/lib/push-open-listener'
 import { queryClient } from '@/lib/query-client'
 import { registerProductionServiceWorker } from '@/lib/register-service-worker'
 import useTheme, { applyStoredTheme, themeInitScript } from './hooks/useTheme'
@@ -92,6 +93,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <PushOpenListener />
       <Outlet />
     </QueryClientProvider>
   )

@@ -41,6 +41,33 @@ export function readAppPath(value: unknown): string | null {
   return trimmed
 }
 
+export function readNotificationOpenPath(data: unknown): string | null {
+  if (typeof data === 'string') return readStringNotificationPath(data)
+  if (!data || typeof data !== 'object' || Array.isArray(data) || !('url' in data)) return null
+  return readAppPath(data.url)
+}
+
+export function readPushOpenMessage(data: unknown): string | null {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null
+  if (!('type' in data) || !('url' in data)) return null
+  if (data.type !== PUSH_OPEN_MESSAGE) return null
+  return readAppPath(data.url)
+}
+
+function readStringNotificationPath(data: string): string | null {
+  const direct = readAppPath(data)
+  if (direct) return direct
+  try {
+    const parsed: unknown = JSON.parse(data)
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) || !('url' in parsed)) {
+      return null
+    }
+    return readAppPath(parsed.url)
+  } catch {
+    return null
+  }
+}
+
 function readText(value: unknown, maxLength: number): string {
   if (typeof value !== 'string') return ''
   return value.trim().slice(0, maxLength)

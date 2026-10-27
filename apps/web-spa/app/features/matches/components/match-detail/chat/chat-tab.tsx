@@ -13,7 +13,6 @@ interface ChatTabProps {
   draft: string
   onDraftChange: (value: string) => void
   onSubmit: () => void
-  isPending: boolean
 }
 
 export function ChatTab({
@@ -23,7 +22,6 @@ export function ChatTab({
   draft,
   onDraftChange,
   onSubmit,
-  isPending,
 }: ChatTabProps) {
   const { activeClub } = useClub()
   const { data: session } = authClient.useSession()
@@ -62,7 +60,6 @@ export function ChatTab({
         value={draft}
         onChange={onDraftChange}
         onSubmit={onSubmit}
-        isPending={isPending}
         mentionCandidates={mentionCandidates}
       />
     </div>

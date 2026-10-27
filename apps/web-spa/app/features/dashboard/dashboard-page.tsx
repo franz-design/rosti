@@ -10,7 +10,6 @@ import { AppShellProvider } from '@/common/hooks/app-shell-context'
 import { AppSidebar } from '@/common/components/layout/sidebar/app-sidebar'
 import { AppBottomNav } from '@/common/components/layout/app-bottom-nav'
 import { InstalledPushPrompt } from '@/features/notifications/components/installed-push-prompt'
-import { PushOpenListener } from '@/lib/push-open-listener'
 
 export default function DashboardPage() {
   const { data: sessionData, isPending } = authClient.useSession()
@@ -33,7 +32,6 @@ export default function DashboardPage() {
   return (
     <AppShellProvider>
       <ClubProvider>
-        <PushOpenListener />
         <InstalledPushPrompt />
         <AppLayout sidebar={<AppSidebar />}>
           <AppMobileHeader />

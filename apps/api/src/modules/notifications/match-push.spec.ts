@@ -13,7 +13,8 @@ const MATCH = {
   matchTitle: 'Match du jeudi',
 }
 
-const MATCH_URL = `/matches/${MATCH.matchId}?organizationId=${MATCH.organizationId}`
+const SUMMARY_URL = `/matches/${MATCH.matchId}?tab=summary&organizationId=${MATCH.organizationId}`
+const STATS_URL = `/matches/${MATCH.matchId}?tab=stats&organizationId=${MATCH.organizationId}`
 
 describe('match pushes', () => {
   it('asks every player to register', () => {
@@ -23,7 +24,7 @@ describe('match pushes', () => {
       event: 'match_invite',
       organizationId: MATCH.organizationId,
       matchId: MATCH.matchId,
-      url: MATCH_URL,
+      url: SUMMARY_URL,
     })
   })
 
@@ -32,7 +33,7 @@ describe('match pushes', () => {
       title: 'Rappel : Match du jeudi',
       body: "Tu n'as pas encore répondu.",
       event: 'rsvp_reminder',
-      url: MATCH_URL,
+      url: SUMMARY_URL,
     })
   })
 
@@ -41,6 +42,7 @@ describe('match pushes', () => {
       title: 'Score à saisir',
       body: 'Match du jeudi',
       event: 'score_reminder',
+      url: STATS_URL,
     })
   })
 
@@ -49,6 +51,7 @@ describe('match pushes', () => {
       title: 'Meilleur joueur',
       body: 'Vote pour Match du jeudi. Tu as 2 jours.',
       event: 'player_vote_opened',
+      url: SUMMARY_URL,
     })
   })
 
@@ -59,6 +62,7 @@ describe('match pushes', () => {
       title: 'Meilleur joueur',
       body: 'Hugo Bernard est élu.',
       event: 'player_vote_result',
+      url: SUMMARY_URL,
     })
   })
 
@@ -67,6 +71,7 @@ describe('match pushes', () => {
       title: 'Égalité',
       body: "Personne n'est élu pour Match du jeudi.",
       event: 'player_vote_result',
+      url: SUMMARY_URL,
     })
   })
 

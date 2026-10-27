@@ -15,3 +15,17 @@ export interface AppPushPayload {
   matchId: string
   url: string
 }
+
+export type MatchPushTab = 'summary' | 'chat' | 'stats'
+
+export function matchPushUrl(input: {
+  matchId: string
+  organizationId: string
+  tab: MatchPushTab
+}): string {
+  const params = new URLSearchParams({
+    tab: input.tab,
+    organizationId: input.organizationId,
+  })
+  return `/matches/${input.matchId}?${params.toString()}`
+}

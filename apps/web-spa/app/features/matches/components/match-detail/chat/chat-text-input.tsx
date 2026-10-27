@@ -15,7 +15,6 @@ interface ChatTextInputProps {
   value: string
   onChange: (value: string) => void
   onSubmit: () => void
-  isPending: boolean
   mentionCandidates: ChatMentionCandidate[]
 }
 
@@ -102,11 +101,10 @@ export function ChatTextInput({
   value,
   onChange,
   onSubmit,
-  isPending,
   mentionCandidates,
 }: ChatTextInputProps) {
   const { t } = useTranslation()
-  const canSubmit = Boolean(value.trim()) && !isPending
+  const canSubmit = Boolean(value.trim())
 
   const mentionData = useMemo(
     () =>

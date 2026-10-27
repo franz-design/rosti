@@ -1,4 +1,4 @@
-import type { AppPushPayload } from './app-push'
+import { matchPushUrl, type AppPushPayload } from './app-push'
 
 const MAX_TITLE_LENGTH = 80
 const MAX_BODY_LENGTH = 140
@@ -22,7 +22,11 @@ export function chatPush(input: {
     event: input.isMention ? 'chat_mention' : 'chat_message',
     organizationId: input.organizationId,
     matchId: input.matchId,
-    url: `/matches/${input.matchId}?tab=chat&organizationId=${input.organizationId}`,
+    url: matchPushUrl({
+      matchId: input.matchId,
+      organizationId: input.organizationId,
+      tab: 'chat',
+    }),
   }
 }
 
