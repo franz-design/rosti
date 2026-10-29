@@ -40,6 +40,7 @@ export function HomeMatchRsvp({ matchId }: HomeMatchRsvpProps) {
       void queryClient.invalidateQueries({ queryKey: attendancesQueryKey(orgId, matchId) })
       void queryClient.invalidateQueries({ queryKey: ['matches', orgId] })
       void queryClient.invalidateQueries({ queryKey: ['match', orgId, matchId] })
+      void queryClient.invalidateQueries({ queryKey: ['lineups', orgId, matchId] })
     },
     onError: (error: Error, _status, context) => {
       if (orgId) rollbackOptimisticAttendance(queryClient, orgId, matchId, context)

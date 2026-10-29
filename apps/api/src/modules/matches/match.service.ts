@@ -393,6 +393,7 @@ export class MatchService {
 
     attendance.status = data.status
     attendance.respondedAt = new Date()
+    await this.removeLineupWhenNotPresent(matchId, userId, data.status)
     await this.em.flush()
     await this.paymentService.recomputeFees(matchId)
     return attendance
@@ -413,7 +414,7 @@ export class MatchService {
 
   /**
    * Admin override: set any player's attendance at any time (before or after the match).
-   * Clearing presence also removes them from the lineup.
+   * A player who is not present is removed from the lineup.
    */
   async setAttendance(
     organizationId: string,
@@ -445,14 +446,7 @@ export class MatchService {
 
     attendance.status = data.status
     attendance.respondedAt = new Date()
-
-    if (data.status !== AttendanceStatus.Present) {
-      const lineup = await this.em.findOne(MatchLineup, {
-        match: { id: matchId },
-        user: { id: targetUserId },
-      })
-      if (lineup) this.em.remove(lineup)
-    }
+    await this.removeLineupWhenNotPresent(matchId, targetUserId, data.status)
 
     await this.em.flush()
     await this.playerVoteService.sync(match)
@@ -494,6 +488,22 @@ export class MatchService {
     await this.playerVoteService.sync(match)
     await this.paymentService.recomputeFees(matchId)
     return lineups
+  }
+
+  /**
+   * The lineup is only present players. Leaving "present" drops that player's team spot.
+   */
+  private async removeLineupWhenNotPresent(
+    matchId: string,
+    userId: string,
+    status: AttendanceStatus,
+  ): Promise<void> {
+    if (status === AttendanceStatus.Present) return
+    const lineup = await this.em.findOne(MatchLineup, {
+      match: { id: matchId },
+      user: { id: userId },
+    })
+    if (lineup) this.em.remove(lineup)
   }
 
   private async ensurePresentAttendance(match: Match, user: User): Promise<void> {
@@ -560,11 +570,20 @@ export class MatchService {
     matchId: string,
   ): Promise<MatchLineup[]> {
     await this.get(organizationId, userId, matchId)
-    return this.em.find(
+    const lineups = await this.em.find(
       MatchLineup,
       { match: { id: matchId } },
       { populate: ['user'], orderBy: { team: 'ASC' } },
     )
+    if (lineups.length === 0) return lineups
+
+    const present = await this.em.find(MatchAttendance, {
+      match: { id: matchId },
+      status: AttendanceStatus.Present,
+      user: { id: { $in: lineups.map((lineup) => lineup.user.id) } },
+    })
+    const presentUserIds = new Set(present.map((attendance) => attendance.user.id))
+    return lineups.filter((lineup) => presentUserIds.has(lineup.user.id))
   }
 
   async markPlayed(organizationId: string, userId: string, matchId: string): Promise<Match> {

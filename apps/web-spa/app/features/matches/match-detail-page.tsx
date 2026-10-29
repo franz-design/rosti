@@ -42,6 +42,7 @@ import {
   type OutgoingChatMessage,
 } from './utils/optimistic-chat'
 import type { RenameMatchFormValues } from './utils/rename-match-form'
+import { lineupsOfPresentPlayers } from './utils/lineups-of-present-players'
 import {
   attendancesQueryKey,
   rollbackOptimisticAttendance,
@@ -98,7 +99,7 @@ export default function MatchDetailPage() {
     enabled,
   })
 
-  const { data: attendances = [] } = useQuery({
+  const { data: attendances = [], isSuccess: attendancesLoaded } = useQuery({
     queryKey: attendancesQueryKey(orgId, matchId),
     queryFn: () => rostiApi.listAttendances(orgId!, matchId!),
     enabled,
@@ -109,6 +110,11 @@ export default function MatchDetailPage() {
     queryFn: () => rostiApi.listLineups(orgId!, matchId!),
     enabled,
   })
+
+  const composition = useMemo(
+    () => (attendancesLoaded ? lineupsOfPresentPlayers(lineups, attendances) : lineups),
+    [attendances, attendancesLoaded, lineups],
+  )
 
   const { data: messagesData } = useQuery({
     queryKey: messagesQueryKey(orgId, matchId),
@@ -498,7 +504,7 @@ export default function MatchDetailPage() {
               setAttendance.mutate({ userId, status })
             }}
             statDrafts={statDrafts}
-            lineups={lineups}
+            lineups={composition}
             canManageComposition={canManageComposition}
             onEditLineup={() => setIsLineupOpen(true)}
           />
@@ -599,7 +605,7 @@ export default function MatchDetailPage() {
         open={isLineupOpen}
         onOpenChange={setIsLineupOpen}
         presentPlayers={presentPlayers}
-        lineups={lineups}
+        lineups={composition}
         sportType={activeClub?.sportType}
         isPending={saveLineup.isPending}
         onSave={(assignments) => saveLineup.mutate(assignments)}
