@@ -6,42 +6,22 @@ import { useTranslation } from 'react-i18next'
 import { Navigate, useNavigate } from 'react-router'
 import { acceptPendingInvitations } from '@/features/auth/utils/pending-invitation'
 import { storeActiveClubId } from '@/features/clubs/utils/club-session'
-import { combineDateAndTime } from '@/features/matches/utils/match-schedule-utils'
-import {
-  clampMatchDateToSeason,
-  endOfCalendarDay,
-  parseCalendarDate,
-  seasonWindowLabel,
-  toCalendarDateString,
-} from '@/features/seasons/utils/season-dates'
 import { authClient } from '@/lib/auth-client'
 import { rostiApi, type SportType } from '@/lib/rosti-api'
 import { OnboardingHeader } from './components/onboarding-header'
 import { ClubStep } from './components/steps/club-step'
-import { InvitesStep } from './components/steps/invites-step'
-import { ScheduleStep } from './components/steps/schedule-step'
 import { SportStep } from './components/steps/sport-step'
 import {
   clearOnboardingDraft,
   clubSlug,
   createDefaultOnboardingDraft,
-  getScheduleIssue,
-  isAlreadyInvited,
   isOnboardingStepReachable,
   isOrganizationNameTaken,
   isSportStepFilled,
   readOnboardingDraft,
   writeOnboardingDraft,
   type OnboardingDraft,
-  type OnboardingRecurrence,
-  type ScheduleIssue,
 } from './utils/onboarding-draft'
-
-const SCHEDULE_ERROR_KEYS = {
-  requiredFields: 'onboarding.errors.requiredFields',
-  seasonEndBeforeStart: 'onboarding.errors.seasonEndBeforeStart',
-  matchOutsideSeason: 'onboarding.errors.matchOutsideSeason',
-} as const satisfies Record<ScheduleIssue, string>
 
 class OnboardingHandledError extends Error {
   constructor() {
@@ -86,62 +66,6 @@ export default function OnboardingPage() {
     submittedRef.current = true
     clearOnboardingDraft()
   }, [draft.createdClubId, existingClubs])
-
-  const weekdayName = draft.matchDate
-    ? parseCalendarDate(draft.matchDate).toLocaleDateString('fr-FR', { weekday: 'long' })
-    : ''
-  const dayOfMonth = draft.matchDate ? parseCalendarDate(draft.matchDate).getDate() : 1
-  const seasonStartsAt = parseCalendarDate(draft.seasonStartsAt)
-  const seasonEndsAt = parseCalendarDate(draft.seasonEndsAt)
-  const matchDate = draft.matchDate ? parseCalendarDate(draft.matchDate) : undefined
-
-  const handleSeasonStartsAtChange = (value: Date | undefined) => {
-    if (!value) return
-    updateDraft((current) => {
-      const nextMatch = current.matchDate
-        ? clampMatchDateToSeason(
-            parseCalendarDate(current.matchDate),
-            value,
-            parseCalendarDate(current.seasonEndsAt),
-          )
-        : undefined
-      return {
-        ...current,
-        seasonStartsAt: toCalendarDateString(value),
-        matchDate: nextMatch ? toCalendarDateString(nextMatch) : current.matchDate,
-      }
-    })
-  }
-
-  const handleSeasonEndsAtChange = (value: Date | undefined) => {
-    if (!value) return
-    updateDraft((current) => {
-      const nextMatch = current.matchDate
-        ? clampMatchDateToSeason(
-            parseCalendarDate(current.matchDate),
-            parseCalendarDate(current.seasonStartsAt),
-            value,
-          )
-        : undefined
-      return {
-        ...current,
-        seasonEndsAt: toCalendarDateString(value),
-        matchDate: nextMatch ? toCalendarDateString(nextMatch) : current.matchDate,
-      }
-    })
-  }
-
-  const handleMatchDateChange = (value: Date | undefined) => {
-    updateDraft((current) => {
-      if (!value) return { ...current, matchDate: null }
-      const next = clampMatchDateToSeason(
-        value,
-        parseCalendarDate(current.seasonStartsAt),
-        parseCalendarDate(current.seasonEndsAt),
-      )
-      return { ...current, matchDate: toCalendarDateString(next) }
-    })
-  }
 
   const rejectTakenName = () => {
     updateDraft((current) => ({ ...current, step: 1, confirmedSlug: null }))
@@ -206,27 +130,12 @@ export default function OnboardingPage() {
     const available = await ensureClubNameAvailable()
     if (!available) return false
 
-    if (target >= 3 && !isSportStepFilled(draftRef.current)) {
-      setStep(2)
-      toast.error(t('onboarding.errors.maxPlayers'))
-      return false
-    }
-
-    if (target >= 4) {
-      const issue = getScheduleIssue(draftRef.current)
-      if (issue) {
-        setStep(3)
-        toast.error(t(SCHEDULE_ERROR_KEYS[issue]))
-        return false
-      }
-    }
-
     setStep(target)
     return true
   }
 
   const finish = useMutation({
-    mutationFn: async (sendInvites: boolean) => {
+    mutationFn: async () => {
       const current = draftRef.current
       const name = current.clubName.trim()
       const venue = current.venue.trim()
@@ -238,14 +147,7 @@ export default function OnboardingPage() {
         throw new OnboardingHandledError()
       }
       if (!isSportStepFilled(current)) {
-        setStep(2)
         toast.error(t('onboarding.errors.maxPlayers'))
-        throw new OnboardingHandledError()
-      }
-      const scheduleIssue = getScheduleIssue(current)
-      if (scheduleIssue || !current.matchDate) {
-        setStep(3)
-        toast.error(t(SCHEDULE_ERROR_KEYS[scheduleIssue ?? 'requiredFields']))
         throw new OnboardingHandledError()
       }
 
@@ -304,73 +206,6 @@ export default function OnboardingPage() {
         defaultMaxCapacity: current.maxPlayers,
       })
 
-      const latest = draftRef.current
-      let seasonId = latest.createdSeasonId
-      const seasonStarts = parseCalendarDate(latest.seasonStartsAt)
-      const seasonEnds = parseCalendarDate(latest.seasonEndsAt)
-      const seasonName = t('onboarding.step3.seasonName', {
-        year: seasonWindowLabel(seasonStarts, seasonEnds),
-      })
-      if (!seasonId) {
-        const seasons = await rostiApi.listSeasons(clubId)
-        seasonId = seasons.find((season) => season.status === 'active')?.id ?? null
-        if (!seasonId) {
-          const season = await rostiApi.createSeason(clubId, {
-            name: seasonName,
-            startsAt: latest.seasonStartsAt,
-            endsAt: latest.seasonEndsAt,
-          })
-          seasonId = season.id
-        }
-        updateDraft((next) => ({ ...next, createdSeasonId: seasonId }))
-      }
-
-      if (!draftRef.current.matchesCreated && seasonId && draftRef.current.matchDate) {
-        await rostiApi.updateSeason(clubId, seasonId, {
-          name: seasonName,
-          startsAt: draftRef.current.seasonStartsAt,
-          endsAt: draftRef.current.seasonEndsAt,
-        })
-        const startsAt = combineDateAndTime(
-          parseCalendarDate(draftRef.current.matchDate),
-          draftRef.current.matchTime,
-        )
-        await rostiApi.createMatches(clubId, {
-          seasonId,
-          title: t('onboarding.step3.matchTitle', { club: name }),
-          startsAt: startsAt.toISOString(),
-          location: venue,
-          maxCapacity: draftRef.current.maxPlayers,
-          recurrence: {
-            frequency: draftRef.current.recurrence,
-            endsAt: endOfCalendarDay(
-              parseCalendarDate(draftRef.current.seasonEndsAt),
-            ).toISOString(),
-          },
-        })
-        updateDraft((next) => ({ ...next, matchesCreated: true }))
-      }
-
-      if (sendInvites) {
-        for (const email of draftRef.current.emails) {
-          if (draftRef.current.invitedEmails.includes(email)) continue
-          const result = await authClient.organization.inviteMember({
-            email,
-            role: 'member',
-            organizationId: clubId,
-          })
-          if (result.error && !isAlreadyInvited(result.error)) {
-            throw new Error(result.error.message)
-          }
-          updateDraft((next) => ({
-            ...next,
-            invitedEmails: next.invitedEmails.includes(email)
-              ? next.invitedEmails
-              : [...next.invitedEmails, email],
-          }))
-        }
-      }
-
       submittedRef.current = true
       clearOnboardingDraft()
     },
@@ -387,11 +222,12 @@ export default function OnboardingPage() {
   const isStepEnabled = (target: number) =>
     target <= draft.step || isOnboardingStepReachable(draft, target)
 
-  const handleFinish = (sendInvites: boolean) => {
-    void goToStep(4).then((opened) => {
-      if (!opened) return
-      finish.mutate(sendInvites)
-    })
+  const handleCreateClub = () => {
+    if (!isSportStepFilled(draftRef.current)) {
+      toast.error(t('onboarding.errors.maxPlayers'))
+      return
+    }
+    finish.mutate()
   }
 
   if (isSessionPending || (session && isClubsLoading && !draft.createdClubId)) {
@@ -449,40 +285,7 @@ export default function OnboardingPage() {
             updateDraft((current) => ({ ...current, maxPlayers: value }))
           }
           onBack={() => setStep(1)}
-          onNext={() => void goToStep(3)}
-        />
-      ) : null}
-
-      {draft.step === 3 ? (
-        <ScheduleStep
-          seasonStartsAt={seasonStartsAt}
-          seasonEndsAt={seasonEndsAt}
-          matchDate={matchDate}
-          matchTime={draft.matchTime}
-          recurrence={draft.recurrence}
-          weekdayName={weekdayName}
-          dayOfMonth={dayOfMonth}
-          isPending={isLocked}
-          onSeasonStartsAtChange={handleSeasonStartsAtChange}
-          onSeasonEndsAtChange={handleSeasonEndsAtChange}
-          onDateChange={handleMatchDateChange}
-          onTimeChange={(value) => updateDraft((current) => ({ ...current, matchTime: value }))}
-          onRecurrenceChange={(value: OnboardingRecurrence) =>
-            updateDraft((current) => ({ ...current, recurrence: value }))
-          }
-          onBack={() => setStep(2)}
-          onNext={() => void goToStep(4)}
-        />
-      ) : null}
-
-      {draft.step === 4 ? (
-        <InvitesStep
-          emails={draft.emails}
-          isPending={isLocked}
-          onEmailsChange={(emails) => updateDraft((current) => ({ ...current, emails }))}
-          onSend={() => handleFinish(true)}
-          onSkip={() => handleFinish(false)}
-          onBack={() => setStep(3)}
+          onCreate={handleCreateClub}
         />
       ) : null}
     </div>

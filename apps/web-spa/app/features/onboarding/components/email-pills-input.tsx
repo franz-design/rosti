@@ -21,7 +21,7 @@ export function EmailPillsInput({ emails, onChange, placeholder }: EmailPillsInp
     const email = raw.trim().replace(/,$/, '').toLowerCase()
     if (!email) return
     if (!EMAIL_RE.test(email)) {
-      setError(t('onboarding.step4.invalidEmail'))
+      setError(t('clubSettings.invite.invalidEmail'))
       return
     }
     if (emails.includes(email)) {
@@ -48,7 +48,7 @@ export function EmailPillsInput({ emails, onChange, placeholder }: EmailPillsInp
               type="button"
               className="rounded-sm p-0.5 hover:bg-muted"
               onClick={() => removeEmail(email)}
-              aria-label={t('onboarding.step4.removeEmail', { email })}
+              aria-label={t('clubSettings.invite.removeEmail', { email })}
             >
               <XIcon className="size-3" />
             </button>

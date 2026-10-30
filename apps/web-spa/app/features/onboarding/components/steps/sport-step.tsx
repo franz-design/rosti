@@ -12,7 +12,7 @@ interface SportStepProps {
   onSportChange: (value: SportType) => void
   onMaxPlayersChange: (value: number) => void
   onBack: () => void
-  onNext: () => void
+  onCreate: () => void
 }
 
 export function SportStep({
@@ -22,7 +22,7 @@ export function SportStep({
   onSportChange,
   onMaxPlayersChange,
   onBack,
-  onNext,
+  onCreate,
 }: SportStepProps) {
   const { t } = useTranslation()
 
@@ -44,16 +44,16 @@ export function SportStep({
         />
       </div>
       <div className="flex gap-2">
-        <Button variant="outline" className="flex-1" onClick={onBack}>
+        <Button variant="outline" className="flex-1" disabled={isPending} onClick={onBack}>
           {t('onboarding.back')}
         </Button>
         <Button
           className="flex-1"
           disabled={isPending || maxPlayers < 2}
           loading={isPending}
-          onClick={onNext}
+          onClick={onCreate}
         >
-          {t('onboarding.next')}
+          {t('onboarding.createClub')}
         </Button>
       </div>
     </div>

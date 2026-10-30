@@ -8,6 +8,7 @@ import { rostiApi } from '@/lib/rosti-api'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Navigate } from 'react-router'
+import { HomeGettingStarted } from './components/home/home-getting-started'
 import { HomeHeader } from './components/home/home-header'
 import { HomeInstallLink } from './components/home/home-install-link'
 import { HomeMatchSection } from './components/home/home-match-section'
@@ -35,6 +36,7 @@ export default function ClubsPage() {
   const lastMatch = getLastMatch(matches)
   const nextMatch = getNextMatch(matches)
   const dateLocale = i18n.language?.startsWith('en') ? 'en-GB' : 'fr-FR'
+  const showGettingStarted = !isMatchesLoading && matches.length === 0
 
   return (
     <div className="min-w-0 flex flex-col gap-12">
@@ -50,28 +52,34 @@ export default function ClubsPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <HomeMatchSection
-          title={t('home.lastMatch')}
-          isLoading={isMatchesLoading}
-          match={lastMatch}
-          dateLocale={dateLocale}
-          variant="past"
-          emptyLabel={t('home.noPast')}
-          promptEnterScore={lastMatch ? shouldPromptEnterScore(lastMatch, isClubAdmin) : undefined}
-        />
-        <HomeMatchSection
-          title={t('home.nextMatch')}
-          isLoading={isMatchesLoading}
-          match={nextMatch}
-          dateLocale={dateLocale}
-          variant="upcoming"
-          emptyLabel={t('home.noUpcoming')}
-          showCreateMatch
-        />
-      </div>
+      {showGettingStarted ? (
+        <HomeGettingStarted isClubAdmin={isClubAdmin} />
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <HomeMatchSection
+            title={t('home.lastMatch')}
+            isLoading={isMatchesLoading}
+            match={lastMatch}
+            dateLocale={dateLocale}
+            variant="past"
+            emptyLabel={t('home.noPast')}
+            promptEnterScore={
+              lastMatch ? shouldPromptEnterScore(lastMatch, isClubAdmin) : undefined
+            }
+          />
+          <HomeMatchSection
+            title={t('home.nextMatch')}
+            isLoading={isMatchesLoading}
+            match={nextMatch}
+            dateLocale={dateLocale}
+            variant="upcoming"
+            emptyLabel={t('home.noUpcoming')}
+            showCreateMatch
+          />
+        </div>
+      )}
 
-      <HomeStatsSection />
+      {!showGettingStarted && <HomeStatsSection />}
     </div>
   )
 }

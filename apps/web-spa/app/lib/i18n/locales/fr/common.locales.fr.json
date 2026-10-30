@@ -137,6 +137,14 @@
     "noUpcoming": "Aucun match à venir pour le moment.",
     "noPast": "Aucun match passé pour le moment.",
     "allMatches": "Tous les matchs",
+    "gettingStarted": {
+      "matchesTitle": "Crée tes premiers matchs",
+      "matchesDescription": "Choisis une date, une heure, et si le créneau se répète.",
+      "matchesAction": "Créer des matchs",
+      "invitesTitle": "Invite tes joueurs",
+      "invitesDescription": "Envoie une invitation par email. Ils rejoignent le club en un clic.",
+      "invitesAction": "Inviter des joueurs"
+    },
     "skillsPrompt": "Renseigne tes compétences",
     "install": {
       "link": "Ajoute l'app à ton téléphone",
@@ -386,6 +394,15 @@
     "title": "Créer un match",
     "subtitle": "Planifie le prochain créneau pour {{club}}.",
     "back": "Retour",
+    "next": "Continuer",
+    "stepsLabel": "Étapes",
+    "steps": {
+      "match": "Match",
+      "when": "Date",
+      "group": "Groupe",
+      "repeat": "Répéter",
+      "length": "Durée"
+    },
     "submit": "Créer le match",
     "submitting": "Création…",
     "success": "Match créé",
@@ -469,6 +486,8 @@
       "title": "Inviter des joueurs",
       "hint": "Saisis des emails séparés par une virgule. Chaque email devient une pastille.",
       "placeholder": "ami@email.com, …",
+      "invalidEmail": "Email invalide",
+      "removeEmail": "Retirer {{email}}",
       "send": "Envoyer les invitations",
       "success": "Invitations envoyées"
     },
@@ -706,20 +725,16 @@
     "stepsLabel": "Étapes",
     "next": "Continuer",
     "back": "Retour",
+    "createClub": "Créer mon club",
     "done": "Ton club est prêt !",
     "steps": {
       "club": "Club",
-      "sport": "Sport",
-      "schedule": "Calendrier",
-      "invites": "Invitations"
+      "sport": "Sport"
     },
     "errors": {
       "requiredFields": "Merci de remplir tous les champs.",
       "createClub": "Impossible de créer le club.",
-      "missingClub": "Club introuvable. Reprends depuis le début.",
       "maxPlayers": "Il faut au moins 2 joueurs.",
-      "seasonEndBeforeStart": "La fin de saison doit être le même jour ou après le début.",
-      "matchOutsideSeason": "Le premier match doit être dans la saison.",
       "nameTaken": "Ce nom est déjà pris.",
       "nameInvalid": "Le nom doit contenir des lettres ou des chiffres.",
       "checkName": "Impossible de vérifier ce nom."
@@ -743,31 +758,6 @@
     "step2": {
       "sport": "Type de match",
       "maxPlayers": "Nombre max de joueurs par match"
-    },
-    "step3": {
-      "seasonStartsAt": "Début de saison",
-      "seasonEndsAt": "Fin de saison",
-      "seasonHint": "Les matchs seront créés jusqu'à cette date. Par défaut : saison en cours ou à venir (sept. → juin).",
-      "date": "Date du prochain match",
-      "datePlaceholder": "Choisir une date",
-      "time": "Heure",
-      "recurrence": "Récurrence",
-      "everyWeek": "Chaque semaine - tous les {{day}}s",
-      "everyNthWeekday": "Tous les {{ordinal}} {{day}}s du mois",
-      "everyMonthDate": "Tous les {{day}} du mois",
-      "monthlyNthFallback": "1er jour du mois",
-      "recurrenceHint": "Les occurrences sont créées jusqu'à la fin de la saison.",
-      "seasonName": "Saison {{year}}",
-      "matchTitle": "Match - {{club}}"
-    },
-    "step4": {
-      "emails": "Invite des joueurs",
-      "emailsHint": "Saisis des emails séparés par une virgule. Chaque email devient une pastille.",
-      "emailsPlaceholder": "ami@email.com, …",
-      "sendInvites": "Envoyer les invitations",
-      "skip": "Passer cette étape",
-      "invalidEmail": "Email invalide",
-      "removeEmail": "Retirer {{email}}"
     }
   },
   "commandPalette": {

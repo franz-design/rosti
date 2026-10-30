@@ -34,6 +34,12 @@ const ART = {
     dark: whistleDark,
     className: 'w-1/2',
   },
+  // Stand-in for the invite illustration until bibs.png and bibs-dark.png land.
+  bibs: {
+    light: bench,
+    dark: benchDark,
+    className: '-mr-16 -mt-4 -mb-4 max-w-128',
+  },
 } as const
 
 const BALLS: Record<EmptyBallKind, { light: string; dark: string; className: string }> = {

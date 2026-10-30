@@ -34,6 +34,8 @@ interface CreateMatchFormValues {
 }
 
 interface CreateMatchFormProps {
+  step: number
+  isLastStep: boolean
   values: CreateMatchFormValues
   weekdayName: string
   dayOfMonth: number
@@ -47,10 +49,13 @@ interface CreateMatchFormProps {
   onRecurrenceChange: (value: RecurrenceChoice) => void
   onEndModeChange: (value: RecurrenceEndMode) => void
   onOccurrenceCountChange: (value: number) => void
-  onSubmit: () => void
+  onBack: () => void
+  onNext: () => void
 }
 
 export function CreateMatchForm({
+  step,
+  isLastStep,
   values,
   weekdayName,
   dayOfMonth,
@@ -64,94 +69,111 @@ export function CreateMatchForm({
   onRecurrenceChange,
   onEndModeChange,
   onOccurrenceCountChange,
-  onSubmit,
+  onBack,
+  onNext,
 }: CreateMatchFormProps) {
   const { t } = useTranslation()
+  const isCountMode = !values.canUntilSeason || values.endMode === 'count'
+  const occurrenceCountInvalid =
+    step === 5 &&
+    isCountMode &&
+    (values.occurrenceCount < 1 || values.occurrenceCount > MAX_OCCURRENCE_COUNT)
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="matchTitle">{t('createMatch.matchTitle')}</Label>
-        <Input
-          id="matchTitle"
-          value={values.title}
-          onChange={(e) => onTitleChange(e.target.value)}
-          placeholder={t('createMatch.matchTitlePlaceholder')}
-        />
-      </div>
+      {step === 1 ? (
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="matchTitle">{t('createMatch.matchTitle')}</Label>
+            <Input
+              id="matchTitle"
+              value={values.title}
+              onChange={(e) => onTitleChange(e.target.value)}
+              placeholder={t('createMatch.matchTitlePlaceholder')}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="location">{t('createMatch.location')}</Label>
+            <Input
+              id="location"
+              value={values.location}
+              onChange={(e) => onLocationChange(e.target.value)}
+              placeholder={t('createMatch.locationPlaceholder')}
+            />
+          </div>
+        </>
+      ) : null}
 
-      <div className="space-y-2">
-        <Label htmlFor="location">{t('createMatch.location')}</Label>
-        <Input
-          id="location"
-          value={values.location}
-          onChange={(e) => onLocationChange(e.target.value)}
-          placeholder={t('createMatch.locationPlaceholder')}
-        />
-      </div>
+      {step === 2 ? (
+        <>
+          <div className="space-y-2">
+            <Label>{t('createMatch.date')}</Label>
+            <DatePicker
+              value={values.matchDate}
+              onDateChange={onDateChange}
+              localeCode="fr-FR"
+              placeholder={t('createMatch.datePlaceholder')}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>{t('createMatch.time')}</Label>
+            <Select value={values.matchTime} onValueChange={(v) => v && onTimeChange(v)}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TIME_OPTIONS.map((time) => (
+                  <SelectItem key={time} value={time}>
+                    {time}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </>
+      ) : null}
 
-      <div className="space-y-2">
-        <Label htmlFor="maxPlayers">{t('createMatch.maxPlayers')}</Label>
-        <Input
-          id="maxPlayers"
-          type="number"
-          min={2}
-          max={40}
-          value={values.maxPlayers}
-          onChange={(e) => onMaxPlayersChange(Number(e.target.value) || 0)}
-        />
-      </div>
+      {step === 3 ? (
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="maxPlayers">{t('createMatch.maxPlayers')}</Label>
+            <Input
+              id="maxPlayers"
+              type="number"
+              min={2}
+              max={40}
+              value={values.maxPlayers}
+              onChange={(e) => onMaxPlayersChange(Number(e.target.value) || 0)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="pitchCost">{t('createMatch.pitchCost')}</Label>
+            <Input
+              id="pitchCost"
+              inputMode="decimal"
+              value={values.pitchCost}
+              onChange={(event) => onPitchCostChange(event.target.value)}
+              placeholder={t('createMatch.pitchCostPlaceholder')}
+            />
+            <p className="text-sm text-muted-foreground">{t('createMatch.pitchCostHint')}</p>
+          </div>
+        </>
+      ) : null}
 
-      <div className="space-y-2">
-        <Label htmlFor="pitchCost">{t('createMatch.pitchCost')}</Label>
-        <Input
-          id="pitchCost"
-          inputMode="decimal"
-          value={values.pitchCost}
-          onChange={(event) => onPitchCostChange(event.target.value)}
-          placeholder={t('createMatch.pitchCostPlaceholder')}
-        />
-        <p className="text-sm text-muted-foreground">{t('createMatch.pitchCostHint')}</p>
-      </div>
+      {step === 4 ? (
+        <div className="space-y-2">
+          <Label>{t('createMatch.recurrence')}</Label>
+          <RecurrencePicker
+            value={values.recurrence}
+            onChange={onRecurrenceChange}
+            matchDate={values.matchDate}
+            weekdayName={weekdayName}
+            dayOfMonth={dayOfMonth}
+          />
+        </div>
+      ) : null}
 
-      <div className="space-y-2">
-        <Label>{t('createMatch.date')}</Label>
-        <DatePicker
-          value={values.matchDate}
-          onDateChange={onDateChange}
-          localeCode="fr-FR"
-          placeholder={t('createMatch.datePlaceholder')}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label>{t('createMatch.time')}</Label>
-        <Select value={values.matchTime} onValueChange={(v) => v && onTimeChange(v)}>
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {TIME_OPTIONS.map((time) => (
-              <SelectItem key={time} value={time}>
-                {time}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label>{t('createMatch.recurrence')}</Label>
-        <RecurrencePicker
-          value={values.recurrence}
-          onChange={onRecurrenceChange}
-          matchDate={values.matchDate}
-          weekdayName={weekdayName}
-          dayOfMonth={dayOfMonth}
-        />
-      </div>
-
-      {values.recurrence !== 'once' ? (
+      {step === 5 ? (
         <div className="space-y-2">
           <Label htmlFor="occurrenceCount">{t('createMatch.occurrences')}</Label>
           <OccurrencesPicker
@@ -165,24 +187,28 @@ export function CreateMatchForm({
       ) : null}
 
       <div className="flex gap-2 pt-2">
-        <Button variant="outline" className="flex-1" render={<Link to="/matches" />}>
-          {t('createMatch.back')}
-        </Button>
+        {step === 1 ? (
+          <Button variant="outline" className="flex-1" render={<Link to="/matches" />}>
+            {t('createMatch.back')}
+          </Button>
+        ) : (
+          <Button variant="outline" className="flex-1" disabled={isPending} onClick={onBack}>
+            {t('createMatch.back')}
+          </Button>
+        )}
         <Button
           className="flex-1"
           disabled={
             isPending ||
-            !values.matchDate ||
-            !values.title.trim() ||
-            values.maxPlayers < 2 ||
-            (values.recurrence !== 'once' &&
-              values.endMode === 'count' &&
-              (values.occurrenceCount < 1 || values.occurrenceCount > MAX_OCCURRENCE_COUNT))
+            (step === 1 && !values.title.trim()) ||
+            (step === 2 && !values.matchDate) ||
+            (step === 3 && values.maxPlayers < 2) ||
+            occurrenceCountInvalid
           }
-          loading={isPending}
-          onClick={onSubmit}
+          loading={isPending && isLastStep}
+          onClick={onNext}
         >
-          {t('createMatch.submit')}
+          {isLastStep ? t('createMatch.submit') : t('createMatch.next')}
         </Button>
       </div>
     </div>

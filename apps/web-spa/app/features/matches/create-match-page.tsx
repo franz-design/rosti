@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Navigate, useNavigate } from 'react-router'
+import { StepProgress } from '@/common/components/step-progress'
 import { useClub } from '@/features/clubs/hooks/club-context'
 import {
   endOfCalendarDay,
@@ -15,10 +16,16 @@ import { CreateMatchForm } from './components/create-match/create-match-form'
 import { CreateMatchHeader } from './components/create-match/create-match-header'
 import { centsToEuroInput, eurosToCents } from './utils/euros'
 import {
+  createMatchStepIds,
+  isCreateMatchStepReachable,
+  type CreateMatchStepInput,
+} from './utils/create-match-steps'
+import {
   buildMatchRecurrencePayload,
   combineDateAndTime,
   DEFAULT_OCCURRENCE_COUNT,
   defaultNextMatchDate,
+  MAX_OCCURRENCE_COUNT,
   type RecurrenceChoice,
   type RecurrenceEndMode,
 } from './utils/match-schedule-utils'
@@ -29,6 +36,7 @@ export default function CreateMatchPage() {
   const queryClient = useQueryClient()
   const { activeClub } = useClub()
 
+  const [step, setStep] = useState(1)
   const [title, setTitle] = useState('')
   const [location, setLocation] = useState('')
   const [maxPlayers, setMaxPlayers] = useState(10)
@@ -48,12 +56,26 @@ export default function CreateMatchPage() {
   const seasonStartsAt = activeSeason ? parseCalendarDate(activeSeason.startsAt) : null
   const seasonEndsAt = activeSeason?.endsAt ? parseCalendarDate(activeSeason.endsAt) : null
   const canUntilSeason = !!seasonEndsAt
+  const stepIds = createMatchStepIds(recurrence)
+  const stepCount = stepIds.length
+
+  const stepInput: CreateMatchStepInput = {
+    title,
+    matchDate,
+    maxPlayers,
+    pitchCost,
+    recurrence,
+  }
 
   useEffect(() => {
     if (!canUntilSeason && endMode === 'season') {
       setEndMode('count')
     }
   }, [canUntilSeason, endMode])
+
+  useEffect(() => {
+    if (step > stepCount) setStep(stepCount)
+  }, [step, stepCount])
 
   useEffect(() => {
     if (!activeClub || defaultsReady) return
@@ -72,6 +94,38 @@ export default function CreateMatchPage() {
   )
   const dayOfMonth = matchDate?.getDate() ?? 1
 
+  const goToStep = (target: number) => {
+    if (target === step) return
+    if (target < step) {
+      setStep(target)
+      return
+    }
+    if (!isCreateMatchStepReachable(stepInput, target)) {
+      if (!title.trim()) {
+        setStep(1)
+        toast.error(t('createMatch.errors.requiredFields'))
+        return
+      }
+      if (!matchDate) {
+        setStep(2)
+        toast.error(t('createMatch.errors.requiredFields'))
+        return
+      }
+      if (maxPlayers < 2) {
+        setStep(3)
+        toast.error(t('createMatch.errors.maxPlayers'))
+        return
+      }
+      if (eurosToCents(pitchCost) == null) {
+        setStep(3)
+        toast.error(t('createMatch.errors.pitchCost'))
+        return
+      }
+      return
+    }
+    setStep(target)
+  }
+
   const create = useMutation({
     mutationFn: async () => {
       if (!activeClub) throw new Error(t('createMatch.errors.missingClub'))
@@ -79,6 +133,13 @@ export default function CreateMatchPage() {
       if (maxPlayers < 2) throw new Error(t('createMatch.errors.maxPlayers'))
       const pitchCostCents = eurosToCents(pitchCost)
       if (pitchCostCents == null) throw new Error(t('createMatch.errors.pitchCost'))
+      if (
+        recurrence !== 'once' &&
+        endMode === 'count' &&
+        (occurrenceCount < 1 || occurrenceCount > MAX_OCCURRENCE_COUNT)
+      ) {
+        throw new Error(t('createMatch.errors.requiredFields'))
+      }
 
       let seasonId = activeSeason?.id
       if (!seasonId) {
@@ -125,14 +186,36 @@ export default function CreateMatchPage() {
     onError: (err: Error) => toast.error(err.message),
   })
 
+  const handleNext = () => {
+    if (step < stepCount) {
+      goToStep(step + 1)
+      return
+    }
+    create.mutate()
+  }
+
   if (!activeClub) {
     return <Navigate to="/dashboard" replace />
   }
 
+  const isStepEnabled = (target: number) =>
+    target <= step || isCreateMatchStepReachable(stepInput, target)
+
   return (
     <div className="mx-auto w-full max-w-lg space-y-8">
       <CreateMatchHeader clubName={activeClub.name} />
+      <StepProgress
+        steps={stepIds}
+        step={step}
+        ariaLabel={t('createMatch.stepsLabel')}
+        labelFor={(id) => t(`createMatch.steps.${id}`)}
+        isStepEnabled={isStepEnabled}
+        isLocked={create.isPending}
+        onStepSelect={goToStep}
+      />
       <CreateMatchForm
+        step={step}
+        isLastStep={step === stepCount}
         values={{
           title,
           location,
@@ -157,7 +240,8 @@ export default function CreateMatchPage() {
         onRecurrenceChange={setRecurrence}
         onEndModeChange={setEndMode}
         onOccurrenceCountChange={setOccurrenceCount}
-        onSubmit={() => create.mutate()}
+        onBack={() => goToStep(step - 1)}
+        onNext={handleNext}
       />
     </div>
   )
