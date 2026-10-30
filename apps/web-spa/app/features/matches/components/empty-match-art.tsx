@@ -6,6 +6,8 @@ import basketballDark from '@/assets/images/empty/basketball-dark.png'
 import basketball from '@/assets/images/empty/basketball.png'
 import benchDark from '@/assets/images/empty/bench-dark.png'
 import bench from '@/assets/images/empty/bench.png'
+import bibsDark from '@/assets/images/empty/bibs-dark.png'
+import bibs from '@/assets/images/empty/bibs.png'
 import padelDark from '@/assets/images/empty/padel-dark.png'
 import padel from '@/assets/images/empty/padel.png'
 import tennisDark from '@/assets/images/empty/tennis-dark.png'
@@ -34,11 +36,10 @@ const ART = {
     dark: whistleDark,
     className: 'w-1/2',
   },
-  // Stand-in for the invite illustration until bibs.png and bibs-dark.png land.
   bibs: {
-    light: bench,
-    dark: benchDark,
-    className: '-mr-16 -mt-4 -mb-4 max-w-128',
+    light: bibs,
+    dark: bibsDark,
+    className: 'w-4/5',
   },
 } as const
 
