@@ -94,6 +94,34 @@ describe('mergeOutgoingMessages', () => {
 
     expect(actual).toEqual([])
   })
+
+  it('hides an unconfirmed send when the poll already returned the same message', () => {
+    const pending = outgoing()
+
+    const actual = mergeOutgoingMessages(
+      [message('server-1', 'Avant'), message('server-2', 'Salut')],
+      [pending],
+      'match-1',
+    )
+
+    expect(actual.map((item) => item.id)).toEqual(['server-1', 'server-2'])
+  })
+
+  it('keeps a second identical send when only one matching server row exists', () => {
+    const first = outgoing({ clientId: 'pending-1' })
+    const second = outgoing({
+      clientId: 'pending-2',
+      message: message('pending-2', 'Salut'),
+    })
+
+    const actual = mergeOutgoingMessages(
+      [message('server-2', 'Salut')],
+      [first, second],
+      'match-1',
+    )
+
+    expect(actual.map((item) => item.id)).toEqual(['server-2', 'pending-2'])
+  })
 })
 
 describe('pruneOutgoingMessages', () => {
@@ -103,6 +131,18 @@ describe('pruneOutgoingMessages', () => {
 
     const actual = pruneOutgoingMessages(
       [...saved, otherMatch],
+      [message('server-2', 'Salut')],
+      'match-1',
+    )
+
+    expect(actual).toEqual([])
+  })
+
+  it('drops an unconfirmed send once the poll returned the same message', () => {
+    const pending = outgoing()
+
+    const actual = pruneOutgoingMessages(
+      [pending],
       [message('server-2', 'Salut')],
       'match-1',
     )

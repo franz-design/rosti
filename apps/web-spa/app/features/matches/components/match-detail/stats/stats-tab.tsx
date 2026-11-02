@@ -15,8 +15,10 @@ interface StatsTabProps {
   players: Attendance[]
   drafts: Record<string, PlayerStatDraft>
   onStatChange: (userId: string, draft: PlayerStatDraft) => void
-  onSaveStats: (drafts: Record<string, PlayerStatDraft>) => void
-  canManage: boolean
+  onSaveStats: (drafts: Record<string, PlayerStatDraft>, changedUserId: string) => void
+  canEditScore: boolean
+  canEditAllStats: boolean
+  currentUserId?: string
 }
 
 export function StatsTab({
@@ -27,20 +29,23 @@ export function StatsTab({
   drafts,
   onStatChange,
   onSaveStats,
-  canManage,
+  canEditScore,
+  canEditAllStats,
+  currentUserId,
 }: StatsTabProps) {
   return (
     <>
       <ScoreEditor
         score={score}
-        canEdit={canManage}
+        canEdit={canEditScore}
         onChange={onScoreChange}
         onSave={onSaveScore}
       />
       <PlayerStatsList
         players={players}
         drafts={drafts}
-        canEdit={canManage}
+        canEditAll={canEditAllStats}
+        currentUserId={currentUserId}
         onChange={onStatChange}
         onSave={onSaveStats}
       />

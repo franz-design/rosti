@@ -28,7 +28,7 @@ export function ChatBubble({ message, isMine, mentionNameById }: ChatBubbleProps
       ) : null}
       <div
         className={cn(
-          'max-w-[85%] rounded-2xl px-3 py-2 text-sm',
+          'max-w-[45%] rounded-2xl px-3 py-2 text-sm',
           isMine ? 'bg-primary text-primary-foreground' : 'bg-muted',
         )}
       >

@@ -39,18 +39,61 @@ export function buildOptimisticMessage(input: OptimisticMessageInput): MatchMess
 }
 
 /**
+ * True when a loaded message is the same send as an optimistic bubble.
+ * Used when the poll returns the saved row before we store its server id.
+ */
+function isSameOutgoingSend(server: MatchMessage, outgoing: OutgoingChatMessage): boolean {
+  return (
+    server.authorId === outgoing.message.authorId && server.body === outgoing.message.body
+  )
+}
+
+/**
+ * Outgoing client ids already represented in the loaded list — by confirmed
+ * server id, or one-to-one author+body match when the poll won the race.
+ */
+function resolvedOutgoingClientIds(
+  serverMessages: MatchMessage[],
+  outgoing: OutgoingChatMessage[],
+): Set<string> {
+  const resolved = new Set<string>()
+  const claimedServerIds = new Set<string>()
+  const serverIds = new Set(serverMessages.map((item) => item.id))
+
+  for (const item of outgoing) {
+    if (item.confirmedId && serverIds.has(item.confirmedId)) {
+      resolved.add(item.clientId)
+      claimedServerIds.add(item.confirmedId)
+    }
+  }
+
+  for (const item of outgoing) {
+    if (resolved.has(item.clientId)) continue
+    const match = serverMessages.find(
+      (server) => !claimedServerIds.has(server.id) && isSameOutgoingSend(server, item),
+    )
+    if (match) {
+      resolved.add(item.clientId)
+      claimedServerIds.add(match.id)
+    }
+  }
+
+  return resolved
+}
+
+/**
  * Appends messages that are not on the server yet.
- * A confirmed send drops out once the loaded list contains its server id.
+ * A send drops out once the loaded list contains it (by id or content match).
  */
 export function mergeOutgoingMessages(
   serverMessages: MatchMessage[],
   outgoing: OutgoingChatMessage[],
   matchId: string | undefined,
 ): MatchMessage[] {
-  const serverIds = new Set(serverMessages.map((item) => item.id))
-  const pending = outgoing
-    .filter((item) => item.matchId === matchId)
-    .filter((item) => !item.confirmedId || !serverIds.has(item.confirmedId))
+  const relevant = outgoing.filter((item) => item.matchId === matchId)
+  const resolved = resolvedOutgoingClientIds(serverMessages, relevant)
+  const pending = relevant
+    .filter((item) => !resolved.has(item.clientId))
     .map((item) => item.message)
   return [...serverMessages, ...pending]
 }
@@ -70,10 +113,9 @@ export function pruneOutgoingMessages(
   serverMessages: MatchMessage[],
   matchId: string | undefined,
 ): OutgoingChatMessage[] {
-  const serverIds = new Set(serverMessages.map((item) => item.id))
-  return outgoing.filter(
-    (item) => item.matchId === matchId && (!item.confirmedId || !serverIds.has(item.confirmedId)),
-  )
+  const relevant = outgoing.filter((item) => item.matchId === matchId)
+  const resolved = resolvedOutgoingClientIds(serverMessages, relevant)
+  return relevant.filter((item) => !resolved.has(item.clientId))
 }
 
 /** Adds the saved message to the loaded list without duplicating it. */

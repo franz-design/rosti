@@ -1,5 +1,10 @@
 import { EntityManager } from '@mikro-orm/core'
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { Organization, User } from '../auth/auth.entity'
 import { OrganizationService } from '../auth/organization.service'
 import { AttendanceStatus, MatchStatus } from '../matches/contracts/match.contract'
@@ -44,18 +49,42 @@ export class StatsService {
     private readonly playerVoteService: PlayerVoteService,
   ) {}
 
+  /**
+   * Goals and assists for a match.
+   * Club admins can set any present player's stats. Members can set only their own
+   * when they were present. Saving stats marks the match as played.
+   */
   async upsertMatchStats(
     organizationId: string,
     userId: string,
     matchId: string,
     data: UpsertMatchStatsInput,
   ): Promise<MatchStat[]> {
-    await this.organizationService.requireRole(organizationId, userId, ['owner', 'admin'])
+    const member = await this.organizationService.requireMember(organizationId, userId)
+    const isClubAdmin = member.role === 'owner' || member.role === 'admin'
+
     const match = await this.em.findOne(Match, {
       id: matchId,
       organization: { id: organizationId },
     })
     if (!match) throw new NotFoundException('Match not found')
+    if (match.status === MatchStatus.Cancelled) {
+      throw new BadRequestException('Cannot update stats on a cancelled match')
+    }
+
+    if (!isClubAdmin) {
+      const editingOthers = data.stats.some((row) => row.userId !== userId)
+      if (editingOthers) {
+        throw new ForbiddenException('You can only update your own stats')
+      }
+      const attendance = await this.em.findOne(MatchAttendance, {
+        match: { id: matchId },
+        user: { id: userId },
+      })
+      if (!attendance || attendance.status !== AttendanceStatus.Present) {
+        throw new ForbiddenException('Only present players can update their stats')
+      }
+    }
 
     const result: MatchStat[] = []
     for (const row of data.stats) {

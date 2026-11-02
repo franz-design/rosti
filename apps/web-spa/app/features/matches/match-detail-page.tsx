@@ -371,12 +371,12 @@ export default function MatchDetailPage() {
   const postMsg = useMutation({
     mutationFn: ({ markup }: { clientId: string; markup: string }) =>
       rostiApi.postMessage(orgId!, matchId!, toPlainMentionBody(markup), extractMentionIds(markup)),
-    onSuccess: async (saved, { clientId }) => {
-      setOutgoingMessages((current) => confirmOutgoingMessage(current, clientId, saved.id))
-      await queryClient.cancelQueries({ queryKey: messagesQueryKey(orgId, matchId) })
+    onSuccess: (saved, { clientId }) => {
+      void queryClient.cancelQueries({ queryKey: messagesQueryKey(orgId, matchId) })
       queryClient.setQueryData<MatchMessage[]>(messagesQueryKey(orgId, matchId), (current) =>
         appendMessageIfMissing(current, saved),
       )
+      setOutgoingMessages((current) => confirmOutgoingMessage(current, clientId, saved.id))
       invalidate()
     },
     onError: (error: Error, { clientId, markup }) => {
@@ -451,6 +451,7 @@ export default function MatchDetailPage() {
   }
 
   const canManageComposition = isClubAdmin && match.status !== 'cancelled'
+  const canEditMatchStats = match.status !== 'cancelled'
   const showMatchResult = shouldShowMatchResult(match)
 
   return (
@@ -537,7 +538,7 @@ export default function MatchDetailPage() {
             onStatChange={(userId, draft) =>
               setStatDrafts((prev) => ({ ...prev, [userId]: draft }))
             }
-            onSaveStats={(next) => {
+            onSaveStats={(next, changedUserId) => {
               const userIds = presentPlayers.map((player) => player.userId)
               const server: Record<string, PlayerStatDraft> = {}
               for (const player of presentPlayers) {
@@ -552,15 +553,24 @@ export default function MatchDetailPage() {
                 return
               }
               pendingStatSave.current = next
-              saveStats.mutate(
-                presentPlayers.map((player) => ({
-                  userId: player.userId,
-                  goals: next[player.userId]?.goals ?? 0,
-                  assists: next[player.userId]?.assists ?? 0,
-                })),
-              )
+              const entries = canManageComposition
+                ? presentPlayers.map((player) => ({
+                    userId: player.userId,
+                    goals: next[player.userId]?.goals ?? 0,
+                    assists: next[player.userId]?.assists ?? 0,
+                  }))
+                : [
+                    {
+                      userId: changedUserId,
+                      goals: next[changedUserId]?.goals ?? 0,
+                      assists: next[changedUserId]?.assists ?? 0,
+                    },
+                  ]
+              saveStats.mutate(entries)
             }}
-            canManage={canManageComposition}
+            canEditScore={canManageComposition}
+            canEditAllStats={canManageComposition}
+            currentUserId={canEditMatchStats ? session?.user?.id : undefined}
           />
         </TabsContent>
 

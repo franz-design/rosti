@@ -12,15 +12,17 @@ const STATS_SAVE_DELAY_MS = 750
 interface PlayerStatsListProps {
   players: Attendance[]
   drafts: Record<string, PlayerStatDraft>
-  canEdit: boolean
+  canEditAll: boolean
+  currentUserId?: string
   onChange: (userId: string, draft: PlayerStatDraft) => void
-  onSave: (drafts: Record<string, PlayerStatDraft>) => void
+  onSave: (drafts: Record<string, PlayerStatDraft>, changedUserId: string) => void
 }
 
 export function PlayerStatsList({
   players,
   drafts,
-  canEdit,
+  canEditAll,
+  currentUserId,
   onChange,
   onSave,
 }: PlayerStatsListProps) {
@@ -35,14 +37,18 @@ export function PlayerStatsList({
     }
   }, [])
 
+  function canEditRow(userId: string) {
+    return canEditAll || userId === currentUserId
+  }
+
   function handleChange(userId: string, draft: PlayerStatDraft) {
+    if (!canEditRow(userId)) return
     const next = { ...drafts, [userId]: draft }
     onChange(userId, draft)
-    if (!canEdit) return
     if (saveTimer.current) clearTimeout(saveTimer.current)
     saveTimer.current = setTimeout(() => {
       saveTimer.current = null
-      onSaveRef.current(next)
+      onSaveRef.current(next, userId)
     }, STATS_SAVE_DELAY_MS)
   }
 
@@ -60,6 +66,7 @@ export function PlayerStatsList({
       <ul className="flex flex-col border rounded-lg overflow-hidden">
         {players.map((player, index) => {
           const draft = drafts[player.userId] ?? { goals: 0, assists: 0 }
+          const editable = canEditRow(player.userId)
           return (
             <li
               key={player.userId}
@@ -72,7 +79,7 @@ export function PlayerStatsList({
                 <PlayerAvatar name={player.userName} imageUrl={player.image} />
                 <span className="truncate text-sm group-hover:underline">{player.userName}</span>
               </PlayerLink>
-              {canEdit ? (
+              {editable ? (
                 <>
                   <QuantityStepper
                     size="sm"
