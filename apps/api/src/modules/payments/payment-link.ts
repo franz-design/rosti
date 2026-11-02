@@ -1,8 +1,9 @@
-const PAYPAL_AMOUNT = /^(\d+(?:\.\d+)?)[A-Za-z]{3}$/
-
 /**
  * Fills the amount on a PayPal.me link. Any other link is returned unchanged.
- * Example: https://paypal.me/alex and 650 cents becomes https://paypal.me/alex/6.50EUR
+ * Omits the currency code: the PayPal mobile app drops the amount when a
+ * currency suffix is present (e.g. 3.75EUR). PayPal then uses the recipient's
+ * primary currency.
+ * Example: https://paypal.me/alex and 650 cents becomes https://paypal.me/alex/6.50
  */
 export function buildPaymentUrl(
   link: string | null | undefined,
@@ -24,14 +25,12 @@ export function buildPaymentUrl(
   const isPaypalMePath = host === 'paypal.com' && segments[0] === 'paypalme'
   if (!isPaypalMeHost && !isPaypalMePath) return trimmed
 
-  const amount = `${formatPaypalAmount(amountCents)}EUR`
-  const last = segments.at(-1)
-  if (last && PAYPAL_AMOUNT.test(last)) {
-    segments[segments.length - 1] = amount
-  } else {
-    segments.push(amount)
-  }
-  url.pathname = `/${segments.join('/')}`
+  // paypal.me/{user} or paypal.com/paypalme/{user} — drop any prior amount/currency.
+  const userSegments = isPaypalMeHost ? segments.slice(0, 1) : segments.slice(0, 2)
+  if (userSegments.length < (isPaypalMeHost ? 1 : 2)) return trimmed
+
+
+  url.pathname = `/${[...userSegments, formatPaypalAmount(amountCents)].join('/')}`
   return url.toString()
 }
 

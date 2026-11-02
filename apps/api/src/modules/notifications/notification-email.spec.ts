@@ -38,7 +38,7 @@ describe('notification emails', () => {
       match: MATCH,
       appUrl: APP_URL,
       amountCents: 650,
-      paymentUrl: 'https://paypal.me/alex/6.50EUR',
+      paymentUrl: 'https://paypal.me/alex/6.50',
       isReminder: false,
       shares: 2,
     })
@@ -48,7 +48,7 @@ describe('notification emails', () => {
     expect(actual.paragraphs[1]).toBe('Cette somme couvre 2 parts.')
     expect(actual.action).toEqual({
       label: 'Payer avec PayPal',
-      url: 'https://paypal.me/alex/6.50EUR',
+      url: 'https://paypal.me/alex/6.50',
     })
   })
 
