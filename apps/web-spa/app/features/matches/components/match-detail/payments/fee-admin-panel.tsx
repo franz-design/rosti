@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@rosti/ui/components/primitives/select'
+import { cn } from '@rosti/ui/lib/utils'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { MatchCost, SessionFee } from '@/lib/rosti-api'
@@ -110,7 +111,13 @@ export function FeeAdminPanel({
           </p>
           <ul className="flex flex-col gap-3">
             {fees.map((fee) => (
-              <li key={fee.id} className="space-y-2 rounded-lg border p-3">
+              <li
+                key={fee.id}
+                className={cn(
+                  'space-y-2 rounded-lg border p-3',
+                  fee.status === 'paid' && 'border-success/40 bg-success/10',
+                )}
+              >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex gap-4">
                     <QuantityStepper
