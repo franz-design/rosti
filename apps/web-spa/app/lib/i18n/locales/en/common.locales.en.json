@@ -274,6 +274,11 @@
     "detail": {
       "back": "Back",
       "loading": "Loading match…",
+      "share": {
+        "button": "Share",
+        "copied": "Match summary copied",
+        "failed": "Could not share the match"
+      },
       "tabs": {
         "summary": "Summary",
         "chat": "Chat",

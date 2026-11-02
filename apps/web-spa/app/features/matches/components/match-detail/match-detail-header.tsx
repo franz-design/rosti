@@ -1,13 +1,17 @@
 import { Button } from '@rosti/ui/components/primitives/button'
-import { CalendarDays, Clock, MapPin } from '@rosti/ui/icons'
+import { toast } from '@rosti/ui/components/primitives/sonner'
+import { CalendarDays, Clock, MapPin, Share } from '@rosti/ui/icons'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { getMatchesListHref } from '@/features/matches/utils/match-filters'
+import { buildMatchShareText } from '@/features/matches/utils/build-match-share-text'
+import { shareMatchText } from '@/features/matches/utils/share-match-text'
 import type { Match } from '@/lib/rosti-api'
 import { MatchDetailActions } from './match-detail-actions'
 
 interface MatchDetailHeaderProps {
   match: Match
+  presentCount: number
   canManage: boolean
   isStatusPending?: boolean
   onRename: () => void
@@ -19,6 +23,7 @@ interface MatchDetailHeaderProps {
 
 export function MatchDetailHeader({
   match,
+  presentCount,
   canManage,
   isStatusPending,
   onRename,
@@ -41,6 +46,28 @@ export function MatchDetailHeader({
     minute: '2-digit',
   })
   const location = match.location?.trim()
+
+  const handleShare = async () => {
+    const text = buildMatchShareText({
+      title: match.title,
+      dateLabel,
+      timeLabel,
+      location,
+      capacityLabel: t('matches.capacity', {
+        present: presentCount,
+        max: match.maxCapacity,
+      }),
+      url: `${window.location.origin}/matches/${match.id}`,
+    })
+
+    try {
+      const result = await shareMatchText({ title: match.title, text })
+      if (result === 'copied') toast.success(t('matches.detail.share.copied'))
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return
+      toast.error(t('matches.detail.share.failed'))
+    }
+  }
 
   return (
     <div className="space-y-2">
@@ -75,17 +102,23 @@ export function MatchDetailHeader({
             ) : null}
           </p>
         </div>
-        {canManage ? (
-          <MatchDetailActions
-            status={match.status}
-            disabled={isStatusPending}
-            onRename={onRename}
-            onReopen={onReopen}
-            onMarkPlayed={onMarkPlayed}
-            onCancel={onCancel}
-            onDelete={onDelete}
-          />
-        ) : null}
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" type="button" onClick={() => void handleShare()}>
+            <Share />
+            {t('matches.detail.share.button')}
+          </Button>
+          {canManage ? (
+            <MatchDetailActions
+              status={match.status}
+              disabled={isStatusPending}
+              onRename={onRename}
+              onReopen={onReopen}
+              onMarkPlayed={onMarkPlayed}
+              onCancel={onCancel}
+              onDelete={onDelete}
+            />
+          ) : null}
+        </div>
       </div>
     </div>
   )

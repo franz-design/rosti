@@ -465,6 +465,9 @@ export default function MatchDetailPage() {
         >
           <MatchDetailHeader
             match={match}
+            presentCount={
+              attendancesLoaded ? presentPlayers.length : (match.presentCount ?? 0)
+            }
             canManage={isClubAdmin}
             isStatusPending={cancel.isPending || setStatus.isPending || removeMatch.isPending}
             onRename={() => setIsRenameOpen(true)}

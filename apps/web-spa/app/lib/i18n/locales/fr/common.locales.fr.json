@@ -274,6 +274,11 @@
     "detail": {
       "back": "Retour",
       "loading": "Chargement du match…",
+      "share": {
+        "button": "Partager",
+        "copied": "Résumé du match copié",
+        "failed": "Impossible de partager le match"
+      },
       "tabs": {
         "summary": "Résumé",
         "chat": "Chat",
