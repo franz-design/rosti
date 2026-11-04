@@ -5,19 +5,15 @@ import { Loader2, Search } from '@rosti/ui/icons'
 import { useState, type ChangeEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { filterPlayersByName } from '@/features/clubs/utils/filter-players'
+import {
+  findStaleInvitationIds,
+  selectPendingInvitations,
+  type ClubInvitation,
+} from '@/features/clubs/utils/player-invitations'
 import { authClient } from '@/lib/auth-client'
 import { rostiApi } from '@/lib/rosti-api'
 import { ClubPlayerRow } from './club-player-row'
 import type { PlayerRow } from './player-row'
-
-interface PendingInvitation {
-  id: string
-  email: string
-  role: string
-  status: string
-  organizationId: string
-  expiresAt: string | Date
-}
 
 interface ClubPlayersSectionProps {
   organizationId: string
@@ -45,9 +41,11 @@ export function ClubPlayersSection({ organizationId, currentUserId }: ClubPlayer
         throw new Error(invitationsResult.error.message)
       }
 
-      const pending = ((invitationsResult.data ?? []) as PendingInvitation[]).filter(
-        (invitation) => invitation.status === 'pending',
-      )
+      const invitations = (invitationsResult.data ?? []) as ClubInvitation[]
+      const pending = selectPendingInvitations({
+        invitations,
+        memberEmails: members.map((member) => member.email),
+      })
 
       const memberRows: PlayerRow[] = members.map((member) => ({
         kind: 'member' as const,
@@ -75,7 +73,9 @@ export function ClubPlayersSection({ organizationId, currentUserId }: ClubPlayer
 
   const invalidatePlayers = () => {
     void queryClient.invalidateQueries({ queryKey: playersQueryKey })
-    void queryClient.invalidateQueries({ queryKey: ['club-members', organizationId] })
+    void queryClient.invalidateQueries({
+      queryKey: ['club-members', organizationId],
+    })
   }
 
   const resend = useMutation({
@@ -87,6 +87,28 @@ export function ClubPlayersSection({ organizationId, currentUserId }: ClubPlayer
         resend: true,
       })
       if (result.error) throw new Error(result.error.message)
+
+      const keptId = result.data?.id
+      if (!keptId) return
+
+      const listed = await authClient.organization.listInvitations({
+        query: { organizationId },
+      })
+      if (listed.error) throw new Error(listed.error.message)
+
+      const staleIds = findStaleInvitationIds({
+        invitations: (listed.data ?? []) as ClubInvitation[],
+        email,
+        keptId,
+      })
+      await Promise.all(
+        staleIds.map(async (invitationId) => {
+          const canceled = await authClient.organization.cancelInvitation({
+            invitationId,
+          })
+          if (canceled.error) throw new Error(canceled.error.message)
+        }),
+      )
     },
     onSuccess: () => {
       toast.success(t('clubSettings.players.resent'))

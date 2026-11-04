@@ -118,6 +118,7 @@ export function PlayerSkillRatingsSection({
   const isEditingRef = useRef(isEditing)
   const isSelf = session?.user?.id === playerUserId
   const canEdit = isSelf || (isClubAdmin && !isMembershipLoading)
+  const hideThumb = !isSelf && !isClubAdmin && !isMembershipLoading
   const isMobileLocked = isMobile && !isEditing
   isEditingRef.current = isEditing
 
@@ -182,9 +183,9 @@ export function PlayerSkillRatingsSection({
 
   return (
     <section className="w-full px-4 sm:px-0 lg:w-1/2">
-      <h2 className="text-lg font-medium">{t('playerSkills.title')}</h2>
+      {isSelf ? <h2 className="text-lg font-medium">{t('playerSkills.title')}</h2> : null}
       {canEdit ? (
-        <div className="mt-4 md:hidden">
+        <div className={cn('md:hidden', isSelf && 'mt-4')}>
           {isEditing ? (
             renderSaveButton()
           ) : (
@@ -194,7 +195,13 @@ export function PlayerSkillRatingsSection({
           )}
         </div>
       ) : null}
-      <div className="mt-6 flex flex-col gap-10">
+      <div
+        className={cn(
+          'flex flex-col gap-10',
+          isSelf && 'mt-6',
+          canEdit && !isSelf && 'mt-6 md:mt-0',
+        )}
+      >
         {ratings.skills.map((skill) => (
           <SkillSlider
             key={skill.key}
@@ -205,6 +212,7 @@ export function PlayerSkillRatingsSection({
             disabled={!canEdit || isMobileLocked || (isEditing && save.isPending)}
             locked={!isEditing}
             preserveOpacity={canEdit && isMobileLocked}
+            hideThumb={hideThumb}
             deferCommit={isEditing}
             onDraftChange={handleDraftChange}
             onCommit={(key, value) => save.mutate([{ key, value }])}
@@ -224,6 +232,7 @@ interface SkillSliderProps {
   disabled: boolean
   locked: boolean
   preserveOpacity: boolean
+  hideThumb: boolean
   deferCommit: boolean
   onDraftChange: (key: PlayerSkillKey, value: number) => void
   onCommit: (key: PlayerSkillKey, value: number) => void
@@ -237,6 +246,7 @@ function SkillSlider({
   disabled,
   locked,
   preserveOpacity,
+  hideThumb,
   deferCommit,
   onDraftChange,
   onCommit,
@@ -257,6 +267,7 @@ function SkillSlider({
         step={1}
         largeStep={1}
         disabled={disabled}
+        hideThumb={hideThumb}
         aria-label={label}
         className={cn(
           locked && 'max-md:pointer-events-none',

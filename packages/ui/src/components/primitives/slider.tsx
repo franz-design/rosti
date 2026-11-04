@@ -11,8 +11,9 @@ function Slider({
   min = 0,
   max = 100,
   step = 1,
+  hideThumb = false,
   ...props
-}: SliderPrimitive.Root.Props<number>) {
+}: SliderPrimitive.Root.Props<number> & { hideThumb?: boolean }) {
   const ticks = labeledTicks(min, max, step)
 
   return (
@@ -33,7 +34,12 @@ function Slider({
       <SliderPrimitive.Control className="flex w-full touch-none items-center py-1 select-none">
         <SliderPrimitive.Track className="relative h-4 w-full grow rounded-full bg-[#f4efe9] dark:bg-muted">
           <SliderPrimitive.Indicator className="rounded-full bg-primary" />
-          <SliderPrimitive.Thumb className="flex h-5.5 w-[var(--slider-thumb-width)] cursor-grab items-center justify-center rounded-full bg-white shadow-[0_1px_2px_rgba(40,24,16,0.08),0_4px_12px_rgba(40,24,16,0.14)] ring-1 ring-black/5 outline-none select-none group-aria-disabled/slider:cursor-default focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing">
+          <SliderPrimitive.Thumb
+            className={cn(
+              'flex h-5.5 w-[var(--slider-thumb-width)] cursor-grab items-center justify-center rounded-full bg-white shadow-[0_1px_2px_rgba(40,24,16,0.08),0_4px_12px_rgba(40,24,16,0.14)] ring-1 ring-black/5 outline-none select-none group-aria-disabled/slider:cursor-default focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing',
+              hideThumb && 'invisible',
+            )}
+          >
             <span className="pointer-events-none flex items-center gap-[3px]" aria-hidden="true">
               <span className="h-2 w-px rounded-full bg-black/15" />
               <span className="h-2.5 w-px rounded-full bg-black/15" />
