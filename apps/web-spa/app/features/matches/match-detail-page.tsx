@@ -361,11 +361,8 @@ export default function MatchDetailPage() {
   })
 
   const sortedAttendances = useMemo(
-    () =>
-      [...attendances].sort((a, b) =>
-        a.userName.localeCompare(b.userName, dateLocale, { sensitivity: 'base' }),
-      ),
-    [attendances, dateLocale],
+    () => [...attendanceGroups.present, ...attendanceGroups.pending, ...attendanceGroups.absent],
+    [attendanceGroups],
   )
 
   const postMsg = useMutation({

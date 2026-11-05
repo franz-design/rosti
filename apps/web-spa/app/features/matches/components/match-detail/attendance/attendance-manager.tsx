@@ -41,7 +41,8 @@ export function AttendanceManager({
               key={player.id}
               className={cn(
                 'flex flex-wrap gap-3 p-2 lg:p-3 items-center justify-between',
-                player.status === 'absent' && 'opacity-50',
+                player.status === 'present' && 'bg-green-50 dark:bg-green-950/40',
+                player.status === 'absent' && 'bg-neutral-100 dark:bg-neutral-800/60',
               )}
             >
               <PlayerLink
