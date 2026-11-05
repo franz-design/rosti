@@ -32,7 +32,7 @@ export function AttendanceManager({
 
   return (
     <section className="space-y-4">
-      <ul className="divide-y rounded-lg border">
+      <ul className="divide-y overflow-hidden rounded-lg border">
         {players.map((player) => {
           const playerStats =
             player.status === 'present' ? statsByUserId?.[player.userId] : undefined
