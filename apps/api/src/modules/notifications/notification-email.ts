@@ -117,7 +117,7 @@ export function feeRequestEmail(input: {
   }
 }
 
-function formatEuroCents(amountCents: number): string {
+export function formatEuroCents(amountCents: number): string {
   const euros = Math.trunc(amountCents / 100)
   const cents = Math.abs(amountCents % 100)
   if (cents === 0) return `${euros} €`

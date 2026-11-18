@@ -1,4 +1,5 @@
 import { matchPushUrl, type AppPushPayload, type MatchPushTab } from './app-push'
+import { formatEuroCents } from './notification-email'
 
 const MAX_TITLE_LENGTH = 80
 const MAX_BODY_LENGTH = 140
@@ -24,6 +25,35 @@ export function rsvpReminderPush(match: MatchPushSource): AppPushPayload {
     title: `Rappel : ${match.matchTitle}`,
     body: "Tu n'as pas encore répondu.",
     tab: 'summary',
+  })
+}
+
+export function matchCancelledPush(match: MatchPushSource): AppPushPayload {
+  return buildMatchPush(match, {
+    event: 'match_cancelled',
+    title: 'Match annulé',
+    body: match.matchTitle,
+    tab: 'summary',
+  })
+}
+
+export function feeRequestPush(
+  match: MatchPushSource & { amountCents: number; isReminder: boolean },
+): AppPushPayload {
+  const amount = formatEuroCents(match.amountCents)
+  if (match.isReminder) {
+    return buildMatchPush(match, {
+      event: 'fee_reminder',
+      title: `Rappel : ${amount} à payer`,
+      body: `Tu n'as pas encore payé ta part pour ${match.matchTitle}.`,
+      tab: 'payments',
+    })
+  }
+  return buildMatchPush(match, {
+    event: 'fee_request',
+    title: `Ta part : ${amount}`,
+    body: match.matchTitle,
+    tab: 'payments',
   })
 }
 

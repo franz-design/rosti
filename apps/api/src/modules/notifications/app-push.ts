@@ -2,6 +2,9 @@ export type AppPushEvent =
   | 'chat_mention'
   | 'chat_message'
   | 'match_invite'
+  | 'match_cancelled'
+  | 'fee_request'
+  | 'fee_reminder'
   | 'rsvp_reminder'
   | 'score_reminder'
   | 'player_vote_opened'
@@ -16,7 +19,7 @@ export interface AppPushPayload {
   url: string
 }
 
-export type MatchPushTab = 'summary' | 'chat' | 'stats'
+export type MatchPushTab = 'summary' | 'chat' | 'stats' | 'payments'
 
 export function matchPushUrl(input: {
   matchId: string

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
+  feeRequestPush,
+  matchCancelledPush,
   matchInvitePush,
   playerVoteOpenedPush,
   playerVoteResultPush,
@@ -14,6 +16,7 @@ const MATCH = {
 }
 
 const SUMMARY_URL = `/matches/${MATCH.matchId}?tab=summary&organizationId=${MATCH.organizationId}`
+const PAYMENTS_URL = `/matches/${MATCH.matchId}?tab=payments&organizationId=${MATCH.organizationId}`
 const STATS_URL = `/matches/${MATCH.matchId}?tab=stats&organizationId=${MATCH.organizationId}`
 
 describe('match pushes', () => {
@@ -34,6 +37,35 @@ describe('match pushes', () => {
       body: "Tu n'as pas encore répondu.",
       event: 'rsvp_reminder',
       url: SUMMARY_URL,
+    })
+  })
+
+  it('tells present players the match is cancelled', () => {
+    expect(matchCancelledPush(MATCH)).toMatchObject({
+      title: 'Match annulé',
+      body: 'Match du jeudi',
+      event: 'match_cancelled',
+      url: SUMMARY_URL,
+    })
+  })
+
+  it('asks a player to pay their share', () => {
+    expect(feeRequestPush({ ...MATCH, amountCents: 850, isReminder: false })).toEqual({
+      title: 'Ta part : 8,50 €',
+      body: 'Match du jeudi',
+      event: 'fee_request',
+      organizationId: MATCH.organizationId,
+      matchId: MATCH.matchId,
+      url: PAYMENTS_URL,
+    })
+  })
+
+  it('reminds a player who has not paid yet', () => {
+    expect(feeRequestPush({ ...MATCH, amountCents: 800, isReminder: true })).toMatchObject({
+      title: 'Rappel : 8 € à payer',
+      body: "Tu n'as pas encore payé ta part pour Match du jeudi.",
+      event: 'fee_reminder',
+      url: PAYMENTS_URL,
     })
   })
 

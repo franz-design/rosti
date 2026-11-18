@@ -24,7 +24,7 @@ Do not cache club, match, chat, or profile data in the service worker. The first
 - [x] Notification preferences, including `pushEnabled` and one flag per event
 - [x] `device_token` table and `POST /api/notifications/devices` for `ios`, `android`, and `web`
 - [x] Email delivery for new matches, RSVP reminders, cancellations, chat, and score reminders
-- [x] A `deliver()` hook that sends a Web Push for chat, match registration, the RSVP reminder, the score reminder, and the best-player vote. Cancellation and payment emails still only log a push
+- [x] A `deliver()` hook that sends a Web Push for every notification email: chat, match registration, the RSVP reminder, the score reminder, the best-player vote, cancellation, and the payment request and its reminders
 - [x] HTTPS in production: `https://rosti.lesk.fr` for the app and `https://rosti-api.lesk.fr` for the API
 
 ## Phase 1 — Installable app
@@ -66,7 +66,7 @@ Goal: the events that already send email also send a push when the user allowed 
 
 The email copy and the push copy are different. A push carries a short title, a short body, the event type, `organizationId`, `matchId`, and the URL to open.
 
-Chat, match registration, the RSVP reminder, the score reminder, and the best-player vote send a push. Cancellation and payment emails still only write a log line. A mention uses `notifyChatMention`. Every other message uses `notifyAllChatMessages`, which stays off until the member turns it on. Registration uses `notifyNewMatch`. The RSVP reminder uses `notifyRsvpReminder`. The vote uses `notifyPlayerVote`.
+Every notification email also sends a push: chat, match registration, the RSVP reminder, the score reminder, the best-player vote, cancellation, and payments. A mention uses `notifyChatMention`. Every other message uses `notifyAllChatMessages`, which stays off until the member turns it on. Registration uses `notifyNewMatch`. The RSVP reminder uses `notifyRsvpReminder`. The vote uses `notifyPlayerVote`. Cancellation uses `notifyMatchCancelled`. The payment request and its reminders use `notifyFeeRequest` and open the match on the payments tab.
 
 - [x] Add a Web Push sender behind the existing `deliver()` method
 - [x] Send only to `web` subscriptions, and only when `pushEnabled` and the matching event flag are true

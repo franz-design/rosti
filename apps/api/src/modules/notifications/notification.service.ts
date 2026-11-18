@@ -38,6 +38,8 @@ import {
   readMatchDurationMinutes,
 } from './match-end'
 import {
+  feeRequestPush,
+  matchCancelledPush,
   matchInvitePush,
   playerVoteOpenedPush,
   playerVoteResultPush,
@@ -358,6 +360,7 @@ export class NotificationService {
         row.user,
         prefs,
         cancelledMatchEmail(match, config.clients.webApp.url, match.cancellationReason),
+        matchCancelledPush(matchPushSource(match)),
       )
     }
   }
@@ -540,6 +543,7 @@ export class NotificationService {
         isReminder,
         shares: fee.shares,
       }),
+      feeRequestPush({ ...matchPushSource(match), amountCents: fee.amountCents, isReminder }),
     )
     return true
   }
@@ -749,7 +753,7 @@ export class NotificationService {
     user: User,
     prefs: NotificationPreference,
     email: NotificationEmailCopy,
-    push?: AppPushPayload,
+    push: AppPushPayload,
   ): Promise<void> {
     if (prefs.emailEnabled) {
       await this.emailService.sendEmail({
@@ -761,18 +765,6 @@ export class NotificationService {
       })
     }
     if (!prefs.pushEnabled) return
-
-    if (!push) {
-      const devices = await this.em.find(DeviceToken, {
-        user: { id: user.id },
-      })
-      for (const device of devices) {
-        this.logger.log(
-          `Push to ${device.platform} token ${device.token.slice(0, 8)}…: ${email.subject}`,
-        )
-      }
-      return
-    }
 
     const devices = await this.em.find(DeviceToken, {
       user: { id: user.id },
