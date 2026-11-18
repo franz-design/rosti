@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common'
 import { Organization, User } from '../auth/auth.entity'
 import { OrganizationService } from '../auth/organization.service'
+import { MatchActivityAction } from '../match-activity/match-activity.contract'
+import { MatchActivityService } from '../match-activity/match-activity.service'
 import { AttendanceStatus, MatchStatus } from '../matches/contracts/match.contract'
 import { MatchAttendance } from '../matches/match-attendance.entity'
 import { MatchLineup } from '../matches/match-lineup.entity'
@@ -47,7 +49,32 @@ export class StatsService {
     private readonly em: EntityManager,
     private readonly organizationService: OrganizationService,
     private readonly playerVoteService: PlayerVoteService,
+    private readonly matchActivityService: MatchActivityService,
   ) {}
+
+  private recordStatsChange(input: {
+    match: Match
+    actorId: string
+    stat: MatchStat
+    next: { goals: number; assists: number }
+  }): void {
+    const { stat, next } = input
+    if (stat.goals === next.goals && stat.assists === next.assists) return
+    this.matchActivityService.record({
+      match: input.match,
+      actorId: input.actorId,
+      subjectId: stat.user.id,
+      entry: {
+        action: MatchActivityAction.PlayerStatsChanged,
+        details: {
+          fromGoals: stat.goals,
+          fromAssists: stat.assists,
+          toGoals: next.goals,
+          toAssists: next.assists,
+        },
+      },
+    })
+  }
 
   /**
    * Goals and assists for a match.
@@ -101,6 +128,7 @@ export class StatsService {
         stat.user = user
         this.em.persist(stat)
       }
+      this.recordStatsChange({ match, actorId: userId, stat, next: row })
       stat.goals = row.goals
       stat.assists = row.assists
       result.push(stat)

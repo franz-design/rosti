@@ -392,6 +392,36 @@
         "scoreSaved": "Score saved",
         "noPlayers": "No present players to enter stats for.",
         "hint": "Goals and assists are indicative: they do not affect the score."
+      },
+      "activity": {
+        "open": {
+          "attendance": "Attendance history",
+          "score": "Score and stats history",
+          "payment": "Payment history"
+        },
+        "title": {
+          "attendance": "Attendance history",
+          "score": "Score history",
+          "payment": "Payment history"
+        },
+        "description": "Changes made by players and admins, newest first. Automatic actions are not shown.",
+        "loading": "Loading…",
+        "empty": "No changes yet.",
+        "by": "By {{name}}",
+        "bySelf": "By the player",
+        "byFormerMember": "By a former member",
+        "attendanceStatus": {
+          "present": "Present",
+          "absent": "Absent",
+          "pending": "Pending"
+        },
+        "attendanceChanged": "Attendance: {{change}}",
+        "scoreChanged": "Score blue - red: {{change}}",
+        "playerStatsChanged": "Goals: {{goals}} · Assists: {{assists}}",
+        "matchCostChanged": "Pitch: {{pitch}} · Equipment: {{extras}}",
+        "feeStatusChanged": "Payment: {{change}}",
+        "feeSharesChanged": "Shares: {{change}}",
+        "feesReminded": "Manual reminder sent · players reminded: {{count}}"
       }
     }
   },

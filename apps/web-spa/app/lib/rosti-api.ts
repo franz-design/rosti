@@ -182,6 +182,9 @@ export const rostiApi = {
       body: JSON.stringify({ team }),
     }),
 
+  listMatchActivity: (orgId: string, matchId: string, area: MatchActivityArea) =>
+    request<MatchActivity[]>(`/clubs/${orgId}/matches/${matchId}/activity?area=${area}`),
+
   listMatchStats: (orgId: string, matchId: string) =>
     request<MatchStat[]>(`/clubs/${orgId}/matches/${matchId}/stats`),
   upsertMatchStats: (
@@ -407,6 +410,58 @@ export interface Lineup {
   userName: string
   image?: string | null
   team: 'blue' | 'red'
+}
+
+export type MatchActivityArea = 'attendance' | 'score' | 'payment'
+
+interface MatchActivityPerson {
+  id: string
+  name: string
+  image?: string | null
+}
+
+type MatchActivityEntry =
+  | {
+      action: 'attendance_changed'
+      details: { from: Attendance['status'] | null; to: Attendance['status'] }
+    }
+  | {
+      action: 'score_changed'
+      details: {
+        fromBlue: number | null
+        fromRed: number | null
+        toBlue: number | null
+        toRed: number | null
+      }
+    }
+  | {
+      action: 'player_stats_changed'
+      details: { fromGoals: number; fromAssists: number; toGoals: number; toAssists: number }
+    }
+  | {
+      action: 'match_cost_changed'
+      details: {
+        fromPitchCents: number
+        fromExtrasCents: number
+        toPitchCents: number
+        toExtrasCents: number
+      }
+    }
+  | {
+      action: 'fee_status_changed'
+      details: { from: SessionFee['status']; to: SessionFee['status'] }
+    }
+  | { action: 'fee_shares_changed'; details: { from: number; to: number } }
+  | { action: 'fees_reminded'; details: { remindedCount: number } }
+
+/** One change a person made on a match. Only club admins can read these. */
+export type MatchActivity = MatchActivityEntry & {
+  id: string
+  matchId: string
+  area: MatchActivityArea
+  createdAt: string
+  actor?: MatchActivityPerson | null
+  subject?: MatchActivityPerson | null
 }
 
 export interface MatchStat {

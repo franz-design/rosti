@@ -1,6 +1,8 @@
 import { EntityManager } from '@mikro-orm/core'
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { OrganizationService } from '../auth/organization.service'
+import { MatchActivityAction } from '../match-activity/match-activity.contract'
+import { MatchActivityService } from '../match-activity/match-activity.service'
 import { AttendanceStatus, MatchStatus } from '../matches/contracts/match.contract'
 import { MatchAttendance } from '../matches/match-attendance.entity'
 import { Match } from '../matches/match.entity'
@@ -21,6 +23,7 @@ export class PaymentService {
   constructor(
     private readonly em: EntityManager,
     private readonly organizationService: OrganizationService,
+    private readonly matchActivityService: MatchActivityService,
   ) {}
 
   async upsertMatchCost(
@@ -42,8 +45,27 @@ export class PaymentService {
       cost.match = match
       this.em.persist(cost)
     }
+    const previous = { pitchCents: cost.pitchCostCents, extrasCents: cost.extrasCostCents }
     cost.pitchCostCents = data.pitchCostCents
     cost.extrasCostCents = data.extrasCostCents
+    if (
+      previous.pitchCents !== data.pitchCostCents ||
+      previous.extrasCents !== data.extrasCostCents
+    ) {
+      this.matchActivityService.record({
+        match,
+        actorId: userId,
+        entry: {
+          action: MatchActivityAction.MatchCostChanged,
+          details: {
+            fromPitchCents: previous.pitchCents,
+            fromExtrasCents: previous.extrasCents,
+            toPitchCents: data.pitchCostCents,
+            toExtrasCents: data.extrasCostCents,
+          },
+        },
+      })
+    }
     await this.em.flush()
 
     const result = await this.recomputeFees(matchId)
@@ -157,6 +179,17 @@ export class PaymentService {
       throw new BadRequestException('Players cannot waive their own fee')
     }
 
+    if (fee.status !== data.status) {
+      this.matchActivityService.record({
+        match: fee.match,
+        actorId: userId,
+        subjectId: fee.user.id,
+        entry: {
+          action: MatchActivityAction.FeeStatusChanged,
+          details: { from: fee.status, to: data.status },
+        },
+      })
+    }
     fee.status = data.status
     fee.paidAt = data.status === FeeStatus.Paid ? new Date() : undefined
     await this.em.flush()
@@ -189,6 +222,17 @@ export class PaymentService {
       throw new BadRequestException('Only a present player can take extra shares')
     }
 
+    if (fee.shares !== shares) {
+      this.matchActivityService.record({
+        match: fee.match,
+        actorId: userId,
+        subjectId: fee.user.id,
+        entry: {
+          action: MatchActivityAction.FeeSharesChanged,
+          details: { from: fee.shares, to: shares },
+        },
+      })
+    }
     fee.shares = shares
     const { fees } = await this.recomputeFees(fee.match.id)
     return fees.find((item) => item.id === fee.id) ?? fee

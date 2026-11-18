@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { MatchActivityButton } from '../activity/match-activity-button'
 import { ScoreSide } from '../score-side'
 
 const SCORE_SAVE_DELAY_MS = 750
@@ -40,7 +41,10 @@ export function ScoreEditor({ score, canEdit, onChange, onSave }: ScoreEditorPro
 
   return (
     <section className="space-y-3">
-      <h2 className="text-base font-medium">{t('matches.detail.stats.score')}</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-base font-medium">{t('matches.detail.stats.score')}</h2>
+        <MatchActivityButton area="score" />
+      </div>
       <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
         <ScoreSide
           className="w-full sm:w-1/2 rounded-lg bg-team-blue p-4 sm:p-8"

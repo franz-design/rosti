@@ -392,6 +392,36 @@
         "scoreSaved": "Score enregistré",
         "noPlayers": "Aucun joueur présent pour saisir les stats.",
         "hint": "Les buts et passes décisives sont indicatifs : ils n’ont aucun impact sur le score."
+      },
+      "activity": {
+        "open": {
+          "attendance": "Historique des présences",
+          "score": "Historique du score et des stats",
+          "payment": "Historique des paiements"
+        },
+        "title": {
+          "attendance": "Historique des présences",
+          "score": "Historique du score",
+          "payment": "Historique des paiements"
+        },
+        "description": "Les changements faits par les joueurs et les admins, du plus récent au plus ancien. Les actions automatiques n'apparaissent pas.",
+        "loading": "Chargement…",
+        "empty": "Aucun changement pour le moment.",
+        "by": "Par {{name}}",
+        "bySelf": "Par le joueur",
+        "byFormerMember": "Par un ancien membre",
+        "attendanceStatus": {
+          "present": "Présent",
+          "absent": "Absent",
+          "pending": "En attente"
+        },
+        "attendanceChanged": "Présence : {{change}}",
+        "scoreChanged": "Score bleu - rouge : {{change}}",
+        "playerStatsChanged": "Buts : {{goals}} · Passes : {{assists}}",
+        "matchCostChanged": "Terrain : {{pitch}} · Matériel : {{extras}}",
+        "feeStatusChanged": "Paiement : {{change}}",
+        "feeSharesChanged": "Parts : {{change}}",
+        "feesReminded": "Relance envoyée à la main · joueurs relancés : {{count}}"
       }
     }
   },

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { PlayerAvatar } from '@/common/components/player-avatar'
 import { PlayerLink } from '@/common/components/player-link'
 import type { Attendance, Lineup, Match } from '@/lib/rosti-api'
+import { MatchActivityButton } from './activity/match-activity-button'
 import { AttendanceGroup } from './attendance/attendance-group'
 import { AttendanceManager } from './attendance/attendance-manager'
 import { LineupSection } from './lineup/lineup-section'
@@ -84,7 +85,10 @@ export function SummaryTab({
                 <span className="text-primary text-2xl">{presentPlayers.length}</span>{' '}
                 {t('matches.detail.attendance.present')}
               </h2>
-              {lineupButton}
+              <div className="flex items-center gap-1">
+                <MatchActivityButton area="attendance" />
+                {lineupButton}
+              </div>
             </div>
             {presentPlayers.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground p-4">
@@ -125,7 +129,12 @@ export function SummaryTab({
       <section className="space-y-3">
         <div className="flex items-start justify-between gap-3">
           <h2 className="text-base font-medium">{t('matches.detail.summary.lineup')}</h2>
-          {showAttendance ? null : lineupButton}
+          {showAttendance ? null : (
+            <div className="flex items-center gap-1">
+              <MatchActivityButton area="attendance" />
+              {lineupButton}
+            </div>
+          )}
         </div>
         <LineupSection lineups={lineups} />
       </section>

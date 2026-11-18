@@ -12,6 +12,7 @@ import { cn } from '@rosti/ui/lib/utils'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { MatchCost, SessionFee } from '@/lib/rosti-api'
+import { MatchActivityButton } from '../activity/match-activity-button'
 import { QuantityStepper } from '../quantity-stepper'
 import { centsToEuroInput, eurosToCents, formatEuro } from '@/features/matches/utils/euros'
 
@@ -72,31 +73,34 @@ export function FeeAdminPanel({
 
   return (
     <div className="flex flex-col justify-start items-start gap-6">
-      <div className="flex gap-6 items-end bg-sidebar p-4 rounded-lg">
-        <div className="space-y-2">
-          <Label htmlFor="pitchCost">{t('matches.detail.payments.pitch')}</Label>
-          <Input
-            id="pitchCost"
-            inputMode="decimal"
-            value={pitch}
-            onChange={(event) => setPitch(event.target.value)}
-          />
+      <div className="flex w-full items-start justify-between gap-3">
+        <div className="flex gap-6 items-end bg-sidebar p-4 rounded-lg">
+          <div className="space-y-2">
+            <Label htmlFor="pitchCost">{t('matches.detail.payments.pitch')}</Label>
+            <Input
+              id="pitchCost"
+              inputMode="decimal"
+              value={pitch}
+              onChange={(event) => setPitch(event.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="extrasCost">{t('matches.detail.payments.extras')}</Label>
+            <Input
+              id="extrasCost"
+              inputMode="decimal"
+              value={extras}
+              onChange={(event) => setExtras(event.target.value)}
+            />
+          </div>
+          {amountError ? (
+            <p className="text-sm text-destructive">{t('matches.detail.payments.invalidAmount')}</p>
+          ) : null}
+          <Button onClick={handleSave} disabled={isSavingCost} loading={isSavingCost}>
+            {t('matches.detail.payments.saveCost')}
+          </Button>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="extrasCost">{t('matches.detail.payments.extras')}</Label>
-          <Input
-            id="extrasCost"
-            inputMode="decimal"
-            value={extras}
-            onChange={(event) => setExtras(event.target.value)}
-          />
-        </div>
-        {amountError ? (
-          <p className="text-sm text-destructive">{t('matches.detail.payments.invalidAmount')}</p>
-        ) : null}
-        <Button onClick={handleSave} disabled={isSavingCost} loading={isSavingCost}>
-          {t('matches.detail.payments.saveCost')}
-        </Button>
+        <MatchActivityButton area="payment" />
       </div>
 
       {fees.length === 0 ? (

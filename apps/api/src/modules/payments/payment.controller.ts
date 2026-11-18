@@ -6,6 +6,8 @@ import { LoggedInBetterAuthSession } from '../auth/auth.config'
 import { Session } from '../auth/auth.decorator'
 import { AuthGuard } from '../auth/auth.guard'
 import { OrganizationService } from '../auth/organization.service'
+import { MatchActivityAction } from '../match-activity/match-activity.contract'
+import { MatchActivityService } from '../match-activity/match-activity.service'
 import { AttendanceStatus } from '../matches/contracts/match.contract'
 import { MatchAttendance } from '../matches/match-attendance.entity'
 import { Match } from '../matches/match.entity'
@@ -33,6 +35,7 @@ export class PaymentController {
     private readonly paymentService: PaymentService,
     private readonly organizationService: OrganizationService,
     private readonly notificationService: NotificationService,
+    private readonly matchActivityService: MatchActivityService,
     private readonly em: EntityManager,
   ) {}
 
@@ -161,6 +164,12 @@ export class PaymentController {
     })
     if (!match) throw new NotFoundException('Match not found')
     const remindedCount = await this.notificationService.remindUnpaidFees(match)
+    this.matchActivityService.record({
+      match,
+      actorId: session.user.id,
+      entry: { action: MatchActivityAction.FeesReminded, details: { remindedCount } },
+    })
+    await this.em.flush()
     return { remindedCount }
   }
 

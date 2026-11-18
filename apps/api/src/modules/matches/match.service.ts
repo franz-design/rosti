@@ -9,6 +9,8 @@ import {
   latestKickoffThatHasEnded,
   latestKickoffThatMayHaveEnded,
 } from '../notifications/match-end'
+import { MatchActivityAction } from '../match-activity/match-activity.contract'
+import { MatchActivityService } from '../match-activity/match-activity.service'
 import { NotificationService } from '../notifications/notification.service'
 import { MatchCost } from '../payments/match-cost.entity'
 import { PaymentService } from '../payments/payment.service'
@@ -46,6 +48,7 @@ export class MatchService {
     private readonly notificationService: NotificationService,
     private readonly playerVoteService: PlayerVoteService,
     private readonly paymentService: PaymentService,
+    private readonly matchActivityService: MatchActivityService,
   ) {}
 
   async create(organizationId: string, userId: string, data: CreateMatchInput): Promise<Match[]> {
@@ -217,6 +220,7 @@ export class MatchService {
       throw new BadRequestException('Cannot update a cancelled match')
     }
     const previousStartsAt = match.startsAt
+    const previousScore = { blue: match.blueScore ?? null, red: match.redScore ?? null }
     if (data.title !== undefined) match.title = data.title
     if (data.startsAt !== undefined) match.startsAt = data.startsAt
     if (data.location !== undefined) match.location = data.location ?? undefined
@@ -226,6 +230,7 @@ export class MatchService {
     if (data.reminderOffsetsHours !== undefined) {
       match.reminderOffsetsHours = data.reminderOffsetsHours ?? undefined
     }
+    this.recordScoreChange({ match, actorId: userId, previousScore })
     await this.em.flush()
 
     const startsAtChanged = match.startsAt.getTime() !== previousStartsAt.getTime()
@@ -380,6 +385,7 @@ export class MatchService {
       this.em.persist(attendance)
     }
 
+    const previousStatus = attendance.status
     if (data.status === AttendanceStatus.Present) {
       const presentCount = await this.em.count(MatchAttendance, {
         match: { id: matchId },
@@ -393,6 +399,13 @@ export class MatchService {
 
     attendance.status = data.status
     attendance.respondedAt = new Date()
+    this.recordAttendanceChange({
+      match,
+      actorId: userId,
+      subjectId: userId,
+      from: previousStatus,
+      to: data.status,
+    })
     await this.removeLineupWhenNotPresent(matchId, userId, data.status)
     await this.em.flush()
     await this.paymentService.recomputeFees(matchId)
@@ -444,8 +457,16 @@ export class MatchService {
       this.em.persist(attendance)
     }
 
+    const previousStatus = attendance.status
     attendance.status = data.status
     attendance.respondedAt = new Date()
+    this.recordAttendanceChange({
+      match,
+      actorId: adminUserId,
+      subjectId: targetUserId,
+      from: previousStatus,
+      to: data.status,
+    })
     await this.removeLineupWhenNotPresent(matchId, targetUserId, data.status)
 
     await this.em.flush()
@@ -475,7 +496,7 @@ export class MatchService {
       if (!user) continue
 
       // Being in the lineup implies the player was present.
-      await this.ensurePresentAttendance(match, user)
+      await this.ensurePresentAttendance({ match, user, actorId: userId })
 
       const lineup = new MatchLineup()
       lineup.match = match
@@ -506,7 +527,12 @@ export class MatchService {
     if (lineup) this.em.remove(lineup)
   }
 
-  private async ensurePresentAttendance(match: Match, user: User): Promise<void> {
+  private async ensurePresentAttendance(input: {
+    match: Match
+    user: User
+    actorId: string
+  }): Promise<void> {
+    const { match, user } = input
     let attendance = await this.em.findOne(MatchAttendance, {
       match: { id: match.id },
       user: { id: user.id },
@@ -518,9 +544,54 @@ export class MatchService {
       this.em.persist(attendance)
     }
     if (attendance.status !== AttendanceStatus.Present) {
+      this.recordAttendanceChange({
+        match,
+        actorId: input.actorId,
+        subjectId: user.id,
+        from: attendance.status,
+        to: AttendanceStatus.Present,
+      })
       attendance.status = AttendanceStatus.Present
       attendance.respondedAt = new Date()
     }
+  }
+
+  private recordAttendanceChange(input: {
+    match: Match
+    actorId: string
+    subjectId: string
+    from: AttendanceStatus | null
+    to: AttendanceStatus
+  }): void {
+    if (input.from === input.to) return
+    this.matchActivityService.record({
+      match: input.match,
+      actorId: input.actorId,
+      subjectId: input.subjectId,
+      entry: {
+        action: MatchActivityAction.AttendanceChanged,
+        details: { from: input.from, to: input.to },
+      },
+    })
+  }
+
+  private recordScoreChange(input: {
+    match: Match
+    actorId: string
+    previousScore: { blue: number | null; red: number | null }
+  }): void {
+    const { match, previousScore } = input
+    const toBlue = match.blueScore ?? null
+    const toRed = match.redScore ?? null
+    if (previousScore.blue === toBlue && previousScore.red === toRed) return
+    this.matchActivityService.record({
+      match,
+      actorId: input.actorId,
+      entry: {
+        action: MatchActivityAction.ScoreChanged,
+        details: { fromBlue: previousScore.blue, fromRed: previousScore.red, toBlue, toRed },
+      },
+    })
   }
 
   async setPlayerTeam(
@@ -548,7 +619,7 @@ export class MatchService {
     if (team === null) {
       if (lineup) this.em.remove(lineup)
     } else {
-      await this.ensurePresentAttendance(match, user)
+      await this.ensurePresentAttendance({ match, user, actorId: adminUserId })
       if (!lineup) {
         lineup = new MatchLineup()
         lineup.match = match

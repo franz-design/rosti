@@ -13,6 +13,7 @@ import { ChatModule } from './modules/chat/chat.module'
 import { ClubModule } from './modules/clubs/club.module'
 import { DbModule } from './modules/db/db.module'
 import { EmailModule } from './modules/email/email.module'
+import { MatchActivityModule } from './modules/match-activity/match-activity.module'
 import { MatchModule } from './modules/matches/match.module'
 import { NotificationModule } from './modules/notifications/notification.module'
 import { PaymentModule } from './modules/payments/payment.module'
@@ -104,6 +105,7 @@ interface ExpressResponse extends ServerResponse<IncomingMessage> {
     NestConfigModule,
     ClubModule,
     SeasonModule,
+    MatchActivityModule,
     MatchModule,
     StatsModule,
     ChatModule,

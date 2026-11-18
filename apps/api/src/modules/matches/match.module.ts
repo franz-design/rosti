@@ -1,5 +1,6 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { Module, forwardRef } from '@nestjs/common'
+import { MatchActivityModule } from '../match-activity/match-activity.module'
 import { NotificationModule } from '../notifications/notification.module'
 import { PaymentModule } from '../payments/payment.module'
 import { MatchAttendance } from './match-attendance.entity'
@@ -19,6 +20,7 @@ import { PlayerVoteService } from './player-vote.service'
     MikroOrmModule.forFeature([Match, MatchSeries, MatchAttendance, MatchLineup, MatchPlayerVote]),
     forwardRef(() => NotificationModule),
     PaymentModule,
+    MatchActivityModule,
   ],
   controllers: [MatchController],
   providers: [
