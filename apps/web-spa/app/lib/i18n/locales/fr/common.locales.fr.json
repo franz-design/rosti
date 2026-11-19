@@ -396,15 +396,14 @@
       "activity": {
         "open": {
           "attendance": "Historique des présences",
-          "score": "Historique du score et des stats",
+          "score": "Historique du score, des buts et des passes",
           "payment": "Historique des paiements"
         },
         "title": {
           "attendance": "Historique des présences",
-          "score": "Historique du score",
+          "score": "Score, buts et passes",
           "payment": "Historique des paiements"
         },
-        "description": "Les changements faits par les joueurs et les admins, du plus récent au plus ancien. Les actions automatiques n'apparaissent pas.",
         "loading": "Chargement…",
         "empty": "Aucun changement pour le moment.",
         "by": "Par {{name}}",
@@ -417,11 +416,12 @@
         },
         "attendanceChanged": "Présence : {{change}}",
         "scoreChanged": "Score bleu - rouge : {{change}}",
-        "playerStatsChanged": "Buts : {{goals}} · Passes : {{assists}}",
         "matchCostChanged": "Terrain : {{pitch}} · Matériel : {{extras}}",
         "feeStatusChanged": "Paiement : {{change}}",
         "feeSharesChanged": "Parts : {{change}}",
-        "feesReminded": "Relance envoyée à la main · joueurs relancés : {{count}}"
+        "feesReminded": "Relance envoyée à la main · joueurs relancés : {{count}}",
+        "goalsChanged": "Buts : {{change}}",
+        "assistsChanged": "Passes décisives : {{change}}"
       }
     }
   },

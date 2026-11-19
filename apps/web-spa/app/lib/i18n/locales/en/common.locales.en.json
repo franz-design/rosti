@@ -396,15 +396,14 @@
       "activity": {
         "open": {
           "attendance": "Attendance history",
-          "score": "Score and stats history",
+          "score": "Score, goals and assists history",
           "payment": "Payment history"
         },
         "title": {
           "attendance": "Attendance history",
-          "score": "Score history",
+          "score": "Score, goals and assists",
           "payment": "Payment history"
         },
-        "description": "Changes made by players and admins, newest first. Automatic actions are not shown.",
         "loading": "Loading…",
         "empty": "No changes yet.",
         "by": "By {{name}}",
@@ -417,11 +416,12 @@
         },
         "attendanceChanged": "Attendance: {{change}}",
         "scoreChanged": "Score blue - red: {{change}}",
-        "playerStatsChanged": "Goals: {{goals}} · Assists: {{assists}}",
         "matchCostChanged": "Pitch: {{pitch}} · Equipment: {{extras}}",
         "feeStatusChanged": "Payment: {{change}}",
         "feeSharesChanged": "Shares: {{change}}",
-        "feesReminded": "Manual reminder sent · players reminded: {{count}}"
+        "feesReminded": "Manual reminder sent · players reminded: {{count}}",
+        "goalsChanged": "Goals: {{change}}",
+        "assistsChanged": "Assists: {{change}}"
       }
     }
   },

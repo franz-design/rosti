@@ -41,6 +41,17 @@ describe('describeMatchActivity', () => {
     expect(actual).toBe('matches.detail.activity.scoreChanged {"change":"– → 3 - 1"}')
   })
 
+  it('shows only the stats that changed', () => {
+    const inputActivity = buildActivity({
+      action: 'player_stats_changed',
+      details: { fromGoals: 1, fromAssists: 0, toGoals: 2, toAssists: 0 },
+    })
+
+    const actual = describeMatchActivity({ activity: inputActivity, t: mockT, locale: 'fr-FR' })
+
+    expect(actual).toBe('matches.detail.activity.goalsChanged {"change":"1 → 2"}')
+  })
+
   it('passes the reminded player count for plural forms', () => {
     const inputActivity = buildActivity({
       action: 'fees_reminded',

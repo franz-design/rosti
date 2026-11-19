@@ -1,11 +1,5 @@
 import { Button } from '@rosti/ui/components/primitives/button'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@rosti/ui/components/primitives/sheet'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@rosti/ui/components/primitives/sheet'
 import { HistoryIcon } from '@solar-icons/react/linear/history'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -39,9 +33,9 @@ export function MatchActivityButton({ area }: MatchActivityButtonProps) {
     <>
       <Button
         type="button"
-        variant="ghost"
+        variant="outline"
         size="icon-sm"
-        className="text-muted-foreground"
+        className="rounded-md text-muted-foreground"
         aria-label={label}
         title={label}
         onClick={() => setIsOpen(true)}
@@ -52,7 +46,6 @@ export function MatchActivityButton({ area }: MatchActivityButtonProps) {
         <SheetContent className="gap-0 overflow-y-auto">
           <SheetHeader className="pr-10">
             <SheetTitle>{t(`matches.detail.activity.title.${area}`)}</SheetTitle>
-            <SheetDescription>{t('matches.detail.activity.description')}</SheetDescription>
           </SheetHeader>
           {isOpen ? (
             <MatchActivityList orgId={activeClub.id} matchId={matchId} area={area} />

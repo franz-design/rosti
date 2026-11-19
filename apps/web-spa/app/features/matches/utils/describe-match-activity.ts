@@ -30,10 +30,19 @@ export function describeMatchActivity({ activity, t, locale }: DescribeMatchActi
     }
     case 'player_stats_changed': {
       const { fromGoals, fromAssists, toGoals, toAssists } = activity.details
-      return t('matches.detail.activity.playerStatsChanged', {
-        goals: arrow(String(fromGoals), String(toGoals)),
-        assists: arrow(String(fromAssists), String(toAssists)),
-      })
+      const changes = [
+        fromGoals !== toGoals
+          ? t('matches.detail.activity.goalsChanged', {
+              change: arrow(String(fromGoals), String(toGoals)),
+            })
+          : null,
+        fromAssists !== toAssists
+          ? t('matches.detail.activity.assistsChanged', {
+              change: arrow(String(fromAssists), String(toAssists)),
+            })
+          : null,
+      ]
+      return changes.filter((change) => change !== null).join(' · ')
     }
     case 'match_cost_changed': {
       const { fromPitchCents, fromExtrasCents, toPitchCents, toExtrasCents } = activity.details
