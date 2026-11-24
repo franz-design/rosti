@@ -196,7 +196,7 @@ export function AwardCard({
         </div>
         <p
           className={cn(
-            'award-card-name absolute top-(--award-ribbon-top) left-[11%] z-4 isolate flex h-[10%] w-[78%] items-center justify-center overflow-hidden rounded-full border-[0.75cqi] border-transparent px-[9%] text-[#fff8f2]',
+            'award-card-name absolute top-(--award-ribbon-top) left-[11%] z-4 isolate flex h-[10%] w-[78%] items-center justify-center overflow-hidden rounded-full border-[0.75cqi] border-transparent px-[5%] text-[#fff8f2]',
             'bg-origin-border [background-clip:padding-box,border-box]',
             skin.ribbon,
           )}
@@ -206,7 +206,7 @@ export function AwardCard({
               'relative z-[1] min-w-0 truncate font-display leading-none',
               player
                 ? companion
-                  ? 'text-[5.2cqi] font-extrabold tracking-[0.01em]'
+                  ? 'text-[14px] font-extrabold tracking-[0.01em]'
                   : 'text-[6.6cqi] font-extrabold tracking-[0.01em]'
                 : 'text-[4.8cqi] font-bold tracking-[0.02em]',
             )}
